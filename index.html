@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple SITTEMP - Interactive Military Mapping Tool</title>
+    <!-- Replace YOUR_API_KEY with your actual Google Maps API key -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDixCJvsoavnyz6Z7VAkBp_C6Ta2DVwi6w&libraries=drawing,geometry"></script>
+    <script src="markerTypes.js"></script>
+    <!-- Include Proj4js for coordinate transformations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script>
+    <!-- Include mgrs.js locally -->
+    <script src="mgrs.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Marker Controls -->
+    <div id="controls">
+        <!-- Marker buttons will be dynamically added here -->
+    </div>
+
+    <!-- Color Picker -->
+    <div id="colorPicker">
+        <!-- Color options -->
+        <div class="color-option" style="background-color: green;" data-color="green"></div>
+        <div class="color-option" style="background-color: blue;" data-color="blue"></div>
+        <div class="color-option" style="background-color: red;" data-color="red"></div>
+        <div class="color-option" style="background-color: black;" data-color="black"></div>
+        <div class="color-option" style="background-color: yellow;" data-color="yellow"></div>
+        <div class="color-option" style="background-color: purple;" data-color="purple"></div>
+        <div class="color-option" style="background-color: orange;" data-color="orange"></div>
+    </div>
+
+    <!-- Text Controls -->
+    <div id="textControls">
+        <button id="addTextButton">Add Text</button>
+        <select id="fontSizeSelector">
+            <!-- Options from 8px to 32px -->
+
+            <option value="8">8px</option>
+            <option value="12">12px</option>
+            <option value="16">16px</option>
+            <option value="20">20px</option>
+            <option value="24">24px</option>
+            <option value="28">28px</option>
+            <option value="32">32px</option>
+			<option value="36">36px</option>
+			<option value="40">38px</option>
+			<option value="44">44px</option>
+			<option value="48">48px</option>
+        </select>
+        <select id="fontStyleSelector">
+            <option value="normal">Normal</option>
+            <option value="bold">Bold</option>
+            <option value="italic">Italic</option>
+        </select>
+        <button id="deleteTextButton" disabled>Delete Text</button>
+    </div>
+
+    <!-- Measurement and Delete Controls -->
+    <div id="actionControls">
+        <button id="measureDistanceButton">Measure Distance</button>
+        <button id="deleteButton" disabled>Delete Marker</button>
+        <button id="deleteShapeButton" disabled>Delete Shape</button>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Coordinate Display -->
+    <div id="coordinateDisplay">Lat/Lon: N/A | MGRS: N/A</div>
+
+    <!-- Include JavaScript Files -->
+    <script src="mgrs_functions.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,119 @@
+/* Map Container */
+html, body {
+    height: 100%;
+    margin: 2;
+    padding: 2;
+}
+
+#map {
+    height: 75vh;
+    width: 80vw;
+	position: relative;
+    margin: left; /* Center the map horizontally */
+}
+
+/* Controls Container */
+#controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+/* Icon Buttons */
+.icon-button {
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.icon-button svg {
+    width: 100%;
+    height: 100%;
+}
+
+.icon-button:hover:not(:disabled) {
+    background-color: #e0e0e0;
+}
+
+.selected {
+    background-color: #d0d0d0;
+    border: 2px solid #999;
+}
+
+/* Color Picker */
+#colorPicker {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.color-option {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.color-option.selected {
+    border: 2px solid #000;
+}
+
+/* Text Controls */
+#textControls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+#textControls select,
+#textControls button {
+    padding: 5px;
+    font-size: 14px;
+}
+
+/* Action Controls */
+#actionControls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+#actionControls button {
+    padding: 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+#actionControls button.selected {
+    background-color: #d0d0d0;
+    border: 2px solid #999;
+}
+
+#actionControls button:hover:not(:disabled) {
+    background-color: #e0e0e0;
+}
+
+/* Disabled Buttons */
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Coordinate Display */
+#coordinateDisplay {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
