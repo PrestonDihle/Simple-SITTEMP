@@ -14,6 +14,7 @@ let drawingManager;
 let measureMode = false;
 let measurePolyline = null;
 let measureDistanceInfoWindow = null;
+let mgrsDisplayPrecision = 5; // Default to 1m precision
 
 function initMap() {
     // Check if markerTypes is loaded
@@ -40,24 +41,26 @@ function initMap() {
     // Add event listener for adding text
     document.getElementById('addTextButton').addEventListener('click', enableTextMode);
 
-    // Coordinate Display
+    // Coordinate Display with updated function
     map.addListener('mousemove', function(event) {
-        var latLng = event.latLng;
-        var lat = latLng.lat();
-        var lng = latLng.lng();
-
-        // Convert Lat/Lon to MGRS (Assuming latLonToMgrs is defined in mgrs_functions.js)
-        var mgrsCoord = latLonToMgrs(lat, lng);
-
-        // Update the display
-        document.getElementById('coordinateDisplay').innerText =
-            'Lat/Lon: ' + lat.toFixed(6) + ', ' + lng.toFixed(6) + ' | MGRS: ' + mgrsCoord;
+        // Save the event for precision selector updates
+        document.getElementById('map').lastMouseMoveEvent = event;
+        updateCoordinateDisplay(event.latLng);
     });
 
-    // Grid Lines (Assuming drawMgrsGrid is defined elsewhere)
+    // Grid Lines
     map.addListener('zoom_changed', drawMgrsGrid);
     map.addListener('dragend', drawMgrsGrid);
     google.maps.event.addListenerOnce(map, 'idle', drawMgrsGrid);
+
+    // Initialize MGRS controls
+    initMgrsControls();
+
+    // Initialize clipboard functionality
+    initClipboardFunctionality();
+
+    // Add right-click context menu
+    addMapContextMenu();
 }
 
 function createMarkerButtons() {
@@ -413,6 +416,201 @@ function clearMeasurement() {
     if (measureDistanceInfoWindow) {
         measureDistanceInfoWindow.close();
     }
+}
+
+// New MGRS-related functions
+function initMgrsControls() {
+    // Add event listener for the MGRS go button
+    document.getElementById('mgrsGoButton').addEventListener('click', function() {
+        const mgrsCoord = document.getElementById('mgrsInput').value.trim();
+        if (mgrsCoord) {
+            goToMgrs(mgrsCoord);
+        } else {
+            alert('Please enter an MGRS coordinate');
+        }
+    });
+
+    // Add event listener for the enter key in the MGRS input field
+    document.getElementById('mgrsInput').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('mgrsGoButton').click();
+        }
+    });
+
+    // Add event listener for the grid toggle
+    document.getElementById('mgrsGridToggle').addEventListener('change', function() {
+        if (this.checked) {
+            drawMgrsGrid();
+        } else {
+            // Clear existing grid lines and labels
+            if (window.gridLines) {
+                window.gridLines.forEach(function(line) {
+                    line.setMap(null);
+                });
+                window.gridLines = [];
+            }
+            
+            if (window.gridLabels) {
+                window.gridLabels.forEach(function(label) {
+                    label.setMap(null);
+                });
+                window.gridLabels = [];
+            }
+        }
+    });
+
+    // Add event listener for the precision selector
+    document.getElementById('precisionSelector').addEventListener('change', function() {
+        mgrsDisplayPrecision = parseInt(this.value);
+        // Update coordinate display if mouse is over map
+        const mapDiv = document.getElementById('map');
+        const lastEvent = mapDiv.lastMouseMoveEvent;
+        if (lastEvent) {
+            updateCoordinateDisplay(lastEvent.latLng);
+        }
+    });
+}
+
+// Clipboard functionality
+function initClipboardFunctionality() {
+    const coordDisplay = document.getElementById('coordinateDisplay');
+    
+    // Make it visually clear it's clickable
+    coordDisplay.style.cursor = 'pointer';
+    coordDisplay.title = 'Click to copy coordinates';
+    
+    coordDisplay.addEventListener('click', function() {
+        // Get the current coordinates
+        const mgrsText = coordDisplay.querySelector('.mgrs-highlight')?.textContent || 'N/A';
+        const latLonText = coordDisplay.textContent.split('\n')[0].replace('Lat/Lon: ', '');
+        
+        // Prepare text to copy
+        const textToCopy = `${latLonText}\nMGRS: ${mgrsText}`;
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                // Visual feedback
+                const originalBackground = coordDisplay.style.backgroundColor;
+                coordDisplay.style.backgroundColor = 'rgba(76, 175, 80, 0.3)';  // Green highlight
+                
+                // Reset after a short delay
+                setTimeout(() => {
+                    coordDisplay.style.backgroundColor = originalBackground;
+                }, 500);
+            })
+            .catch(err => {
+                console.error('Failed to copy coordinates: ', err);
+                alert('Failed to copy coordinates to clipboard');
+            });
+    });
+}
+
+// Add right-click context menu for the map to copy MGRS at click point
+function addMapContextMenu() {
+    google.maps.event.addListener(map, 'rightclick', function(event) {
+        // Create a custom context menu
+        if (window.contextMenu) {
+            window.contextMenu.close();
+        }
+        
+        // Get MGRS at click position
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
+        const mgrsCoord = mgrs.forward([lng, lat], mgrsDisplayPrecision);
+        const formattedMgrs = formatMgrsForDisplay(mgrsCoord);
+        
+        // Create context menu div
+        const contextMenuDiv = document.createElement('div');
+        contextMenuDiv.className = 'custom-context-menu';
+        contextMenuDiv.innerHTML = `
+            <div class="context-menu-item" id="copyMgrs">Copy MGRS: ${formattedMgrs}</div>
+            <div class="context-menu-item" id="copyLatLng">Copy Lat/Lng: ${lat.toFixed(6)}, ${lng.toFixed(6)}</div>
+            <div class="context-menu-item" id="placeMarkerHere">Place Marker Here</div>
+            <div class="context-menu-item" id="measureFromHere">Measure From Here</div>
+        `;
+        
+        // Position the menu at click point
+        contextMenuDiv.style.position = 'absolute';
+        document.body.appendChild(contextMenuDiv);
+        
+        // Get pixel coordinates for positioning
+        const mapDiv = document.getElementById('map');
+        const rect = mapDiv.getBoundingClientRect();
+        const x = event.pixel.x + rect.left + window.scrollX;
+        const y = event.pixel.y + rect.top + window.scrollY;
+        
+        contextMenuDiv.style.left = x + 'px';
+        contextMenuDiv.style.top = y + 'px';
+        
+        // Attach click handlers
+        document.getElementById('copyMgrs').addEventListener('click', function() {
+            navigator.clipboard.writeText(formattedMgrs);
+            window.contextMenu.close();
+        });
+        
+        document.getElementById('copyLatLng').addEventListener('click', function() {
+            navigator.clipboard.writeText(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+            window.contextMenu.close();
+        });
+        
+        document.getElementById('placeMarkerHere').addEventListener('click', function() {
+            if (selectedMarkerType) {
+                addCustomMarker(event.latLng, selectedMarkerType);
+            } else {
+                // Fall back to default marker
+                const marker = new google.maps.Marker({
+                    position: event.latLng,
+                    map: map,
+                    draggable: true
+                });
+                markers.push(marker);
+                marker.addListener('click', () => selectMarker(marker));
+            }
+            window.contextMenu.close();
+        });
+        
+        document.getElementById('measureFromHere').addEventListener('click', function() {
+            // Enable measure mode if not already enabled
+            if (!measureMode) {
+                toggleMeasureMode();
+            }
+            // Add this point as the first measure point
+            addMeasurePoint({latLng: event.latLng});
+            window.contextMenu.close();
+        });
+        
+        // Close menu on click elsewhere
+        window.contextMenu = {
+            div: contextMenuDiv,
+            close: function() {
+                if (contextMenuDiv.parentNode) {
+                    contextMenuDiv.parentNode.removeChild(contextMenuDiv);
+                }
+                window.contextMenu = null;
+            }
+        };
+        
+        // Close on map click or move
+        google.maps.event.addListenerOnce(map, 'click', function() {
+            if (window.contextMenu) window.contextMenu.close();
+        });
+        
+        google.maps.event.addListenerOnce(map, 'dragstart', function() {
+            if (window.contextMenu) window.contextMenu.close();
+        });
+        
+        document.addEventListener('click', function onDocClick(e) {
+            if (window.contextMenu && !contextMenuDiv.contains(e.target)) {
+                window.contextMenu.close();
+                document.removeEventListener('click', onDocClick);
+            }
+        });
+        
+        // Prevent default context menu
+        return false;
+    });
 }
 
 // Wait for the DOM to be fully loaded before initializing the map
