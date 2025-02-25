@@ -63,6 +63,30 @@
         <button id="deleteShapeButton" disabled>Delete Shape</button>
     </div>
 
+    <!-- MGRS Search and Navigation Controls -->
+    <div id="mgrsControls">
+        <div id="mgrsSearch">
+            <input type="text" id="mgrsInput" placeholder="Enter MGRS coordinate (e.g., 11SPA12003400)">
+            <button id="mgrsGoButton">Go to Location</button>
+        </div>
+        <div id="mgrsToggle">
+            <label for="mgrsGridToggle">
+                <input type="checkbox" id="mgrsGridToggle" checked> Show MGRS Grid
+            </label>
+        </div>
+        <div id="mgrsFormat">
+            <label for="precisionSelector">MGRS Precision: </label>
+            <select id="precisionSelector">
+                <option value="0">100km (Grid Zone)</option>
+                <option value="1">10km</option>
+                <option value="2">1km</option>
+                <option value="3">100m</option>
+                <option value="4">10m</option>
+                <option value="5" selected>1m</option>
+            </select>
+        </div>
+    </div>
+
     <!-- Map Container -->
     <div id="map"></div>
 
@@ -74,6 +98,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
