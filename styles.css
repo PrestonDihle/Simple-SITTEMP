@@ -62,6 +62,26 @@ html, body {
     border: 2px solid #000;
 }
 
+/* Line Style Controls */
+#lineControls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+#lineControls label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#lineControls select {
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 /* Text Controls */
 #textControls {
     display: flex;

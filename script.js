@@ -15,6 +15,268 @@ let measureMode = false;
 let measurePolyline = null;
 let measureDistanceInfoWindow = null;
 let mgrsDisplayPrecision = 5; // Default to 1m precision
+let selectedLineType = 'solid';
+let selectedLineWeight = 2;
+
+// Line type definitions: each returns {strokeColor, strokeOpacity, strokeWeight, icons[]}
+const lineTypeDefinitions = {
+    solid: function(color, weight) {
+        return {
+            strokeColor: color,
+            strokeOpacity: 1.0,
+            strokeWeight: weight,
+            icons: []
+        };
+    },
+    dashed: function(color, weight) {
+        return {
+            strokeColor: color,
+            strokeOpacity: 0,
+            strokeWeight: weight,
+            icons: [{
+                icon: {
+                    path: 'M 0,-1 0,1',
+                    strokeOpacity: 1,
+                    strokeColor: color,
+                    scale: weight
+                },
+                offset: '0',
+                repeat: '20px'
+            }]
+        };
+    },
+    dotted: function(color, weight) {
+        return {
+            strokeColor: color,
+            strokeOpacity: 0,
+            strokeWeight: weight,
+            icons: [{
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    strokeOpacity: 1,
+                    strokeColor: color,
+                    fillOpacity: 1,
+                    fillColor: color,
+                    scale: weight * 0.5
+                },
+                offset: '0',
+                repeat: '10px'
+            }]
+        };
+    },
+    'dash-dot': function(color, weight) {
+        return {
+            strokeColor: color,
+            strokeOpacity: 0,
+            strokeWeight: weight,
+            icons: [
+                {
+                    icon: {
+                        path: 'M 0,-1 0,1',
+                        strokeOpacity: 1,
+                        strokeColor: color,
+                        scale: weight
+                    },
+                    offset: '0',
+                    repeat: '30px'
+                },
+                {
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        strokeOpacity: 1,
+                        strokeColor: color,
+                        fillOpacity: 1,
+                        fillColor: color,
+                        scale: weight * 0.5
+                    },
+                    offset: '15px',
+                    repeat: '30px'
+                }
+            ]
+        };
+    },
+    'mine-belt': function(color, weight) {
+        return {
+            strokeColor: color,
+            strokeOpacity: 1.0,
+            strokeWeight: weight,
+            icons: [{
+                icon: {
+                    path: 'M -3,-3 L -3,3 L -1,-1 L 1,3 L 1,-3 L 3,1 L 3,-3 Z',
+                    strokeOpacity: 1,
+                    strokeColor: color,
+                    fillOpacity: 0.8,
+                    fillColor: color,
+                    scale: weight * 1.5,
+                    rotation: 0
+                },
+                offset: '10px',
+                repeat: '40px'
+            }]
+        };
+    },
+    'wire-obstacle': function(color, weight) {
+        return {
+            strokeColor: color,
+            strokeOpacity: 1.0,
+            strokeWeight: weight,
+            icons: [{
+                icon: {
+                    path: 'M 0,-2 0,2',
+                    strokeOpacity: 1,
+                    strokeColor: color,
+                    scale: weight * 1.2
+                },
+                offset: '0',
+                repeat: '15px'
+            }]
+        };
+    },
+    'tank-ditch': function(color, weight) {
+        return {
+            strokeColor: color,
+            strokeOpacity: 1.0,
+            strokeWeight: weight,
+            icons: [{
+                icon: {
+                    path: 'M -2,0 L 0,-4 L 2,0',
+                    strokeOpacity: 1,
+                    strokeColor: color,
+                    fillOpacity: 0.8,
+                    fillColor: color,
+                    scale: weight * 1.0,
+                    rotation: 0
+                },
+                offset: '0',
+                repeat: '20px'
+            }]
+        };
+    }
+};
+
+// Returns full polyline options for a given color, weight, and line type
+function getPolylineOptions(color, weight, lineType) {
+    const def = lineTypeDefinitions[lineType];
+    if (def) {
+        return def(color, weight);
+    }
+    return lineTypeDefinitions.solid(color, weight);
+}
+
+// Applies line type, color, and weight to any shape and stores custom properties
+function applyPropertiesToShape(shape, color, weight, lineType) {
+    shape._strokeColor = color;
+    shape._originalStrokeWeight = weight;
+    shape._lineType = lineType;
+
+    if (shape.type === 'polyline') {
+        const opts = getPolylineOptions(color, weight, lineType);
+        shape.setOptions(opts);
+        shape._originalStrokeOpacity = opts.strokeOpacity;
+        shape._originalIcons = opts.icons ? opts.icons.map(i => ({...i, icon: {...i.icon}})) : [];
+    } else {
+        // For rectangles, circles, polygons — no icon support, just color/weight
+        shape.setOptions({
+            strokeColor: color,
+            strokeWeight: weight,
+            fillColor: color,
+            fillOpacity: 0.5
+        });
+        shape._originalStrokeOpacity = 1.0;
+        shape._originalIcons = [];
+    }
+}
+
+// Syncs line controls UI to reflect a selected shape's current properties
+function updateLineControlsFromShape(shape) {
+    const lineTypeSelect = document.getElementById('lineTypeSelector');
+    if (lineTypeSelect && shape._lineType) {
+        lineTypeSelect.value = shape._lineType;
+    }
+
+    const lineWeightSelect = document.getElementById('lineWeightSelector');
+    if (lineWeightSelect && shape._originalStrokeWeight) {
+        lineWeightSelect.value = shape._originalStrokeWeight;
+    }
+}
+
+function selectLineType(lineType) {
+    selectedLineType = lineType;
+
+    // Update DrawingManager for future polylines
+    if (drawingManager) {
+        drawingManager.setOptions({
+            polylineOptions: Object.assign(
+                getPolylineOptions(selectedColor, selectedLineWeight, selectedLineType),
+                { editable: false }
+            )
+        });
+    }
+
+    // Modify selected shape if one exists
+    if (selectedShape) {
+        applyPropertiesToShape(selectedShape,
+            selectedShape._strokeColor || selectedColor,
+            selectedShape._originalStrokeWeight || selectedLineWeight,
+            lineType);
+        // Re-apply selection highlight
+        const highlightWeight = Math.max((selectedShape._originalStrokeWeight || 2) + 3, 5);
+        selectedShape.setOptions({ strokeWeight: highlightWeight });
+        if (selectedShape._originalIcons && selectedShape._originalIcons.length > 0) {
+            const highlightIcons = selectedShape._originalIcons.map(function(seq) {
+                const newIcon = Object.assign({}, seq.icon);
+                newIcon.scale = (newIcon.scale || 1) * 1.5;
+                return { icon: newIcon, offset: seq.offset, repeat: seq.repeat };
+            });
+            selectedShape.setOptions({ icons: highlightIcons });
+        }
+    }
+}
+
+function selectLineWeight(weight) {
+    selectedLineWeight = weight;
+
+    // Update DrawingManager for future shapes
+    if (drawingManager) {
+        drawingManager.setOptions({
+            polylineOptions: Object.assign(
+                getPolylineOptions(selectedColor, selectedLineWeight, selectedLineType),
+                { editable: false }
+            ),
+            rectangleOptions: {
+                fillColor: selectedColor, strokeColor: selectedColor,
+                fillOpacity: 0.5, strokeWeight: weight, editable: false, draggable: true
+            },
+            circleOptions: {
+                fillColor: selectedColor, strokeColor: selectedColor,
+                fillOpacity: 0.5, strokeWeight: weight, editable: false, draggable: true
+            },
+            polygonOptions: {
+                fillColor: selectedColor, strokeColor: selectedColor,
+                fillOpacity: 0.5, strokeWeight: weight, editable: false, draggable: true
+            }
+        });
+    }
+
+    // Modify selected shape if one exists
+    if (selectedShape) {
+        applyPropertiesToShape(selectedShape,
+            selectedShape._strokeColor || selectedColor,
+            weight,
+            selectedShape._lineType || 'solid');
+        // Re-apply selection highlight
+        const highlightWeight = Math.max(weight + 3, 5);
+        selectedShape.setOptions({ strokeWeight: highlightWeight });
+        if (selectedShape._originalIcons && selectedShape._originalIcons.length > 0) {
+            const highlightIcons = selectedShape._originalIcons.map(function(seq) {
+                const newIcon = Object.assign({}, seq.icon);
+                newIcon.scale = (newIcon.scale || 1) * 1.5;
+                return { icon: newIcon, offset: seq.offset, repeat: seq.repeat };
+            });
+            selectedShape.setOptions({ icons: highlightIcons });
+        }
+    }
+}
 
 function initMap() {
     // Check if markerTypes is loaded
@@ -35,6 +297,14 @@ function initMap() {
     document.getElementById('deleteTextButton').addEventListener('click', deleteSelectedTextOverlay);
     document.getElementById('measureDistanceButton').addEventListener('click', toggleMeasureMode);
     initColorPicker();
+
+    // Line type and weight selectors
+    document.getElementById('lineTypeSelector').addEventListener('change', function() {
+        selectLineType(this.value);
+    });
+    document.getElementById('lineWeightSelector').addEventListener('change', function() {
+        selectLineWeight(parseInt(this.value));
+    });
 
     initDrawingManager();
 
@@ -90,20 +360,41 @@ function selectColor(color) {
     // Update drawing manager options with the selected color
     if (drawingManager) {
         drawingManager.setOptions({
-            polylineOptions: { strokeColor: selectedColor },
+            polylineOptions: Object.assign(
+                getPolylineOptions(selectedColor, selectedLineWeight, selectedLineType),
+                { editable: false }
+            ),
             rectangleOptions: {
-                fillColor: selectedColor,
-                strokeColor: selectedColor
+                fillColor: selectedColor, strokeColor: selectedColor,
+                fillOpacity: 0.5, strokeWeight: selectedLineWeight, editable: false, draggable: true
             },
             circleOptions: {
-                fillColor: selectedColor,
-                strokeColor: selectedColor
+                fillColor: selectedColor, strokeColor: selectedColor,
+                fillOpacity: 0.5, strokeWeight: selectedLineWeight, editable: false, draggable: true
             },
             polygonOptions: {
-                fillColor: selectedColor,
-                strokeColor: selectedColor
+                fillColor: selectedColor, strokeColor: selectedColor,
+                fillOpacity: 0.5, strokeWeight: selectedLineWeight, editable: false, draggable: true
             }
         });
+    }
+
+    // Apply color to selected shape if one exists
+    if (selectedShape) {
+        applyPropertiesToShape(selectedShape, color,
+            selectedShape._originalStrokeWeight || selectedLineWeight,
+            selectedShape._lineType || 'solid');
+        // Re-apply selection highlight
+        const highlightWeight = Math.max((selectedShape._originalStrokeWeight || 2) + 3, 5);
+        selectedShape.setOptions({ strokeWeight: highlightWeight });
+        if (selectedShape._originalIcons && selectedShape._originalIcons.length > 0) {
+            const highlightIcons = selectedShape._originalIcons.map(function(seq) {
+                const newIcon = Object.assign({}, seq.icon);
+                newIcon.scale = (newIcon.scale || 1) * 1.5;
+                return { icon: newIcon, offset: seq.offset, repeat: seq.repeat };
+            });
+            selectedShape.setOptions({ icons: highlightIcons });
+        }
     }
 }
 
@@ -131,16 +422,15 @@ function initDrawingManager() {
         markerOptions: {
             draggable: true
         },
-        polylineOptions: {
-            strokeColor: selectedColor,
-            strokeWeight: 2,
-            editable: false
-        },
+        polylineOptions: Object.assign(
+            getPolylineOptions(selectedColor, selectedLineWeight, selectedLineType),
+            { editable: false }
+        ),
         rectangleOptions: {
             fillColor: selectedColor,
             fillOpacity: 0.5,
             strokeColor: selectedColor,
-            strokeWeight: 2,
+            strokeWeight: selectedLineWeight,
             editable: false,
             draggable: true
         },
@@ -148,7 +438,7 @@ function initDrawingManager() {
             fillColor: selectedColor,
             fillOpacity: 0.5,
             strokeColor: selectedColor,
-            strokeWeight: 2,
+            strokeWeight: selectedLineWeight,
             editable: false,
             draggable: true
         },
@@ -156,7 +446,7 @@ function initDrawingManager() {
             fillColor: selectedColor,
             fillOpacity: 0.5,
             strokeColor: selectedColor,
-            strokeWeight: 2,
+            strokeWeight: selectedLineWeight,
             editable: false,
             draggable: true
         },
@@ -177,6 +467,21 @@ function initDrawingManager() {
     google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
         const overlay = event.overlay;
         overlay.type = event.type;
+
+        // Store original properties for selection/deselection restore
+        overlay._originalStrokeWeight = selectedLineWeight;
+        overlay._lineType = (event.type === 'polyline') ? selectedLineType : 'solid';
+        overlay._strokeColor = selectedColor;
+
+        if (event.type === 'polyline') {
+            const opts = getPolylineOptions(selectedColor, selectedLineWeight, selectedLineType);
+            overlay._originalStrokeOpacity = opts.strokeOpacity;
+            overlay._originalIcons = opts.icons ? opts.icons.map(i => ({...i, icon: {...i.icon}})) : [];
+        } else {
+            overlay._originalStrokeOpacity = 1.0;
+            overlay._originalIcons = [];
+        }
+
         shapes.push(overlay);
         overlay.addListener('click', () => selectShape(overlay));
         clearSelection();
@@ -224,8 +529,23 @@ function deleteSelectedMarker() {
 function selectShape(shape) {
     clearSelection();
     selectedShape = shape;
-    shape.setOptions({ strokeWeight: 5 });
+
+    // Highlight: increase weight for visual feedback
+    const highlightWeight = Math.max((shape._originalStrokeWeight || 2) + 3, 5);
+    shape.setOptions({ strokeWeight: highlightWeight });
+
+    // For icon-based lines, scale up the icons too
+    if (shape._originalIcons && shape._originalIcons.length > 0) {
+        const highlightIcons = shape._originalIcons.map(function(seq) {
+            const newIcon = Object.assign({}, seq.icon);
+            newIcon.scale = (newIcon.scale || 1) * 1.5;
+            return { icon: newIcon, offset: seq.offset, repeat: seq.repeat };
+        });
+        shape.setOptions({ icons: highlightIcons });
+    }
+
     document.getElementById('deleteShapeButton').disabled = false;
+    updateLineControlsFromShape(shape);
 }
 
 function deleteSelectedShape() {
@@ -245,7 +565,12 @@ function clearSelection() {
     }
 
     if (selectedShape) {
-        selectedShape.setOptions({ strokeWeight: 2 });
+        selectedShape.setOptions({
+            strokeWeight: selectedShape._originalStrokeWeight || 2,
+            strokeOpacity: selectedShape._originalStrokeOpacity !== undefined
+                ? selectedShape._originalStrokeOpacity : 1.0,
+            icons: selectedShape._originalIcons || []
+        });
         selectedShape = null;
         document.getElementById('deleteShapeButton').disabled = true;
     }

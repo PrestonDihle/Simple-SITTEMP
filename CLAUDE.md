@@ -57,13 +57,42 @@ textOverlays[]         - All text overlays (each has a { marker, overlay } pair)
 measureMarkers[]       - Temporary markers for distance measurement
 selectedMarkerType     - Currently selected symbol type (string key into markerTypes)
 selectedColor          - Currently selected color (string)
+selectedLineType       - Currently selected line type (string key into lineTypeDefinitions)
+selectedLineWeight     - Currently selected stroke weight (integer)
 selectedMarker         - Currently clicked/selected marker (for deletion)
-selectedShape          - Currently clicked/selected shape (for deletion)
+selectedShape          - Currently clicked/selected shape (for deletion/modification)
 selectedTextOverlay    - Currently clicked/selected text overlay (for deletion)
 drawingManager         - Google Maps DrawingManager instance
 measureMode            - Boolean toggle for measurement mode
 mgrsDisplayPrecision   - Integer 0-5 for MGRS display precision
+lineTypeDefinitions    - Object mapping line type names to functions that return polyline options
 ```
+
+Each shape in `shapes[]` also carries custom properties:
+```
+shape._originalStrokeWeight  - The user's chosen stroke weight (restored on deselect)
+shape._originalStrokeOpacity - The line's stroke opacity (0 for icon-only lines like dashed)
+shape._originalIcons         - The icons[] array (restored on deselect)
+shape._lineType              - The line type string key (e.g. 'dashed', 'mine-belt')
+shape._strokeColor           - The line's color
+```
+
+### Tactical Line Types (`lineTypeDefinitions` in `script.js`)
+
+Seven line types are available, defined as functions returning Google Maps Polyline options:
+- **solid** — Standard solid line
+- **dashed** — Dashed line using icon sequences (`strokeOpacity: 0` + dash icons)
+- **dotted** — Dotted line using circle icons
+- **dash-dot** — Alternating dash and dot pattern
+- **mine-belt** — Solid line with "M" mine symbols at intervals (MIL-STD-2525)
+- **wire-obstacle** — Solid line with perpendicular tick marks
+- **tank-ditch** — Solid line with triangular serrations
+
+To add a new line type: add an entry to `lineTypeDefinitions`. The key becomes the option value, the function receives `(color, weight)` and returns `{strokeColor, strokeOpacity, strokeWeight, icons[]}`. Also add a matching `<option>` in the `#lineTypeSelector` in `index.html`.
+
+### Post-Placement Modification
+
+Selecting a shape (click it) then changing color, line type, or thickness updates the selected shape in-place via `applyPropertiesToShape()`. The UI controls sync to reflect the selected shape's current properties via `updateLineControlsFromShape()`.
 
 ### Drawing Manager
 
@@ -71,7 +100,7 @@ Google Maps DrawingManager handles shape creation (polyline, rectangle, circle, 
 - If `selectedMarkerType` is set, it creates a custom SVG marker via `addCustomMarker()`
 - Otherwise it creates a default Google Maps marker
 
-Shapes are stored in `shapes[]` and support click-to-select and delete.
+Shapes are stored in `shapes[]` and support click-to-select, modify, and delete.
 
 ## Known Issues
 
