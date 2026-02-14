@@ -422,10 +422,11 @@ function initDrawingManager() {
         markerOptions: {
             draggable: true
         },
-        polylineOptions: Object.assign(
-            getPolylineOptions(selectedColor, selectedLineWeight, selectedLineType),
-            { editable: false }
-        ),
+        polylineOptions: {
+            strokeColor: selectedColor,
+            strokeWeight: selectedLineWeight,
+            editable: false
+        },
         rectangleOptions: {
             fillColor: selectedColor,
             fillOpacity: 0.5,
@@ -474,7 +475,9 @@ function initDrawingManager() {
         overlay._strokeColor = selectedColor;
 
         if (event.type === 'polyline') {
+            // Apply the full line type options (icons, opacity) after creation
             const opts = getPolylineOptions(selectedColor, selectedLineWeight, selectedLineType);
+            overlay.setOptions(opts);
             overlay._originalStrokeOpacity = opts.strokeOpacity;
             overlay._originalIcons = opts.icons ? opts.icons.map(i => ({...i, icon: {...i.icon}})) : [];
         } else {
