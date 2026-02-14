@@ -14,7 +14,7 @@ let drawingManager;
 let measureMode = false;
 let measurePolyline = null;
 let measureDistanceInfoWindow = null;
-let mgrsDisplayPrecision = 5; // Default to 1m precision
+// mgrsDisplayPrecision is declared in mgrs_functions.js (shared global)
 let selectedLineType = 'solid';
 let selectedLineWeight = 2;
 
