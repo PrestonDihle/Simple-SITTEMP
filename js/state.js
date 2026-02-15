@@ -38,6 +38,13 @@ const initialState = {
     fillOpacity: 0.6,
     lineType: 'solid',
 
+    // Font settings for text labels
+    fontSize: 14,
+    fontBold: true,
+    fontItalic: false,
+    fontUnderline: false,
+    fontStrikethrough: false,
+
     // Undo / redo stacks (mutated in place, not observed per-element)
     undoStack: [],
     redoStack: [],

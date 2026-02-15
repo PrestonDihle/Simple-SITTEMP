@@ -4,7 +4,7 @@
  * Toolbar button handlers, submenu building, color picker, and toast notifications.
  */
 
-import { get, set, COLORS } from './state.js';
+import { get, set, subscribe, COLORS } from './state.js';
 import {
     equipmentSVG, unitSVG, EQUIPMENT_LIST, UNIT_LIST,
     SHAPE_LIST, LINE_TYPES, getLinePreviewSVG
@@ -12,7 +12,7 @@ import {
 import {
     activateShape, enterSymbolPlacement, exitSymbolPlacement,
     enterTextPlacement, exitTextPlacement, clearSelected,
-    performUndo, performRedo
+    performUndo, performRedo, buildTextSVG, pushUndoState
 } from './drawing.js';
 
 // ===== Toast =====
@@ -243,4 +243,115 @@ function buildColorSubmenu() {
         set('fillOpacity', parseInt(slider.value) / 100);
         valueLabel.textContent = slider.value + '%';
     });
+
+    // ===== Font Style Toggles =====
+    var fontBoldBtn = document.getElementById('font-bold');
+    var fontItalicBtn = document.getElementById('font-italic');
+    var fontUnderlineBtn = document.getElementById('font-underline');
+    var fontStrikethroughBtn = document.getElementById('font-strikethrough');
+
+    fontBoldBtn.addEventListener('click', function () {
+        var val = !get('fontBold');
+        set('fontBold', val);
+    });
+    fontItalicBtn.addEventListener('click', function () {
+        var val = !get('fontItalic');
+        set('fontItalic', val);
+    });
+    fontUnderlineBtn.addEventListener('click', function () {
+        var val = !get('fontUnderline');
+        set('fontUnderline', val);
+    });
+    fontStrikethroughBtn.addEventListener('click', function () {
+        var val = !get('fontStrikethrough');
+        set('fontStrikethrough', val);
+    });
+
+    // Font size slider
+    var fontSizeSlider = document.getElementById('font-size-slider');
+    var fontSizeLabel = document.getElementById('font-size-value');
+    fontSizeSlider.addEventListener('input', function () {
+        var val = parseInt(fontSizeSlider.value);
+        set('fontSize', val);
+        fontSizeLabel.textContent = val + 'px';
+    });
+
+    // ===== UI Sync: update button active states when state changes =====
+    subscribe('fontBold', function (val) {
+        fontBoldBtn.classList.toggle('active', val);
+    });
+    subscribe('fontItalic', function (val) {
+        fontItalicBtn.classList.toggle('active', val);
+    });
+    subscribe('fontUnderline', function (val) {
+        fontUnderlineBtn.classList.toggle('active', val);
+    });
+    subscribe('fontStrikethrough', function (val) {
+        fontStrikethroughBtn.classList.toggle('active', val);
+    });
+    subscribe('fontSize', function (val) {
+        fontSizeSlider.value = val;
+        fontSizeLabel.textContent = val + 'px';
+    });
+
+    // ===== Live editing: update selected text marker when font/color changes =====
+    var undoTimer = null;
+    subscribe(['fontSize', 'fontBold', 'fontItalic', 'fontUnderline', 'fontStrikethrough', 'lineColor'], function () {
+        applyFontToSelectedText();
+    });
+}
+
+// ===== Apply Font Changes to Selected Text Marker =====
+
+function applyFontToSelectedText() {
+    var markers = get('markers');
+    var selected = null;
+    for (var i = 0; i < markers.length; i++) {
+        if (markers[i]._selected && markers[i]._sittemp && markers[i]._sittemp.type === 'text') {
+            selected = markers[i];
+            break;
+        }
+    }
+    if (!selected) return;
+
+    var info = selected._sittemp;
+    var color = get('lineColor');
+    var fontSize = get('fontSize');
+    var fontBold = get('fontBold');
+    var fontItalic = get('fontItalic');
+    var fontUnderline = get('fontUnderline');
+    var fontStrikethrough = get('fontStrikethrough');
+
+    // Early exit if nothing actually changed
+    if (info.color === color &&
+        (info.fontSize || 14) === fontSize &&
+        (info.fontBold !== undefined ? info.fontBold : true) === fontBold &&
+        (info.fontItalic || false) === fontItalic &&
+        (info.fontUnderline || false) === fontUnderline &&
+        (info.fontStrikethrough || false) === fontStrikethrough) {
+        return;
+    }
+
+    var result = buildTextSVG(info.text, color, fontSize, fontBold, fontItalic, fontUnderline, fontStrikethrough);
+    var iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(result.svg);
+
+    selected.setIcon({
+        url: iconUrl,
+        scaledSize: new google.maps.Size(result.width, result.height),
+        anchor: new google.maps.Point(result.width / 2, result.height / 2)
+    });
+
+    // Update metadata
+    info.color = color;
+    info.fontSize = fontSize;
+    info.fontBold = fontBold;
+    info.fontItalic = fontItalic;
+    info.fontUnderline = fontUnderline;
+    info.fontStrikethrough = fontStrikethrough;
+
+    // Debounced undo push (300ms) to avoid spam from slider dragging
+    if (applyFontToSelectedText._undoTimer) clearTimeout(applyFontToSelectedText._undoTimer);
+    applyFontToSelectedText._undoTimer = setTimeout(function () {
+        pushUndoState();
+    }, 300);
 }

@@ -334,19 +334,61 @@ function showTextInputDialog(latLng) {
     input.addEventListener('keydown', onKey);
 }
 
+/**
+ * Build an SVG string for a text label with full font styling.
+ * @returns {{ svg: string, width: number, height: number }}
+ */
+export function buildTextSVG(text, color, fontSize, fontBold, fontItalic, fontUnderline, fontStrikethrough) {
+    var padding = 4;
+    // charWidth scales proportionally with fontSize; base ratio from original: 8px at 14px font
+    var charWidth = fontSize * (8 / 14);
+    if (fontBold) charWidth *= 1.07;
+    if (fontItalic) charWidth *= 1.03;
+
+    var width = Math.ceil(text.length * charWidth + padding * 2);
+    var height = Math.ceil(fontSize + padding * 2);
+
+    var fontWeight = fontBold ? 'bold' : 'normal';
+    var fontStyle = fontItalic ? 'italic' : 'normal';
+    var textY = fontSize + padding - 2;
+
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">';
+
+    svg += '<text x="' + padding + '" y="' + textY + '" fill="' + color + '"'
+        + ' font-size="' + fontSize + '"'
+        + ' font-family="Arial,sans-serif"'
+        + ' font-weight="' + fontWeight + '"'
+        + ' font-style="' + fontStyle + '"'
+        + '>' + escapeXml(text) + '</text>';
+
+    var textWidth = text.length * charWidth;
+
+    if (fontUnderline) {
+        var underlineY = textY + 2;
+        svg += '<line x1="' + padding + '" y1="' + underlineY + '" x2="' + (padding + textWidth) + '" y2="' + underlineY + '" stroke="' + color + '" stroke-width="1"/>';
+    }
+
+    if (fontStrikethrough) {
+        var strikeY = Math.round(textY - fontSize * 0.35);
+        svg += '<line x1="' + padding + '" y1="' + strikeY + '" x2="' + (padding + textWidth) + '" y2="' + strikeY + '" stroke="' + color + '" stroke-width="1"/>';
+    }
+
+    svg += '</svg>';
+    return { svg: svg, width: width, height: height };
+}
+
 function placeTextLabel(latLng, text) {
     const color = get('lineColor');
-    const fontSize = 14;
-    const padding = 4;
-    const charWidth = 8;
-    const width = text.length * charWidth + padding * 2;
-    const height = fontSize + padding * 2;
+    const fontSize = get('fontSize');
+    const fontBold = get('fontBold');
+    const fontItalic = get('fontItalic');
+    const fontUnderline = get('fontUnderline');
+    const fontStrikethrough = get('fontStrikethrough');
 
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-        <text x="${padding}" y="${fontSize + padding - 2}" fill="${color}" font-size="${fontSize}" font-family="Arial,sans-serif" font-weight="bold">${escapeXml(text)}</text>
-    </svg>`;
+    const result = buildTextSVG(text, color, fontSize, fontBold, fontItalic, fontUnderline, fontStrikethrough);
 
-    createMapMarker(latLng, svg, new google.maps.Size(width, height), new google.maps.Point(width / 2, height / 2), { type: 'text', text, color });
+    createMapMarker(latLng, result.svg, new google.maps.Size(result.width, result.height), new google.maps.Point(result.width / 2, result.height / 2),
+        { type: 'text', text, color, fontSize, fontBold, fontItalic, fontUnderline, fontStrikethrough });
     pushUndoState();
 }
 
@@ -371,6 +413,17 @@ function createMapMarker(latLng, svgString, size, anchor, sittempData) {
     marker.addListener('click', function () {
         get('markers').forEach(function (m) { m._selected = false; });
         marker._selected = true;
+
+        // Sync font state when selecting a text marker
+        if (marker._sittemp && marker._sittemp.type === 'text') {
+            var info = marker._sittemp;
+            set('fontSize', info.fontSize !== undefined ? info.fontSize : 14);
+            set('fontBold', info.fontBold !== undefined ? info.fontBold : true);
+            set('fontItalic', info.fontItalic !== undefined ? info.fontItalic : false);
+            set('fontUnderline', info.fontUnderline !== undefined ? info.fontUnderline : false);
+            set('fontStrikethrough', info.fontStrikethrough !== undefined ? info.fontStrikethrough : false);
+        }
+
         showToast('Selected. Press Clear Selected to delete.');
     });
 
@@ -421,7 +474,7 @@ export function clearSelected() {
 
 // ===== Undo / Redo =====
 
-function pushUndoState() {
+export function pushUndoState() {
     const draw = get('draw');
     const markers = get('markers');
     const undoStack = get('undoStack');
@@ -536,15 +589,15 @@ function recreateMarker(data) {
         size = new google.maps.Size(30, 30);
         anchor = new google.maps.Point(15, 15);
     } else if (info.type === 'text') {
-        const text = info.text;
-        const fontSize = 14, padding = 4, charWidth = 8;
-        const w = text.length * charWidth + padding * 2;
-        const h = fontSize + padding * 2;
-        svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-            <text x="${padding}" y="${fontSize + padding - 2}" fill="${info.color}" font-size="${fontSize}" font-family="Arial,sans-serif" font-weight="bold">${escapeXml(text)}</text>
-        </svg>`;
-        size = new google.maps.Size(w, h);
-        anchor = new google.maps.Point(w / 2, h / 2);
+        const fs = info.fontSize !== undefined ? info.fontSize : 14;
+        const fb = info.fontBold !== undefined ? info.fontBold : true;
+        const fi = info.fontItalic !== undefined ? info.fontItalic : false;
+        const fu = info.fontUnderline !== undefined ? info.fontUnderline : false;
+        const fst = info.fontStrikethrough !== undefined ? info.fontStrikethrough : false;
+        const result = buildTextSVG(info.text, info.color, fs, fb, fi, fu, fst);
+        svgString = result.svg;
+        size = new google.maps.Size(result.width, result.height);
+        anchor = new google.maps.Point(result.width / 2, result.height / 2);
     } else {
         return;
     }
