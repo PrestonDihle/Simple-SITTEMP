@@ -197,6 +197,15 @@ html, body {
     margin-bottom: 10px;
 }
 
+/* Wider grid for equipment submenu (6 columns to match reference chart rows) */
+#submenu-equipment {
+    min-width: 460px;
+}
+
+#equipment-grid {
+    grid-template-columns: repeat(6, 1fr);
+}
+
 .submenu-item {
     display: flex;
     flex-direction: column;

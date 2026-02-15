@@ -51,7 +51,7 @@ Simple-SITTEMP/
 - **Transparency Slider:** 0-100% opacity for fill and stroke
 
 ### Military Symbols
-- **Equipment (18):** Rifle, Light MG, Heavy MG, Light Mortar, Heavy Mortar, Observation Post, Artillery OP, Anti-Tank Missile, Anti-Tank Gun, Anti-Aircraft Gun, Anti-Aircraft Missile, Fixed Wing, Attack Helo, Utility Helo, Tank, Armored Vehicle, Radar, AA Radar
+- **Equipment (33):** Rifle, Light MG, Heavy MG, Grenade Launcher, Flame Thrower, AT Rifle, Light Mortar, Heavy Mortar, Recoilless Rifle, Observation Post, Artillery OP, ATGM, AT Gun, AA Gun, SAM, Fixed Wing, Attack Helo, Utility Helo, Tank, APC/IFV, Howitzer, Rocket Artillery, Radar, AD Radar, Sniper, Mine/IED, CBRN, Supply Point, Command Post, Electronic Warfare, UAV, MANPADS, ATGM Vehicle
 - **Units (11):** Infantry, Armor, Armored Infantry, Artillery, Engineers, Aviation, Military Intelligence, Military Police, Reconnaissance, Signal, Electronic Warfare
 - Each symbol: SVG graphic + optional left text (20 char) + optional right text (20 char)
 - Symbols are selectable, draggable, deletable
@@ -163,7 +163,7 @@ const [lng, lat] = mgrs.toPoint(mgrsString);
 - [x] Undo/redo system (50-state stack)
 
 ### Phase 3: Military Symbols
-- [x] 18 equipment SVGs (inline SVG functions)
+- [x] 33 equipment SVGs (inline SVG functions) — expanded from reference chart
 - [x] 11 unit SVGs (inline SVG functions)
 - [x] Equipment and Units sub-menus with icon previews
 - [x] Symbol placement with optional left/right text labels (20 char max)
