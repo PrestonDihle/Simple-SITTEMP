@@ -78,6 +78,12 @@ const initialState = {
     mgrsGridColor: '#000000',
     mgrsGridWeight: 2,
 
+    // Map display
+    mapBaseType: 'terrain',
+    showRoads: true,
+    showLabels: true,
+    citiesOnly: false,
+
     // Export pending callback
     exportCallback: null,
 };

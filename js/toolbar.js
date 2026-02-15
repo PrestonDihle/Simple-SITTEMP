@@ -33,6 +33,7 @@ export function setupToolbar() {
     buildUnitsSubmenu();
     buildColorSubmenu();
     buildTextSubmenu();
+    buildMapSubmenu();
 
     document.getElementById('btn-select').addEventListener('click', function () {
         closeAllSubmenus();
@@ -67,6 +68,11 @@ export function setupToolbar() {
         toggleSubmenu('submenu-text', 'btn-text');
     });
 
+    document.getElementById('btn-map').addEventListener('click', function (e) {
+        e.stopPropagation();
+        toggleSubmenu('submenu-map', 'btn-map');
+    });
+
     document.getElementById('btn-undo').addEventListener('click', function () { performUndo(); });
 
     document.getElementById('btn-color').addEventListener('click', function (e) {
@@ -96,6 +102,7 @@ function positionSubmenus() {
         'btn-equipment': 'submenu-equipment',
         'btn-units': 'submenu-units',
         'btn-text': 'submenu-text',
+        'btn-map': 'submenu-map',
         'btn-color': 'submenu-color',
     };
 
@@ -365,4 +372,91 @@ function applyFontToSelectedText() {
     applyFontToSelectedText._undoTimer = setTimeout(function () {
         pushUndoState();
     }, 300);
+}
+
+// ===== Map Type Sub-menu =====
+
+function buildMapSubmenu() {
+    var terrainBtn = document.getElementById('map-terrain');
+    var satelliteBtn = document.getElementById('map-satellite');
+    var roadsToggle = document.getElementById('toggle-roads');
+    var labelsToggle = document.getElementById('toggle-labels');
+    var citiesOnlyToggle = document.getElementById('toggle-cities-only');
+    var citiesOnlyRow = citiesOnlyToggle.closest('.toggle-row');
+
+    // Terrain / Satellite buttons
+    terrainBtn.addEventListener('click', function () {
+        set('mapBaseType', 'terrain');
+        terrainBtn.classList.add('active');
+        satelliteBtn.classList.remove('active');
+        applyMapStyles();
+    });
+
+    satelliteBtn.addEventListener('click', function () {
+        set('mapBaseType', 'satellite');
+        satelliteBtn.classList.add('active');
+        terrainBtn.classList.remove('active');
+        applyMapStyles();
+    });
+
+    // Roads toggle
+    roadsToggle.addEventListener('change', function () {
+        set('showRoads', roadsToggle.checked);
+        applyMapStyles();
+    });
+
+    // Labels toggle
+    labelsToggle.addEventListener('change', function () {
+        set('showLabels', labelsToggle.checked);
+        if (!labelsToggle.checked) {
+            citiesOnlyToggle.checked = false;
+            set('citiesOnly', false);
+            citiesOnlyRow.classList.add('disabled');
+        } else {
+            citiesOnlyRow.classList.remove('disabled');
+        }
+        applyMapStyles();
+    });
+
+    // Cities Only toggle
+    citiesOnlyToggle.addEventListener('change', function () {
+        set('citiesOnly', citiesOnlyToggle.checked);
+        applyMapStyles();
+    });
+}
+
+function applyMapStyles() {
+    var map = get('map');
+    if (!map) return;
+
+    var baseType = get('mapBaseType');
+    var showLabels = get('showLabels');
+    var citiesOnly = get('citiesOnly');
+
+    // Set map type ID
+    if (baseType === 'satellite') {
+        map.setMapTypeId(showLabels && !citiesOnly ? 'hybrid' : 'satellite');
+    } else {
+        map.setMapTypeId('terrain');
+    }
+
+    var styles = [];
+
+    // Hide roads
+    if (!get('showRoads')) {
+        styles.push({ featureType: 'road', elementType: 'geometry', stylers: [{ visibility: 'off' }] });
+        styles.push({ featureType: 'road', elementType: 'labels', stylers: [{ visibility: 'off' }] });
+    }
+
+    // Hide all labels
+    if (!showLabels) {
+        styles.push({ featureType: 'all', elementType: 'labels', stylers: [{ visibility: 'off' }] });
+    }
+    // Cities only: hide all labels except locality (city) labels
+    else if (citiesOnly) {
+        styles.push({ featureType: 'all', elementType: 'labels', stylers: [{ visibility: 'off' }] });
+        styles.push({ featureType: 'administrative.locality', elementType: 'labels', stylers: [{ visibility: 'on' }] });
+    }
+
+    map.setOptions({ styles: styles });
 }

@@ -448,6 +448,91 @@ html, body {
     margin-top: 2px;
 }
 
+/* ===== Map Type Submenu ===== */
+.map-type-toggles {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.map-type-btn {
+    flex: 1;
+    padding: 8px 12px;
+    background: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #ccc;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.map-type-btn:hover {
+    background: #444;
+    color: #fff;
+}
+
+.map-type-btn.active {
+    background: #4a7;
+    border-color: #4a7;
+    color: #fff;
+}
+
+.map-overlay-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #ccc;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+.toggle-row input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-slider {
+    width: 36px;
+    height: 20px;
+    background: #555;
+    border-radius: 10px;
+    position: relative;
+    transition: background 0.2s;
+}
+
+.toggle-slider::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #ccc;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s;
+}
+
+.toggle-row input:checked + .toggle-slider {
+    background: #4a7;
+}
+
+.toggle-row input:checked + .toggle-slider::after {
+    transform: translateX(16px);
+    background: #fff;
+}
+
+.toggle-row.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
 /* ===== Coordinate Display (Top Right) ===== */
 #coord-display {
     position: absolute;
