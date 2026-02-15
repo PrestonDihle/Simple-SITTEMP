@@ -76,7 +76,7 @@ const initialState = {
     mgrsGridLabels: [],
     mgrsGridScale: 1000,
     mgrsGridColor: '#000000',
-    mgrsGridWeight: 1,
+    mgrsGridWeight: 2,
 
     // Export pending callback
     exportCallback: null,
