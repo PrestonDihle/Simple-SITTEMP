@@ -1,0 +1,826 @@
+/* Simple SITTEMP - Style Sheet */
+
+/* ===== Reset & Base ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ===== Map Container ===== */
+#map-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    border: 3px solid #CC0000;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+/* ===== Classification Warning Modal ===== */
+#classification-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+#classification-modal .modal-content {
+    background: #1a1a1a;
+    border: 3px solid #CC0000;
+    border-radius: 8px;
+    padding: 40px;
+    max-width: 520px;
+    text-align: center;
+    color: #fff;
+}
+
+#classification-modal .modal-content h2 {
+    color: #CC0000;
+    font-size: 24px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+#classification-modal .modal-content p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    color: #ccc;
+}
+
+#classification-modal .modal-content button {
+    background: #CC0000;
+    color: #fff;
+    border: none;
+    padding: 12px 32px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 1px;
+}
+
+#classification-modal .modal-content button:hover {
+    background: #990000;
+}
+
+/* ===== Toolbar (Left Side) ===== */
+#toolbar {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 1000;
+    background: rgba(42, 42, 42, 0.95);
+    border-radius: 8px;
+    padding: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.toolbar-btn {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ddd;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.toolbar-btn:hover {
+    background: #444;
+    border-color: #777;
+}
+
+.toolbar-btn.active {
+    background: #555;
+    border-color: #aaa;
+    color: #fff;
+}
+
+.toolbar-btn svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+    stroke: currentColor;
+}
+
+/* Toolbar Tooltip */
+.toolbar-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 52px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #222;
+    color: #eee;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 1001;
+}
+
+.toolbar-btn:hover::after {
+    opacity: 1;
+}
+
+/* Toolbar Divider */
+.toolbar-divider {
+    width: 32px;
+    height: 1px;
+    background: #555;
+    margin: 2px auto;
+}
+
+/* ===== Sub-menus / Flyouts ===== */
+.submenu {
+    position: absolute;
+    left: 62px;
+    background: rgba(42, 42, 42, 0.97);
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 1001;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    display: none;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.submenu.visible {
+    display: block;
+}
+
+.submenu h3 {
+    color: #aaa;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #444;
+}
+
+.submenu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.submenu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 4px;
+    background: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #ccc;
+    font-size: 10px;
+    text-align: center;
+    min-width: 70px;
+    transition: background 0.1s;
+}
+
+.submenu-item:hover {
+    background: #444;
+    border-color: #666;
+    color: #fff;
+}
+
+.submenu-item.active {
+    background: #555;
+    border-color: #aaa;
+    color: #fff;
+}
+
+.submenu-item svg {
+    width: 28px;
+    height: 28px;
+}
+
+/* Shapes sub-menu - 2 column for line types */
+.submenu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 10px;
+}
+
+.submenu-list-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: #333;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #ccc;
+    font-size: 12px;
+    transition: background 0.1s;
+}
+
+.submenu-list-item:hover {
+    background: #444;
+    border-color: #666;
+    color: #fff;
+}
+
+.submenu-list-item.active {
+    background: #555;
+    border-color: #aaa;
+    color: #fff;
+}
+
+.submenu-list-item .line-preview {
+    width: 40px;
+    height: 2px;
+    flex-shrink: 0;
+}
+
+/* ===== Color Picker Panel ===== */
+.color-section {
+    margin-bottom: 12px;
+}
+
+.color-section label {
+    display: block;
+    color: #aaa;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+
+.color-swatches {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+}
+
+.color-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: 2px solid #444;
+    cursor: pointer;
+    transition: border-color 0.1s, transform 0.1s;
+}
+
+.color-swatch:hover {
+    border-color: #888;
+    transform: scale(1.1);
+}
+
+.color-swatch.active {
+    border-color: #fff;
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+}
+
+.opacity-section {
+    margin-top: 12px;
+}
+
+.opacity-section label {
+    display: block;
+    color: #aaa;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+
+.opacity-section input[type="range"] {
+    width: 100%;
+    accent-color: #aaa;
+}
+
+.opacity-value {
+    color: #ccc;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 2px;
+}
+
+/* ===== Coordinate Display (Top Right) ===== */
+#coord-display {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    z-index: 1000;
+    pointer-events: none;
+    user-select: none;
+}
+
+#coord-display .label {
+    color: #aaa;
+    font-size: 11px;
+}
+
+/* ===== Toast Notification ===== */
+#toast {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+#toast.visible {
+    opacity: 1;
+}
+
+/* ===== Ad Banner (Bottom Center) ===== */
+#banner-ad {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 728px;
+    height: 90px;
+    max-width: calc(100vw - 80px);
+    background: rgba(245, 222, 179, 0.85);
+    border: 2px solid #000;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    z-index: 999;
+    pointer-events: none;
+}
+
+/* ===== Export Dialog ===== */
+#export-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9000;
+}
+
+#export-dialog.visible {
+    display: flex;
+}
+
+#export-dialog .dialog-content {
+    background: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 24px;
+    min-width: 320px;
+    color: #fff;
+}
+
+#export-dialog .dialog-content h3 {
+    margin-bottom: 16px;
+    font-size: 18px;
+}
+
+.export-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #333;
+    border: 1px solid #444;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #ccc;
+    margin-bottom: 8px;
+    transition: background 0.1s;
+}
+
+.export-option:hover {
+    background: #444;
+    color: #fff;
+}
+
+.export-option svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.export-option .export-label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.export-option .export-desc {
+    font-size: 11px;
+    color: #999;
+    margin-top: 2px;
+}
+
+.dialog-close {
+    display: block;
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: #555;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    width: 100%;
+}
+
+.dialog-close:hover {
+    background: #666;
+}
+
+/* ===== Interstitial Ad (Export Pre-screen) ===== */
+#interstitial-ad {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9500;
+    flex-direction: column;
+}
+
+#interstitial-ad.visible {
+    display: flex;
+}
+
+#interstitial-ad .ad-placeholder {
+    width: 400px;
+    height: 300px;
+    background: rgba(245, 222, 179, 0.85);
+    border: 2px solid #000;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+#interstitial-ad .countdown {
+    color: #fff;
+    font-size: 18px;
+}
+
+/* ===== PDF Size Selection Dialog ===== */
+#pdf-size-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9100;
+}
+
+#pdf-size-dialog.visible {
+    display: flex;
+}
+
+#pdf-size-dialog .dialog-content {
+    background: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 24px;
+    min-width: 280px;
+    color: #fff;
+}
+
+#pdf-size-dialog .dialog-content h3 {
+    margin-bottom: 16px;
+}
+
+.size-option {
+    padding: 10px 14px;
+    background: #333;
+    border: 1px solid #444;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #ccc;
+    margin-bottom: 6px;
+    font-size: 14px;
+    transition: background 0.1s;
+}
+
+.size-option:hover {
+    background: #444;
+    color: #fff;
+}
+
+/* ===== Symbol Text Dialog ===== */
+#symbol-text-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9200;
+}
+
+#symbol-text-dialog.visible {
+    display: flex;
+}
+
+#symbol-text-dialog .dialog-content {
+    background: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 24px;
+    min-width: 300px;
+    color: #fff;
+}
+
+#symbol-text-dialog .dialog-content h3 {
+    margin-bottom: 16px;
+    font-size: 16px;
+}
+
+#symbol-text-dialog .dialog-content label {
+    display: block;
+    color: #aaa;
+    font-size: 12px;
+    margin-bottom: 4px;
+    margin-top: 10px;
+}
+
+#symbol-text-dialog .dialog-content input {
+    width: 100%;
+    padding: 8px;
+    background: #444;
+    border: 1px solid #666;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 14px;
+}
+
+#symbol-text-dialog .dialog-btns {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+#symbol-text-dialog .dialog-btns button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#symbol-text-dialog .btn-ok {
+    background: #4a7;
+    color: #fff;
+}
+
+#symbol-text-dialog .btn-cancel {
+    background: #555;
+    color: #fff;
+}
+
+/* ===== Text Placement Dialog ===== */
+#text-input-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9200;
+}
+
+#text-input-dialog.visible {
+    display: flex;
+}
+
+#text-input-dialog .dialog-content {
+    background: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 24px;
+    min-width: 300px;
+    color: #fff;
+}
+
+#text-input-dialog .dialog-content h3 {
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+#text-input-dialog input {
+    width: 100%;
+    padding: 8px;
+    background: #444;
+    border: 1px solid #666;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+#text-input-dialog .dialog-btns {
+    display: flex;
+    gap: 8px;
+}
+
+#text-input-dialog .dialog-btns button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+/* ===== MGRS Grid Controls ===== */
+#mgrs-controls {
+    position: absolute;
+    top: 10px;
+    left: 70px;
+    background: rgba(42, 42, 42, 0.95);
+    border-radius: 6px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1000;
+}
+
+#mgrs-controls label {
+    color: #ccc;
+    font-size: 12px;
+}
+
+#mgrs-controls select {
+    background: #444;
+    color: #fff;
+    border: 1px solid #666;
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 12px;
+}
+
+#mgrs-controls .grid-toggle {
+    padding: 4px 10px;
+    background: #555;
+    color: #ccc;
+    border: 1px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+#mgrs-controls .grid-toggle.active {
+    background: #4a7;
+    color: #fff;
+    border-color: #4a7;
+}
+
+/* ===== Scrollbar styling for sub-menus ===== */
+.submenu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.submenu::-webkit-scrollbar-track {
+    background: #333;
+}
+
+.submenu::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 3px;
+}
+
+/* ===== API Key Prompt ===== */
+#api-key-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 11000;
+}
+
+#api-key-dialog .dialog-content {
+    background: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 30px;
+    max-width: 450px;
+    color: #fff;
+    text-align: center;
+}
+
+#api-key-dialog h3 {
+    margin-bottom: 12px;
+    font-size: 18px;
+}
+
+#api-key-dialog p {
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+#api-key-dialog input {
+    width: 100%;
+    padding: 10px;
+    background: #444;
+    border: 1px solid #666;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+#api-key-dialog button {
+    padding: 10px 24px;
+    background: #4a7;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#api-key-dialog button:hover {
+    background: #3a6;
+}

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple SITTEMP - Situational Template</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ===== Classification Warning Modal ===== -->
+    <div id="classification-modal">
+        <div class="modal-content">
+            <h2>UNCLASSIFIED USE ONLY</h2>
+            <p>
+                Do NOT enter or display classified information on this application.
+                This tool operates over the public internet and provides no security
+                for classified data. By clicking "I Understand," you acknowledge this warning.
+            </p>
+            <button id="classification-accept">I Understand</button>
+        </div>
+    </div>
+
+    <!-- ===== API Key Dialog (shown if no key configured) ===== -->
+    <div id="api-key-dialog" style="display:none;">
+        <div class="dialog-content">
+            <h3>Google Maps API Key Required</h3>
+            <p>
+                Enter your Google Maps JavaScript API key to use this application.
+                The key will be stored in your browser's localStorage.
+            </p>
+            <input type="text" id="api-key-input" placeholder="Enter your API key here...">
+            <button id="api-key-submit">Load Map</button>
+        </div>
+    </div>
+
+    <!-- ===== Map Container ===== -->
+    <div id="map-container">
+        <div id="map"></div>
+
+        <!-- Toolbar (Left Side) -->
+        <div id="toolbar">
+            <button class="toolbar-btn active" id="btn-select" data-tooltip="Select" aria-label="Select tool">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/>
+                    <path d="M13 13l6 6"/>
+                </svg>
+            </button>
+            <button class="toolbar-btn" id="btn-shapes" data-tooltip="Shapes" aria-label="Drawing shapes">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                    <circle cx="17" cy="7" r="4"/>
+                    <polygon points="7,14 3,21 11,21"/>
+                </svg>
+            </button>
+            <button class="toolbar-btn" id="btn-equipment" data-tooltip="Equipment" aria-label="Equipment symbols">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <polygon points="12,3 22,21 2,21"/>
+                </svg>
+            </button>
+            <button class="toolbar-btn" id="btn-units" data-tooltip="Units" aria-label="Unit symbols">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <rect x="3" y="6" width="18" height="12" rx="1"/>
+                    <circle cx="12" cy="4" r="2" fill="currentColor"/>
+                </svg>
+            </button>
+            <button class="toolbar-btn" id="btn-text" data-tooltip="Text" aria-label="Place text label">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M4 7V4h16v3"/>
+                    <path d="M12 4v16"/>
+                    <path d="M8 20h8"/>
+                </svg>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" id="btn-undo" data-tooltip="Undo" aria-label="Undo last action">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M3 10h13a4 4 0 010 8H9"/>
+                    <polyline points="7,6 3,10 7,14"/>
+                </svg>
+            </button>
+            <button class="toolbar-btn" id="btn-color" data-tooltip="Color" aria-label="Color picker">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <circle cx="12" cy="12" r="9"/>
+                    <circle cx="12" cy="12" r="4" fill="currentColor"/>
+                </svg>
+            </button>
+            <button class="toolbar-btn" id="btn-redo" data-tooltip="Redo" aria-label="Redo last action">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M21 10H8a4 4 0 000 8h7"/>
+                    <polyline points="17,6 21,10 17,14"/>
+                </svg>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" id="btn-clear" data-tooltip="Clear Selected" aria-label="Clear selected items">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5">
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                </svg>
+            </button>
+            <button class="toolbar-btn" id="btn-export" data-tooltip="Export" aria-label="Export map">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Shapes Sub-menu -->
+        <div class="submenu" id="submenu-shapes">
+            <h3>Shapes</h3>
+            <div class="submenu-grid" id="shape-grid"></div>
+            <h3>Line Types</h3>
+            <div class="submenu-list" id="line-type-list"></div>
+        </div>
+
+        <!-- Equipment Sub-menu -->
+        <div class="submenu" id="submenu-equipment">
+            <h3>Equipment</h3>
+            <div class="submenu-grid" id="equipment-grid"></div>
+        </div>
+
+        <!-- Units Sub-menu -->
+        <div class="submenu" id="submenu-units">
+            <h3>Units</h3>
+            <div class="submenu-grid" id="units-grid"></div>
+        </div>
+
+        <!-- Color Picker Sub-menu -->
+        <div class="submenu" id="submenu-color">
+            <div class="color-section">
+                <label>Line Color</label>
+                <div class="color-swatches" id="line-color-swatches"></div>
+            </div>
+            <div class="color-section">
+                <label>Fill Color</label>
+                <div class="color-swatches" id="fill-color-swatches"></div>
+            </div>
+            <div class="opacity-section">
+                <label>Opacity</label>
+                <input type="range" id="opacity-slider" min="0" max="100" value="60">
+                <div class="opacity-value" id="opacity-value">60%</div>
+            </div>
+        </div>
+
+        <!-- MGRS Grid Controls -->
+        <div id="mgrs-controls">
+            <button class="grid-toggle active" id="grid-toggle">Grid</button>
+            <label>Scale:</label>
+            <select id="grid-scale">
+                <option value="1000">1:50K (1km)</option>
+                <option value="10000">1:100K (10km)</option>
+                <option value="100000">1:250K (100km)</option>
+            </select>
+            <label>Color:</label>
+            <select id="grid-color">
+                <option value="#000000">Black</option>
+                <option value="#808080">Grey</option>
+                <option value="#FF0000">Red</option>
+                <option value="#0000FF">Blue</option>
+            </select>
+        </div>
+
+        <!-- Coordinate Display (Top Right) -->
+        <div id="coord-display">
+            <div><span class="label">Lat/Lon:</span> <span id="coord-latlon">---, ---</span></div>
+            <div><span class="label">MGRS:</span> <span id="coord-mgrs">---</span></div>
+        </div>
+
+        <!-- Ad Banner (Bottom Center) -->
+        <!-- AD INTEGRATION POINT: Replace this div's content with Google AdSense code -->
+        <div id="banner-ad">Reserved for Advertisement</div>
+    </div>
+
+    <!-- ===== Toast Notification ===== -->
+    <div id="toast"></div>
+
+    <!-- ===== Export Dialog ===== -->
+    <div id="export-dialog">
+        <div class="dialog-content">
+            <h3>Export Map</h3>
+            <div class="export-option" id="export-kml">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                <div>
+                    <div class="export-label">Export as KML</div>
+                    <div class="export-desc">Download all placed features as a .kml file</div>
+                </div>
+            </div>
+            <div class="export-option" id="export-pdf">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h4"/></svg>
+                <div>
+                    <div class="export-label">Export as PDF</div>
+                    <div class="export-desc">Full map view with grid and symbols</div>
+                </div>
+            </div>
+            <div class="export-option" id="export-screenshot">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+                <div>
+                    <div class="export-label">Screenshot (PNG)</div>
+                    <div class="export-desc">Download current view as an image</div>
+                </div>
+            </div>
+            <button class="dialog-close" id="export-close">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ===== PDF Size Selection Dialog ===== -->
+    <div id="pdf-size-dialog">
+        <div class="dialog-content">
+            <h3>Select Page Size</h3>
+            <div class="size-option" data-size="letter">8.5 x 11 inches (Letter)</div>
+            <div class="size-option" data-size="tabloid">11 x 17 inches (Tabloid)</div>
+            <div class="size-option" data-size="arch">18 x 24 inches (Arch C)</div>
+            <button class="dialog-close" id="pdf-size-cancel">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ===== Interstitial Ad Placeholder ===== -->
+    <!-- AD INTEGRATION POINT: Replace countdown with actual interstitial ad -->
+    <div id="interstitial-ad">
+        <div class="ad-placeholder">Advertisement</div>
+        <div class="countdown">Export will begin in <span id="countdown-timer">5</span> seconds...</div>
+    </div>
+
+    <!-- ===== Symbol Text Dialog ===== -->
+    <div id="symbol-text-dialog">
+        <div class="dialog-content">
+            <h3>Symbol Labels</h3>
+            <label for="symbol-left-text">Left Text (max 20 chars):</label>
+            <input type="text" id="symbol-left-text" maxlength="20" placeholder="e.g., 1/2 INF">
+            <label for="symbol-right-text">Right Text (max 20 chars):</label>
+            <input type="text" id="symbol-right-text" maxlength="20" placeholder="e.g., OBJ ALPHA">
+            <div class="dialog-btns">
+                <button class="btn-cancel" id="symbol-text-cancel">Cancel</button>
+                <button class="btn-ok" id="symbol-text-ok">Place</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Text Input Dialog ===== -->
+    <div id="text-input-dialog">
+        <div class="dialog-content">
+            <h3>Place Text Label</h3>
+            <input type="text" id="text-label-input" placeholder="Enter text..." maxlength="50">
+            <div class="dialog-btns">
+                <button class="dialog-close" id="text-cancel">Cancel</button>
+                <button class="btn-ok" id="text-ok" style="background:#4a7;color:#fff;">Place</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Scripts ===== -->
+    <!-- MGRS library -->
+    <script src="https://unpkg.com/mgrs@2.1.0/dist/mgrs.js"></script>
+
+    <!-- html2canvas for screenshot/PDF -->
+    <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+    <!-- jsPDF for PDF export -->
+    <script src="https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+
+    <!-- Terra Draw -->
+    <script src="https://unpkg.com/terra-draw@1.24.2/dist/terra-draw.umd.js"></script>
+    <script src="https://unpkg.com/terra-draw-google-maps-adapter@1.3.1/dist/terra-draw-google-maps-adapter.umd.js"></script>
+
+    <!-- Main Application -->
+    <script src="app.js"></script>
+
+    <!-- Google Maps API is loaded dynamically by app.js after API key is provided -->
+</body>
+</html>
