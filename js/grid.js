@@ -75,6 +75,11 @@ export function setupMGRSGrid() {
         drawMGRSGrid();
     });
 
+    document.getElementById('grid-weight').addEventListener('change', function () {
+        set('mgrsGridWeight', parseFloat(this.value));
+        drawMGRSGrid();
+    });
+
     map.addListener('idle', function () {
         drawMGRSGrid();
     });
@@ -101,6 +106,7 @@ function drawMGRSGrid() {
     const ne = bounds.getNorthEast();
     const sw = bounds.getSouthWest();
     const color = get('mgrsGridColor');
+    const weight = get('mgrsGridWeight');
 
     const midLat = (ne.lat() + sw.lat()) / 2;
     const metersPerDegreeLat = 111320;
@@ -126,7 +132,7 @@ function drawMGRSGrid() {
     for (let lat = startLat; lat <= endLat; lat += degLat) {
         const line = new google.maps.Polyline({
             path: [{ lat, lng: startLng }, { lat, lng: endLng }],
-            strokeColor: color, strokeOpacity: 0.5, strokeWeight: 0.8,
+            strokeColor: color, strokeOpacity: 0.5, strokeWeight: weight,
             map, clickable: false, zIndex: -1,
         });
         gridLines.push(line);
@@ -142,7 +148,7 @@ function drawMGRSGrid() {
     for (let lng = startLng; lng <= endLng; lng += degLng) {
         const line = new google.maps.Polyline({
             path: [{ lat: startLat, lng }, { lat: endLat, lng }],
-            strokeColor: color, strokeOpacity: 0.5, strokeWeight: 0.8,
+            strokeColor: color, strokeOpacity: 0.5, strokeWeight: weight,
             map, clickable: false, zIndex: -1,
         });
         gridLines.push(line);
