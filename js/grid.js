@@ -132,7 +132,7 @@ function drawMGRSGrid() {
     for (let lat = startLat; lat <= endLat; lat += degLat) {
         const line = new google.maps.Polyline({
             path: [{ lat, lng: startLng }, { lat, lng: endLng }],
-            strokeColor: color, strokeOpacity: 0.5, strokeWeight: weight,
+            strokeColor: color, strokeOpacity: 0.7, strokeWeight: weight,
             map, clickable: false, zIndex: -1,
         });
         gridLines.push(line);
@@ -148,7 +148,7 @@ function drawMGRSGrid() {
     for (let lng = startLng; lng <= endLng; lng += degLng) {
         const line = new google.maps.Polyline({
             path: [{ lat: startLat, lng }, { lat: endLat, lng }],
-            strokeColor: color, strokeOpacity: 0.5, strokeWeight: weight,
+            strokeColor: color, strokeOpacity: 0.7, strokeWeight: weight,
             map, clickable: false, zIndex: -1,
         });
         gridLines.push(line);
