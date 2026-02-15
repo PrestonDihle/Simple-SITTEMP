@@ -32,6 +32,7 @@ export function setupToolbar() {
     buildEquipmentSubmenu();
     buildUnitsSubmenu();
     buildColorSubmenu();
+    buildTextSubmenu();
 
     document.getElementById('btn-select').addEventListener('click', function () {
         closeAllSubmenus();
@@ -60,11 +61,10 @@ export function setupToolbar() {
         toggleSubmenu('submenu-units', 'btn-units');
     });
 
-    document.getElementById('btn-text').addEventListener('click', function () {
-        closeAllSubmenus();
+    document.getElementById('btn-text').addEventListener('click', function (e) {
+        e.stopPropagation();
         exitSymbolPlacement();
-        setActiveTool('text');
-        enterTextPlacement();
+        toggleSubmenu('submenu-text', 'btn-text');
     });
 
     document.getElementById('btn-undo').addEventListener('click', function () { performUndo(); });
@@ -95,6 +95,7 @@ function positionSubmenus() {
         'btn-shapes': 'submenu-shapes',
         'btn-equipment': 'submenu-equipment',
         'btn-units': 'submenu-units',
+        'btn-text': 'submenu-text',
         'btn-color': 'submenu-color',
     };
 
@@ -243,6 +244,17 @@ function buildColorSubmenu() {
         set('fillOpacity', parseInt(slider.value) / 100);
         valueLabel.textContent = slider.value + '%';
     });
+}
+
+// ===== Text Sub-menu =====
+
+function buildTextSubmenu() {
+    // "Place Text on Map" button
+    document.getElementById('btn-place-text').addEventListener('click', function () {
+        closeAllSubmenus();
+        setActiveTool('text');
+        enterTextPlacement();
+    });
 
     // ===== Font Style Toggles =====
     var fontBoldBtn = document.getElementById('font-bold');
@@ -295,7 +307,6 @@ function buildColorSubmenu() {
     });
 
     // ===== Live editing: update selected text marker when font/color changes =====
-    var undoTimer = null;
     subscribe(['fontSize', 'fontBold', 'fontItalic', 'fontUnderline', 'fontStrikethrough', 'lineColor'], function () {
         applyFontToSelectedText();
     });
