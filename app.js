@@ -347,7 +347,7 @@ function initTerraDraw() {
         modes: [
             new TerraDrawPointMode({
                 styles: {
-                    pointColor: state.lineColor,
+                    pointColor: function(feature) { return (feature.properties && feature.properties._lineColor) || state.lineColor; },
                     pointWidth: 6,
                     pointOutlineColor: '#000000',
                     pointOutlineWidth: 2
@@ -355,39 +355,44 @@ function initTerraDraw() {
             }),
             new TerraDrawLineStringMode({
                 styles: {
-                    lineStringColor: state.lineColor,
+                    lineStringColor: function(feature) {
+                        if (feature.properties && feature.properties._lineType && feature.properties._lineType !== 'solid') {
+                            return 'rgba(0,0,0,0)';
+                        }
+                        return (feature.properties && feature.properties._lineColor) || state.lineColor;
+                    },
                     lineStringWidth: 3
                 }
             }),
             new TerraDrawPolygonMode({
                 styles: {
-                    fillColor: state.fillColor,
-                    fillOpacity: state.fillOpacity,
-                    outlineColor: state.lineColor,
+                    fillColor: function(feature) { return (feature.properties && feature.properties._fillColor) || state.fillColor; },
+                    fillOpacity: function(feature) { return (feature.properties && feature.properties._fillOpacity !== undefined) ? feature.properties._fillOpacity : state.fillOpacity; },
+                    outlineColor: function(feature) { return (feature.properties && feature.properties._lineColor) || state.lineColor; },
                     outlineWidth: 2
                 }
             }),
             new TerraDrawRectangleMode({
                 styles: {
-                    fillColor: state.fillColor,
-                    fillOpacity: state.fillOpacity,
-                    outlineColor: state.lineColor,
+                    fillColor: function(feature) { return (feature.properties && feature.properties._fillColor) || state.fillColor; },
+                    fillOpacity: function(feature) { return (feature.properties && feature.properties._fillOpacity !== undefined) ? feature.properties._fillOpacity : state.fillOpacity; },
+                    outlineColor: function(feature) { return (feature.properties && feature.properties._lineColor) || state.lineColor; },
                     outlineWidth: 2
                 }
             }),
             new TerraDrawCircleMode({
                 styles: {
-                    fillColor: state.fillColor,
-                    fillOpacity: state.fillOpacity,
-                    outlineColor: state.lineColor,
+                    fillColor: function(feature) { return (feature.properties && feature.properties._fillColor) || state.fillColor; },
+                    fillOpacity: function(feature) { return (feature.properties && feature.properties._fillOpacity !== undefined) ? feature.properties._fillOpacity : state.fillOpacity; },
+                    outlineColor: function(feature) { return (feature.properties && feature.properties._lineColor) || state.lineColor; },
                     outlineWidth: 2
                 }
             }),
             new TerraDrawFreehandMode({
                 styles: {
-                    fillColor: state.fillColor,
-                    fillOpacity: state.fillOpacity,
-                    outlineColor: state.lineColor,
+                    fillColor: function(feature) { return (feature.properties && feature.properties._fillColor) || state.fillColor; },
+                    fillOpacity: function(feature) { return (feature.properties && feature.properties._fillOpacity !== undefined) ? feature.properties._fillOpacity : state.fillOpacity; },
+                    outlineColor: function(feature) { return (feature.properties && feature.properties._lineColor) || state.lineColor; },
                     outlineWidth: 2
                 }
             }),
@@ -411,7 +416,6 @@ function initTerraDraw() {
                     rectangle: {
                         feature: {
                             draggable: true,
-                            coordinates: { draggable: true },
                             resizable: 'opposite'
                         }
                     },
@@ -422,19 +426,27 @@ function initTerraDraw() {
                         }
                     },
                     freehand: {
-                        feature: { draggable: true }
+                        feature: {
+                            draggable: true,
+                            coordinates: { midpoints: true, draggable: true, deletable: true }
+                        }
                     }
                 },
                 styles: {
-                    selectedPolygonColor: state.lineColor,
-                    selectedPolygonFillOpacity: 0.4,
+                    selectedPolygonColor: function(feature) { return (feature.properties && feature.properties._lineColor) || state.lineColor; },
+                    selectedPolygonFillOpacity: function(feature) { return (feature.properties && feature.properties._fillOpacity !== undefined) ? feature.properties._fillOpacity : 0.4; },
                     selectedPolygonOutlineColor: '#FFFFFF',
                     selectedPolygonOutlineWidth: 2,
-                    selectedLineStringColor: '#FFFFFF',
+                    selectedLineStringColor: function(feature) {
+                        if (feature.properties && feature.properties._lineType && feature.properties._lineType !== 'solid') {
+                            return 'rgba(0,0,0,0)';
+                        }
+                        return (feature.properties && feature.properties._lineColor) || '#FFFFFF';
+                    },
                     selectedLineStringWidth: 3,
                     selectedPointColor: '#FFFFFF',
                     selectedPointWidth: 8,
-                    selectedPointOutlineColor: state.lineColor,
+                    selectedPointOutlineColor: function(feature) { return (feature.properties && feature.properties._lineColor) || state.lineColor; },
                     selectedPointOutlineWidth: 3,
                     selectionPointWidth: 7,
                     selectionPointColor: '#FFFFFF',
@@ -473,22 +485,46 @@ function initTerraDraw() {
     state.selectedFeatureId = null;
     state.draw.on('select', function(id) {
         state.selectedFeatureId = id;
+        // Deselect any selected marker (with visual update)
+        state.markers.forEach(function(m) {
+            if (m._selected) { m._selected = false; setMarkerSelected(m, false); }
+        });
+        syncColorPickerToSelection();
+        updateColorSelectionIndicator();
     });
     state.draw.on('deselect', function() {
         state.selectedFeatureId = null;
+        updateColorSelectionIndicator();
     });
 
     // Track changes for undo/redo
     state.draw.on('finish', function(id, context) {
         if (context.action === 'draw') {
+            stampColorProperties(id);
             pushUndoState();
             applyLineType(id);
         }
     });
 
     state.draw.on('change', function(ids, type) {
-        if (type === 'delete') {
+        if (type === 'delete' && !state._suppressUndoPush) {
             pushUndoState();
+        }
+        // Sync line overlay paths when features are dragged/edited
+        if (state._lineOverlays) {
+            ids.forEach(function(id) {
+                if (state._lineOverlays[id]) {
+                    try {
+                        var feature = state.draw.getSnapshotFeature(id);
+                        if (feature && feature.geometry.type === 'LineString') {
+                            var path = feature.geometry.coordinates.map(function(c) {
+                                return { lat: c[1], lng: c[0] };
+                            });
+                            state._lineOverlays[id].setPath(path);
+                        }
+                    } catch (e) {}
+                }
+            });
         }
     });
 }
@@ -600,6 +636,7 @@ function setupToolbar() {
     document.getElementById('btn-color').addEventListener('click', function(e) {
         e.stopPropagation();
         toggleSubmenu('submenu-color', 'btn-color');
+        updateColorSelectionIndicator();
     });
 
     document.getElementById('btn-redo').addEventListener('click', function() {
@@ -676,6 +713,382 @@ function setActiveTool(tool) {
         document.getElementById(btnMap[tool]).classList.add('active');
     }
     state.currentMode = tool;
+}
+
+
+// ===== Selection Helpers for Color Editing =====
+
+/**
+ * Get information about the currently selected object, if any.
+ * Returns { type: 'terra', id, feature } or { type: 'marker', marker, index } or null.
+ */
+function getSelectedObject() {
+    // Check Terra Draw selection first
+    if (state.selectedFeatureId && state.draw) {
+        try {
+            var feature = state.draw.getSnapshotFeature(state.selectedFeatureId);
+            if (feature) {
+                return { type: 'terra', id: state.selectedFeatureId, feature: feature };
+            }
+        } catch (e) { /* feature may have been deleted */ }
+    }
+
+    // Check Google Maps markers
+    for (var i = 0; i < state.markers.length; i++) {
+        if (state.markers[i]._selected) {
+            return { type: 'marker', marker: state.markers[i], index: i };
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Show/hide the "Editing: [type]" indicator in the color submenu.
+ */
+function updateColorSelectionIndicator() {
+    var indicator = document.getElementById('color-selection-indicator');
+    var text = document.getElementById('color-selection-text');
+    if (!indicator) return;
+
+    var selected = getSelectedObject();
+
+    if (!selected) {
+        indicator.style.display = 'none';
+        return;
+    }
+
+    indicator.style.display = 'block';
+
+    if (selected.type === 'terra') {
+        var mode = selected.feature.properties.mode || selected.feature.geometry.type;
+        // Capitalize first letter
+        var label = mode.charAt(0).toUpperCase() + mode.slice(1);
+        text.textContent = 'Editing: ' + label;
+    } else if (selected.type === 'marker') {
+        var info = selected.marker._sittemp;
+        if (info.type === 'equipment') {
+            var eq = EQUIPMENT_LIST.find(function(e) { return e.key === info.key; });
+            text.textContent = 'Editing: ' + (eq ? eq.name : 'Equipment');
+        } else if (info.type === 'unit') {
+            var u = UNIT_LIST.find(function(u) { return u.key === info.key; });
+            text.textContent = 'Editing: ' + (u ? u.name : 'Unit');
+        } else if (info.type === 'star') {
+            text.textContent = 'Editing: Star';
+        } else if (info.type === 'text') {
+            text.textContent = 'Editing: Text Label';
+        }
+    }
+}
+
+/**
+ * When a feature/marker is selected, sync the color picker to reflect its current colors.
+ */
+function syncColorPickerToSelection() {
+    var selected = getSelectedObject();
+    if (!selected) return;
+
+    var lineColor, fillColor, fillOpacity;
+
+    if (selected.type === 'terra') {
+        var props = selected.feature.properties;
+        lineColor = props._lineColor || state.lineColor;
+        fillColor = props._fillColor || state.fillColor;
+        fillOpacity = (props._fillOpacity !== undefined) ? props._fillOpacity : state.fillOpacity;
+    } else if (selected.type === 'marker') {
+        var info = selected.marker._sittemp;
+        lineColor = info.color || state.lineColor;
+        fillColor = info.fillColor || info.color || state.fillColor;
+        fillOpacity = (info.fillOpacity !== undefined) ? info.fillOpacity : state.fillOpacity;
+    }
+
+    // Update global state
+    state.lineColor = lineColor;
+    state.fillColor = fillColor;
+    state.fillOpacity = fillOpacity;
+
+    // Update swatch highlights
+    highlightSwatch('line-color-swatches', lineColor);
+    highlightSwatch('fill-color-swatches', fillColor);
+
+    // Update opacity slider
+    var slider = document.getElementById('opacity-slider');
+    if (slider) {
+        slider.value = Math.round(fillOpacity * 100);
+        document.getElementById('opacity-value').textContent = Math.round(fillOpacity * 100) + '%';
+    }
+
+    // Update drawing mode styles to match
+    updateDrawStyles();
+}
+
+/**
+ * Set the active swatch in a color swatch container to match a hex color.
+ */
+function highlightSwatch(containerId, hexColor) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    var swatches = container.querySelectorAll('.color-swatch');
+    swatches.forEach(function(s) { s.classList.remove('active'); });
+
+    // Match by iterating COLORS in order
+    var index = 0;
+    for (var name in COLORS) {
+        if (COLORS[name].toUpperCase() === hexColor.toUpperCase()) {
+            if (swatches[index]) swatches[index].classList.add('active');
+            return;
+        }
+        index++;
+    }
+}
+
+/**
+ * Stamp current color properties onto a newly drawn Terra Draw feature.
+ * Stores _lineColor, _fillColor, _fillOpacity, _lineType in feature.properties.
+ */
+function stampColorProperties(featureId) {
+    try {
+        var feature = state.draw.getSnapshotFeature(featureId);
+        if (!feature) return;
+
+        var updated = JSON.parse(JSON.stringify(feature));
+        updated.properties._lineColor = state.lineColor;
+        updated.properties._fillColor = state.fillColor;
+        updated.properties._fillOpacity = state.fillOpacity;
+        if (state.lineType !== 'solid') {
+            updated.properties._lineType = state.lineType;
+        }
+
+        state._suppressUndoPush = true;
+        state.draw.removeFeatures([featureId]);
+        delete updated.properties.selected;
+        delete updated.properties.selectionPoint;
+        delete updated.properties.midPoint;
+        state.draw.addFeatures([updated]);
+        state._suppressUndoPush = false;
+    } catch (e) {
+        state._suppressUndoPush = false;
+        console.error('Failed to stamp color properties:', e);
+    }
+}
+
+/**
+ * Apply current color settings to the selected object (if any).
+ * Called whenever line color, fill color, or opacity changes.
+ */
+function applyColorToSelection() {
+    var selected = getSelectedObject();
+    if (!selected) return;
+
+    if (selected.type === 'terra') {
+        applyColorToSelectedTerra(state.lineColor, state.fillColor, state.fillOpacity);
+    } else if (selected.type === 'marker') {
+        applyColorToSelectedMarker(state.lineColor, state.fillColor, state.fillOpacity);
+    }
+}
+
+/**
+ * Apply new colors to the currently selected Terra Draw feature.
+ * Uses remove/add cycle to update feature properties.
+ */
+function applyColorToSelectedTerra(lineColor, fillColor, fillOpacity) {
+    if (!state.selectedFeatureId || !state.draw) return false;
+
+    try {
+        var feature = state.draw.getSnapshotFeature(state.selectedFeatureId);
+        if (!feature) return false;
+
+        var id = state.selectedFeatureId;
+
+        // Deep copy and update color properties
+        var updated = JSON.parse(JSON.stringify(feature));
+        updated.properties._lineColor = lineColor;
+        updated.properties._fillColor = fillColor;
+        updated.properties._fillOpacity = fillOpacity;
+
+        // Remove and re-add with new properties
+        state._suppressUndoPush = true;
+        state.draw.removeFeatures([id]);
+        delete updated.properties.selected;
+        delete updated.properties.selectionPoint;
+        delete updated.properties.midPoint;
+        state.draw.addFeatures([updated]);
+        state._suppressUndoPush = false;
+
+        // Restore selection tracking (feature ID is preserved)
+        state.selectedFeatureId = id;
+
+        // Update any associated line overlay
+        if (state._lineOverlays && state._lineOverlays[id]) {
+            updateLineOverlayColor(id, lineColor);
+        }
+
+        pushUndoState();
+        return true;
+    } catch (e) {
+        state._suppressUndoPush = false;
+        console.error('Failed to update Terra Draw feature color:', e);
+        return false;
+    }
+}
+
+/**
+ * Apply new colors to the currently selected Google Maps marker.
+ * Regenerates the SVG icon and calls marker.setIcon().
+ */
+function applyColorToSelectedMarker(lineColor, fillColor, fillOpacity) {
+    var marker = state.markers.find(function(m) { return m._selected; });
+    if (!marker) return false;
+
+    var info = marker._sittemp;
+    info.color = lineColor;
+
+    var iconUrl, size, anchor;
+
+    if (info.type === 'equipment') {
+        var svgFull = buildSymbolWithLabels(
+            equipmentSVG(info.key, lineColor),
+            info.leftText, info.rightText, lineColor
+        );
+        iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgFull);
+        size = new google.maps.Size(120, 50);
+        anchor = new google.maps.Point(60, 25);
+    } else if (info.type === 'unit') {
+        var svgFull = buildSymbolWithLabels(
+            unitSVG(info.key, lineColor),
+            info.leftText, info.rightText, lineColor
+        );
+        iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgFull);
+        size = new google.maps.Size(120, 50);
+        anchor = new google.maps.Point(60, 25);
+    } else if (info.type === 'star') {
+        info.fillColor = fillColor;
+        info.fillOpacity = fillOpacity;
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">' +
+            '<polygon points="15,1 18.5,11 29,11 20.5,17.5 23.5,28 15,22 6.5,28 9.5,17.5 1,11 11.5,11"' +
+            ' fill="' + fillColor + '" fill-opacity="' + fillOpacity + '" stroke="' + lineColor + '" stroke-width="2"/>' +
+            '</svg>';
+        iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+        size = new google.maps.Size(30, 30);
+        anchor = new google.maps.Point(15, 15);
+    } else if (info.type === 'text') {
+        var text = info.text;
+        var fontSize = 14;
+        var padding = 4;
+        var charWidth = 8;
+        var width = text.length * charWidth + padding * 2;
+        var height = fontSize + padding * 2;
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">' +
+            '<text x="' + padding + '" y="' + (fontSize + padding - 2) + '" fill="' + lineColor + '" font-size="' + fontSize + '" font-family="Arial,sans-serif" font-weight="bold">' + escapeXml(text) + '</text>' +
+            '</svg>';
+        iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+        size = new google.maps.Size(width, height);
+        anchor = new google.maps.Point(width / 2, height / 2);
+    } else {
+        return false;
+    }
+
+    marker.setIcon({
+        url: iconUrl,
+        scaledSize: size,
+        anchor: anchor
+    });
+
+    // Re-apply selection highlight after color change
+    setMarkerSelected(marker, true);
+
+    pushUndoState();
+    return true;
+}
+
+/**
+ * Set the visual selection state of a marker.
+ * When selected, adds a cyan dashed border to the SVG icon.
+ * When deselected, restores the normal icon.
+ */
+function setMarkerSelected(marker, isSelected) {
+    var info = marker._sittemp;
+    if (!info) return;
+
+    var iconUrl, size, anchor;
+
+    if (info.type === 'equipment' || info.type === 'unit') {
+        var svgInner = info.type === 'equipment' ?
+            equipmentSVG(info.key, info.color) :
+            unitSVG(info.key, info.color);
+        var svgFull = buildSymbolWithLabels(svgInner, info.leftText, info.rightText, info.color);
+        if (isSelected) {
+            svgFull = svgFull.replace(
+                /(<svg[^>]*>)/,
+                '$1<rect x="1" y="1" width="118" height="48" fill="none" stroke="cyan" stroke-width="2" stroke-dasharray="4,3" rx="3"/>'
+            );
+        }
+        iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgFull);
+        size = new google.maps.Size(120, 50);
+        anchor = new google.maps.Point(60, 25);
+    } else if (info.type === 'star') {
+        var starFill = info.fillColor || info.color;
+        var starOpacity = (info.fillOpacity !== undefined) ? info.fillOpacity : 1;
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">';
+        if (isSelected) {
+            svg += '<circle cx="15" cy="15" r="14" fill="none" stroke="cyan" stroke-width="2" stroke-dasharray="4,3"/>';
+        }
+        svg += '<polygon points="15,1 18.5,11 29,11 20.5,17.5 23.5,28 15,22 6.5,28 9.5,17.5 1,11 11.5,11"' +
+            ' fill="' + starFill + '" fill-opacity="' + starOpacity + '" stroke="' + info.color + '" stroke-width="2"/>';
+        svg += '</svg>';
+        iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+        size = new google.maps.Size(30, 30);
+        anchor = new google.maps.Point(15, 15);
+    } else if (info.type === 'text') {
+        var text = info.text;
+        var fontSize = 14;
+        var padding = 4;
+        var charWidth = 8;
+        var width = text.length * charWidth + padding * 2;
+        var height = fontSize + padding * 2;
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">';
+        if (isSelected) {
+            svg += '<rect x="0" y="0" width="' + width + '" height="' + height + '" fill="none" stroke="cyan" stroke-width="2" stroke-dasharray="4,3" rx="2"/>';
+        }
+        svg += '<text x="' + padding + '" y="' + (fontSize + padding - 2) + '" fill="' + info.color + '" font-size="' + fontSize + '" font-family="Arial,sans-serif" font-weight="bold">' + escapeXml(text) + '</text>';
+        svg += '</svg>';
+        iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+        size = new google.maps.Size(width, height);
+        anchor = new google.maps.Point(width / 2, height / 2);
+    } else {
+        return;
+    }
+
+    marker.setIcon({
+        url: iconUrl,
+        scaledSize: size,
+        anchor: anchor
+    });
+}
+
+/**
+ * Update a line overlay polyline to a new color.
+ * Removes the old overlay and recreates it with the new color.
+ */
+function updateLineOverlayColor(featureId, newColor) {
+    if (!state._lineOverlays || !state._lineOverlays[featureId]) return;
+
+    var oldPolyline = state._lineOverlays[featureId];
+    var lineType = oldPolyline._lineType;
+    if (!lineType) return;
+
+    // Remove old overlay
+    oldPolyline.setMap(null);
+    delete state._lineOverlays[featureId];
+
+    // Temporarily override state to recreate with new color and stored line type
+    var savedColor = state.lineColor;
+    var savedType = state.lineType;
+    state.lineColor = newColor;
+    state.lineType = lineType;
+    applyLineType(featureId);
+    state.lineColor = savedColor;
+    state.lineType = savedType;
 }
 
 
@@ -815,6 +1228,7 @@ function buildColorSubmenu() {
             lineSwatches.querySelectorAll('.color-swatch').forEach(function(s) { s.classList.remove('active'); });
             lineSwatch.classList.add('active');
             updateDrawStyles();
+            applyColorToSelection();
         });
         lineSwatches.appendChild(lineSwatch);
 
@@ -829,6 +1243,7 @@ function buildColorSubmenu() {
             fillSwatches.querySelectorAll('.color-swatch').forEach(function(s) { s.classList.remove('active'); });
             fillSwatch.classList.add('active');
             updateDrawStyles();
+            applyColorToSelection();
         });
         fillSwatches.appendChild(fillSwatch);
     }
@@ -840,6 +1255,7 @@ function buildColorSubmenu() {
         state.fillOpacity = parseInt(slider.value) / 100;
         valueLabel.textContent = slider.value + '%';
         updateDrawStyles();
+        applyColorToSelection();
     });
 }
 
@@ -849,24 +1265,35 @@ function buildColorSubmenu() {
 function updateDrawStyles() {
     if (!state.draw || !state.ready) return;
 
+    // Since mode styles use functions that read from state.lineColor/fillColor/fillOpacity,
+    // calling updateModeOptions forces Terra Draw to re-evaluate and re-render.
     try {
-        state.draw.updateModeOptions('polygon', {
-            styles: { fillColor: state.fillColor, fillOpacity: state.fillOpacity, outlineColor: state.lineColor, outlineWidth: 2 }
-        });
-        state.draw.updateModeOptions('rectangle', {
-            styles: { fillColor: state.fillColor, fillOpacity: state.fillOpacity, outlineColor: state.lineColor, outlineWidth: 2 }
-        });
-        state.draw.updateModeOptions('circle', {
-            styles: { fillColor: state.fillColor, fillOpacity: state.fillOpacity, outlineColor: state.lineColor, outlineWidth: 2 }
-        });
-        state.draw.updateModeOptions('freehand', {
-            styles: { fillColor: state.fillColor, fillOpacity: state.fillOpacity, outlineColor: state.lineColor, outlineWidth: 2 }
-        });
+        var polyStyles = {
+            fillColor: function(feature) { return (feature.properties && feature.properties._fillColor) || state.fillColor; },
+            fillOpacity: function(feature) { return (feature.properties && feature.properties._fillOpacity !== undefined) ? feature.properties._fillOpacity : state.fillOpacity; },
+            outlineColor: function(feature) { return (feature.properties && feature.properties._lineColor) || state.lineColor; },
+            outlineWidth: 2
+        };
+        state.draw.updateModeOptions('polygon', { styles: polyStyles });
+        state.draw.updateModeOptions('rectangle', { styles: polyStyles });
+        state.draw.updateModeOptions('circle', { styles: polyStyles });
+        state.draw.updateModeOptions('freehand', { styles: polyStyles });
         state.draw.updateModeOptions('linestring', {
-            styles: { lineStringColor: state.lineColor, lineStringWidth: 3 }
+            styles: {
+                lineStringColor: function(feature) {
+                    if (feature.properties && feature.properties._lineType && feature.properties._lineType !== 'solid') {
+                        return 'rgba(0,0,0,0)';
+                    }
+                    return (feature.properties && feature.properties._lineColor) || state.lineColor;
+                },
+                lineStringWidth: 3
+            }
         });
         state.draw.updateModeOptions('point', {
-            styles: { pointColor: state.lineColor, pointWidth: 6, pointOutlineColor: '#000000', pointOutlineWidth: 2 }
+            styles: {
+                pointColor: function(feature) { return (feature.properties && feature.properties._lineColor) || state.lineColor; },
+                pointWidth: 6, pointOutlineColor: '#000000', pointOutlineWidth: 2
+            }
         });
     } catch (e) {
         // Styles may fail if mode not yet ready
@@ -968,9 +1395,16 @@ function placeSymbol(latLng, leftText, rightText) {
     };
 
     marker.addListener('click', function() {
-        // Select this marker for deletion
-        state.markers.forEach(function(m) { m._selected = false; });
+        // Deselect any Terra Draw feature
+        state.selectedFeatureId = null;
+        // Deselect all markers visually, then select this one
+        state.markers.forEach(function(m) {
+            if (m._selected) { m._selected = false; setMarkerSelected(m, false); }
+        });
         marker._selected = true;
+        setMarkerSelected(marker, true);
+        syncColorPickerToSelection();
+        updateColorSelectionIndicator();
         showToast('Symbol selected. Press Clear Selected to delete.');
     });
 
@@ -1053,10 +1487,16 @@ function placeStarMarker(latLng) {
         zIndex: 100,
     });
 
-    marker._sittemp = { type: 'star', color: color };
+    marker._sittemp = { type: 'star', color: color, fillColor: fill, fillOpacity: opacity };
     marker.addListener('click', function() {
-        state.markers.forEach(function(m) { m._selected = false; });
+        state.selectedFeatureId = null;
+        state.markers.forEach(function(m) {
+            if (m._selected) { m._selected = false; setMarkerSelected(m, false); }
+        });
         marker._selected = true;
+        setMarkerSelected(marker, true);
+        syncColorPickerToSelection();
+        updateColorSelectionIndicator();
         showToast('Star selected. Press Clear Selected to delete.');
     });
 
@@ -1128,7 +1568,6 @@ function placeTextLabel(latLng, text) {
     const height = fontSize + padding * 2;
 
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-        <rect x="0" y="0" width="${width}" height="${height}" fill="white" fill-opacity="0.7" rx="2"/>
         <text x="${padding}" y="${fontSize + padding - 2}" fill="${color}" font-size="${fontSize}" font-family="Arial,sans-serif" font-weight="bold">${escapeXml(text)}</text>
     </svg>`;
 
@@ -1143,13 +1582,20 @@ function placeTextLabel(latLng, text) {
         },
         draggable: true,
         clickable: true,
+        optimized: false,
         zIndex: 100,
     });
 
     marker._sittemp = { type: 'text', text: text, color: color };
     marker.addListener('click', function() {
-        state.markers.forEach(function(m) { m._selected = false; });
+        state.selectedFeatureId = null;
+        state.markers.forEach(function(m) {
+            if (m._selected) { m._selected = false; setMarkerSelected(m, false); }
+        });
         marker._selected = true;
+        setMarkerSelected(marker, true);
+        syncColorPickerToSelection();
+        updateColorSelectionIndicator();
         showToast('Text selected. Press Clear Selected to delete.');
     });
 
@@ -1191,6 +1637,7 @@ function clearSelected() {
 
     if (deleted) {
         pushUndoState();
+        updateColorSelectionIndicator();
         showToast('Deleted');
     } else {
         showToast('Nothing selected');
@@ -1253,6 +1700,14 @@ function performRedo() {
 function restoreState(stateJson) {
     const saved = JSON.parse(stateJson);
 
+    // Clear existing line overlays
+    if (state._lineOverlays) {
+        for (var fid in state._lineOverlays) {
+            state._lineOverlays[fid].setMap(null);
+        }
+        state._lineOverlays = {};
+    }
+
     // Restore Terra Draw features
     if (state.draw && state.ready) {
         state.draw.clear();
@@ -1263,6 +1718,19 @@ function restoreState(stateJson) {
                 // Some features may fail to restore
             }
         }
+
+        // Rebuild line overlays for features that have _lineType
+        saved.features.forEach(function(f) {
+            if (f.properties && f.properties._lineType && f.properties._lineType !== 'solid') {
+                var savedColor = state.lineColor;
+                var savedType = state.lineType;
+                state.lineColor = f.properties._lineColor || savedColor;
+                state.lineType = f.properties._lineType;
+                applyLineType(f.id);
+                state.lineColor = savedColor;
+                state.lineType = savedType;
+            }
+        });
     }
 
     // Restore markers
@@ -1272,6 +1740,10 @@ function restoreState(stateJson) {
     saved.markers.forEach(function(data) {
         recreateMarker(data);
     });
+
+    // Clear selection state
+    state.selectedFeatureId = null;
+    updateColorSelectionIndicator();
 }
 
 function recreateMarker(data) {
@@ -1295,9 +1767,11 @@ function recreateMarker(data) {
         size = new google.maps.Size(120, 50);
         anchor = new google.maps.Point(60, 25);
     } else if (info.type === 'star') {
+        const starFill = info.fillColor || info.color;
+        const starOpacity = (info.fillOpacity !== undefined) ? info.fillOpacity : 1;
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
             <polygon points="15,1 18.5,11 29,11 20.5,17.5 23.5,28 15,22 6.5,28 9.5,17.5 1,11 11.5,11"
-                fill="${info.color}" stroke="${info.color}" stroke-width="2"/>
+                fill="${starFill}" fill-opacity="${starOpacity}" stroke="${info.color}" stroke-width="2"/>
         </svg>`;
         iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
         size = new google.maps.Size(30, 30);
@@ -1310,7 +1784,6 @@ function recreateMarker(data) {
         const width = text.length * charWidth + padding * 2;
         const height = fontSize + padding * 2;
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-            <rect x="0" y="0" width="${width}" height="${height}" fill="white" fill-opacity="0.7" rx="2"/>
             <text x="${padding}" y="${fontSize + padding - 2}" fill="${info.color}" font-size="${fontSize}" font-family="Arial,sans-serif" font-weight="bold">${escapeXml(text)}</text>
         </svg>`;
         iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
@@ -1326,13 +1799,20 @@ function recreateMarker(data) {
         icon: { url: iconUrl, scaledSize: size, anchor: anchor },
         draggable: true,
         clickable: true,
+        optimized: false,
         zIndex: 100,
     });
 
     marker._sittemp = info;
     marker.addListener('click', function() {
-        state.markers.forEach(function(m) { m._selected = false; });
+        state.selectedFeatureId = null;
+        state.markers.forEach(function(m) {
+            if (m._selected) { m._selected = false; setMarkerSelected(m, false); }
+        });
         marker._selected = true;
+        setMarkerSelected(marker, true);
+        syncColorPickerToSelection();
+        updateColorSelectionIndicator();
         showToast('Selected. Press Clear Selected to delete.');
     });
 
@@ -1448,6 +1928,7 @@ function applyLineType(featureId) {
     // Store polyline so it can be cleaned up
     if (polyline) {
         if (!state._lineOverlays) state._lineOverlays = {};
+        polyline._lineType = state.lineType;
         state._lineOverlays[featureId] = polyline;
     }
 }

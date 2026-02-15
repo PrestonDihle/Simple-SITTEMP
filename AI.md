@@ -191,6 +191,27 @@ const [lng, lat] = mgrs.toPoint(mgrsString);
 - [x] Triangle shape (via polygon mode with 3-point instruction)
 - [x] Five-point star shape (as Google Maps marker)
 
+### Phase 7: Post-Creation Color Editing
+- [x] Per-feature color properties stamped on creation (`_lineColor`, `_fillColor`, `_fillOpacity`, `_lineType`)
+- [x] Function-based Terra Draw styling (reads per-feature colors, falls back to global state)
+- [x] Color picker applies to selected objects in real-time (Terra Draw features and Google Maps markers)
+- [x] Selection indicator banner ("Editing: Polygon") in color submenu
+- [x] Color picker syncs to selected object's current colors on selection
+- [x] Mutual exclusion: selecting a Terra Draw feature deselects markers and vice versa
+- [x] Line overlay recoloring for specialty line types (dashed, dotted, mine belt, etc.)
+- [x] Star marker stores fillColor/fillOpacity separately from stroke color
+- [x] `_suppressUndoPush` flag prevents double undo states during remove/add cycles
+- [x] `restoreState()` rebuilds line overlays for features with `_lineType` property
+
+### Phase 8: Bug Fixes from Testing
+- [x] Rectangle editing maintains rectangular constraints (uses `resizable: 'opposite'` only, no vertex dragging)
+- [x] Freehand shapes support vertex editing (midpoints, draggable, deletable)
+- [x] Marker selection visually indicated with cyan dashed border via `setMarkerSelected()` function
+- [x] Color editing works for equipment/units/stars/text — cyan highlight persists after color change
+- [x] Text labels have transparent background (no white rect)
+- [x] Specialty lines: base Terra Draw line made transparent (`rgba(0,0,0,0)`) when `_lineType` is set
+- [x] Specialty line overlays sync path on feature drag/edit via `change` event handler
+
 ## Known Limitations & Gotchas
 - Google Maps API key required (not included in repo, user must provide via localStorage prompt)
 - Terra Draw CDN versions pinned: terra-draw@1.24.2, terra-draw-google-maps-adapter@1.3.1
@@ -198,10 +219,13 @@ const [lng, lat] = mgrs.toPoint(mgrsString);
 - MGRS grid uses approximate lat/lon spacing (not true UTM grid lines); acceptable for planning use
 - html2canvas may not perfectly capture Google Maps tiles due to CORS restrictions
 - PDF export quality depends on html2canvas rendering; Google Maps tiles may appear blank
-- Specialty line types render as Google Maps Polylines on top of Terra Draw lines; the base Terra Draw solid line may be slightly visible underneath styled overlays
+- Specialty line types render as Google Maps Polylines on top of Terra Draw lines; the base Terra Draw line is made transparent via function-based styling when `_lineType` is set
 - Triangle shape uses standard polygon mode (user manually places 3 points); no automatic 3-vertex constraint
 - Five-point star is placed as a Google Maps marker, not a Terra Draw feature
-- Military symbols (equipment/units) are Google Maps markers, not Terra Draw features; they use a separate selection system (click to select, then Clear Selected to delete)
+- Military symbols (equipment/units) are Google Maps markers, not Terra Draw features; they use a separate selection system (click to select → cyan dashed border appears, then Clear Selected to delete)
+- `setMarkerSelected(marker, isSelected)` regenerates the SVG icon with/without a cyan dashed border; must be called at every selection state change
+- Color editing uses remove/add cycle for Terra Draw features (updates properties, then re-adds); a `_suppressUndoPush` flag prevents duplicate undo states during this cycle
+- Per-feature colors are stored in feature.properties (`_lineColor`, `_fillColor`, `_fillOpacity`, `_lineType`); Terra Draw mode styles use functions to read these
 - Undo/redo captures full state snapshots; may be memory-intensive with many features
 - Terra Draw `projection_changed` listener is required before init; if Google Maps loads slowly, there may be a brief delay
 - UMD globals: `terraDraw` (core), `terraDrawGoogleMapsAdapter` (adapter), `mgrs` (MGRS conversion)
@@ -233,3 +257,14 @@ const [lng, lat] = mgrs.toPoint(mgrsString);
 - [ ] Line types render correctly (solid, dashed, dotted, dash-dot)
 - [ ] Specialty line types render correctly (mine belt, wire obstacle, tank ditch)
 - [ ] Text placement mode allows clicking to place text labels on the map
+- [ ] Select a polygon → open Color picker → "Editing: Polygon" indicator appears
+- [ ] Change line color of selected polygon → polygon updates immediately
+- [ ] Change fill color of selected polygon → polygon fill updates
+- [ ] Change opacity of selected polygon → polygon opacity updates
+- [ ] Select equipment symbol → change color → SVG icon regenerates
+- [ ] Select text label → change color → text color updates
+- [ ] Select star → change fill color and opacity → star updates
+- [ ] Select dashed line → change color → both Terra Draw line and overlay polyline update
+- [ ] After editing, draw new shape → uses current picker colors
+- [ ] Undo after color change → object reverts to previous color
+- [ ] Color picker swatches sync to selected object's colors when clicking it
