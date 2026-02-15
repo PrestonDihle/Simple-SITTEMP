@@ -6,237 +6,202 @@
  */
 
 // ===== Equipment Symbol SVGs =====
-// NATO APP-6 style equipment symbols rendered as simple SVGs
-// All hostile equipment uses an upward-pointing triangle frame
+// NATO APP-6 style equipment modifier icons (no enclosing frame)
+// These are standalone symbols centered in a 40x40 viewBox
 export function equipmentSVG(key, color) {
     color = color || '#FF0000';
-    // Standard hostile triangle frame: vertex at top, base at bottom
-    const tri = `<polygon points="20,2 38,38 2,38" fill="none" stroke="${color}" stroke-width="2.5"/>`;
     const svgs = {
         // --- Row 1: Small Arms ---
-        // Rifle: diagonal line (barrel) with short perpendicular stock at upper-right end
+        // Rifle: diagonal line (barrel) with short perpendicular stock
         rifle: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="12" y1="30" x2="28" y2="14" stroke="${color}" stroke-width="2"/>
-            <line x1="25" y1="11" x2="31" y2="17" stroke="${color}" stroke-width="2"/>
+            <line x1="8" y1="32" x2="30" y2="10" stroke="${color}" stroke-width="2.5"/>
+            <line x1="27" y1="7" x2="33" y2="13" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
-        // Light MG: X-cross (two diagonal lines) with small open circle at center
+        // Light MG: X-cross with small open circle at center
         light_mg: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="11" y1="30" x2="29" y2="12" stroke="${color}" stroke-width="2"/>
-            <line x1="11" y1="12" x2="29" y2="30" stroke="${color}" stroke-width="2"/>
-            <circle cx="20" cy="21" r="2.5" fill="none" stroke="${color}" stroke-width="1.5"/>
+            <line x1="6" y1="34" x2="34" y2="6" stroke="${color}" stroke-width="2.5"/>
+            <line x1="6" y1="6" x2="34" y2="34" stroke="${color}" stroke-width="2.5"/>
+            <circle cx="20" cy="20" r="3.5" fill="none" stroke="${color}" stroke-width="2"/>
         </svg>`,
         // Heavy MG: X-cross with filled square at center
         heavy_mg: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="11" y1="30" x2="29" y2="12" stroke="${color}" stroke-width="2"/>
-            <line x1="11" y1="12" x2="29" y2="30" stroke="${color}" stroke-width="2"/>
-            <rect x="16.5" y="17.5" width="7" height="7" fill="${color}"/>
+            <line x1="6" y1="34" x2="34" y2="6" stroke="${color}" stroke-width="2.5"/>
+            <line x1="6" y1="6" x2="34" y2="34" stroke="${color}" stroke-width="2.5"/>
+            <rect x="15" y="15" width="10" height="10" fill="${color}"/>
         </svg>`,
-        // Grenade Launcher: vertical line (tube) with short horizontal crossbar at top
+        // Grenade Launcher: vertical tube with short horizontal crossbar at top
         grenade_launcher: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="20" y1="12" x2="20" y2="32" stroke="${color}" stroke-width="2"/>
-            <line x1="15" y1="12" x2="25" y2="12" stroke="${color}" stroke-width="2"/>
+            <line x1="20" y1="6" x2="20" y2="34" stroke="${color}" stroke-width="2.5"/>
+            <line x1="12" y1="6" x2="28" y2="6" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
         // Flame Thrower: vertical line with flame-like curves at top
         flame_thrower: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="20" y1="32" x2="20" y2="18" stroke="${color}" stroke-width="2"/>
-            <path d="M16 18 Q16 10 20 8 Q24 10 24 18" fill="none" stroke="${color}" stroke-width="1.8"/>
-            <path d="M18 16 Q18 12 20 11 Q22 12 22 16" fill="none" stroke="${color}" stroke-width="1.2"/>
+            <line x1="20" y1="36" x2="20" y2="18" stroke="${color}" stroke-width="2.5"/>
+            <path d="M14 18 Q14 8 20 4 Q26 8 26 18" fill="none" stroke="${color}" stroke-width="2"/>
+            <path d="M17 15 Q17 10 20 7 Q23 10 23 15" fill="none" stroke="${color}" stroke-width="1.5"/>
         </svg>`,
-        // AT Rifle: rifle symbol with horizontal crossbar (recoilless indicator)
+        // AT Rifle: rifle with horizontal crossbar at base
         at_rifle: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="12" y1="30" x2="28" y2="14" stroke="${color}" stroke-width="2"/>
-            <line x1="25" y1="11" x2="31" y2="17" stroke="${color}" stroke-width="2"/>
-            <line x1="13" y1="32" x2="27" y2="32" stroke="${color}" stroke-width="2"/>
+            <line x1="8" y1="30" x2="30" y2="8" stroke="${color}" stroke-width="2.5"/>
+            <line x1="27" y1="5" x2="33" y2="11" stroke="${color}" stroke-width="2.5"/>
+            <line x1="8" y1="36" x2="32" y2="36" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
 
         // --- Row 2: Mortars & Observation ---
-        // Light Mortar: vertical tube line with open circle at base
+        // Light Mortar: vertical tube with open circle at base
         light_mortar: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="20" y1="11" x2="20" y2="26" stroke="${color}" stroke-width="2"/>
-            <circle cx="20" cy="30" r="4" fill="none" stroke="${color}" stroke-width="2"/>
+            <line x1="20" y1="4" x2="20" y2="24" stroke="${color}" stroke-width="2.5"/>
+            <circle cx="20" cy="30" r="6" fill="none" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
-        // Heavy Mortar: vertical tube line with filled circle at base
+        // Heavy Mortar: vertical tube with filled circle at base
         heavy_mortar: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="20" y1="11" x2="20" y2="26" stroke="${color}" stroke-width="2"/>
-            <circle cx="20" cy="30" r="4" fill="${color}"/>
+            <line x1="20" y1="4" x2="20" y2="24" stroke="${color}" stroke-width="2.5"/>
+            <circle cx="20" cy="30" r="6" fill="${color}"/>
         </svg>`,
-        // Recoilless Rifle: rifle diagonal with open circle at breech end (lower-left)
+        // Recoilless Rifle: diagonal barrel with open circle at breech (lower-left)
         recoilless_rifle: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="12" y1="30" x2="28" y2="14" stroke="${color}" stroke-width="2"/>
-            <circle cx="12" cy="30" r="3" fill="none" stroke="${color}" stroke-width="1.5"/>
+            <line x1="10" y1="30" x2="32" y2="8" stroke="${color}" stroke-width="2.5"/>
+            <circle cx="10" cy="30" r="5" fill="none" stroke="${color}" stroke-width="2"/>
         </svg>`,
-        // Observation Post: "OP" text centered in triangle
+        // Observation Post: "OP" text
         observation_post: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <text x="20" y="29" text-anchor="middle" fill="${color}" font-size="14" font-weight="bold" font-family="Arial,sans-serif">OP</text>
+            <text x="20" y="27" text-anchor="middle" fill="${color}" font-size="18" font-weight="bold" font-family="Arial,sans-serif">OP</text>
         </svg>`,
-        // Artillery OP: open circle (target) with vertical line extending above it
+        // Artillery OP: open circle with vertical line above
         arty_op: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <circle cx="20" cy="24" r="5" fill="none" stroke="${color}" stroke-width="2"/>
-            <line x1="20" y1="12" x2="20" y2="19" stroke="${color}" stroke-width="2"/>
+            <circle cx="20" cy="26" r="8" fill="none" stroke="${color}" stroke-width="2.5"/>
+            <line x1="20" y1="4" x2="20" y2="18" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
-        // ATGM (Anti-Tank Guided Missile): "ATGM" text in triangle
+        // ATGM: "ATGM" text
         at_missile: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <text x="20" y="29" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold" font-family="Arial,sans-serif">ATGM</text>
+            <text x="20" y="26" text-anchor="middle" fill="${color}" font-size="12" font-weight="bold" font-family="Arial,sans-serif">ATGM</text>
         </svg>`,
 
         // --- Row 3: AT & AA Weapons, Aircraft ---
-        // Anti-Tank Gun: diagonal barrel with small filled circle at breech
+        // Anti-Tank Gun: diagonal barrel with filled circle at breech
         at_gun: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="12" y1="30" x2="28" y2="14" stroke="${color}" stroke-width="2.5"/>
-            <circle cx="12" cy="30" r="2.5" fill="${color}"/>
+            <line x1="10" y1="30" x2="32" y2="8" stroke="${color}" stroke-width="2.5"/>
+            <circle cx="10" cy="30" r="4" fill="${color}"/>
         </svg>`,
-        // AA Gun: "AA" text with horizontal line below (air defense indicator)
+        // AA Gun: "AA" text with horizontal air-defense line below
         aa_gun: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <text x="20" y="25" text-anchor="middle" fill="${color}" font-size="12" font-weight="bold" font-family="Arial,sans-serif">AA</text>
-            <line x1="12" y1="30" x2="28" y2="30" stroke="${color}" stroke-width="2"/>
+            <text x="20" y="22" text-anchor="middle" fill="${color}" font-size="16" font-weight="bold" font-family="Arial,sans-serif">AA</text>
+            <line x1="6" y1="30" x2="34" y2="30" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
-        // SAM (Surface-to-Air Missile): "SAM" text with horizontal line below
+        // SAM: "SAM" text with horizontal air-defense line below
         aa_missile: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <text x="20" y="25" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold" font-family="Arial,sans-serif">SAM</text>
-            <line x1="12" y1="30" x2="28" y2="30" stroke="${color}" stroke-width="2"/>
+            <text x="20" y="22" text-anchor="middle" fill="${color}" font-size="13" font-weight="bold" font-family="Arial,sans-serif">SAM</text>
+            <line x1="6" y1="30" x2="34" y2="30" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
-        // Fixed Wing: fuselage (vertical line), wings (horizontal line), tail (shorter horizontal)
+        // Fixed Wing: fuselage, wings, tail
         fixed_wing: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="20" y1="10" x2="20" y2="32" stroke="${color}" stroke-width="2"/>
-            <line x1="10" y1="20" x2="30" y2="20" stroke="${color}" stroke-width="2"/>
-            <line x1="15" y1="29" x2="25" y2="29" stroke="${color}" stroke-width="1.5"/>
+            <line x1="20" y1="4" x2="20" y2="36" stroke="${color}" stroke-width="2.5"/>
+            <line x1="4" y1="18" x2="36" y2="18" stroke="${color}" stroke-width="2.5"/>
+            <line x1="12" y1="32" x2="28" y2="32" stroke="${color}" stroke-width="2"/>
         </svg>`,
-        // Attack Helicopter: rotor (horizontal line), mast (short vertical), fuselage (ellipse), weapon stubs
+        // Attack Helicopter: rotor, mast, fuselage ellipse, weapon stubs
         attack_helo: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="10" y1="14" x2="30" y2="14" stroke="${color}" stroke-width="2"/>
-            <line x1="20" y1="14" x2="20" y2="18" stroke="${color}" stroke-width="2"/>
-            <ellipse cx="20" cy="23" rx="8" ry="5" fill="none" stroke="${color}" stroke-width="1.5"/>
-            <line x1="12" y1="22" x2="9" y2="22" stroke="${color}" stroke-width="1.5"/>
-            <line x1="28" y1="22" x2="31" y2="22" stroke="${color}" stroke-width="1.5"/>
+            <line x1="4" y1="10" x2="36" y2="10" stroke="${color}" stroke-width="2.5"/>
+            <line x1="20" y1="10" x2="20" y2="16" stroke="${color}" stroke-width="2.5"/>
+            <ellipse cx="20" cy="24" rx="11" ry="7" fill="none" stroke="${color}" stroke-width="2"/>
+            <line x1="9" y1="23" x2="4" y2="23" stroke="${color}" stroke-width="2"/>
+            <line x1="31" y1="23" x2="36" y2="23" stroke="${color}" stroke-width="2"/>
         </svg>`,
-        // Utility Helicopter: rotor (horizontal line), mast, fuselage (ellipse) — no weapon stubs
+        // Utility Helicopter: rotor, mast, fuselage ellipse (no weapon stubs)
         utility_helo: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="10" y1="14" x2="30" y2="14" stroke="${color}" stroke-width="2"/>
-            <line x1="20" y1="14" x2="20" y2="18" stroke="${color}" stroke-width="2"/>
-            <ellipse cx="20" cy="23" rx="8" ry="5" fill="none" stroke="${color}" stroke-width="1.5"/>
+            <line x1="4" y1="10" x2="36" y2="10" stroke="${color}" stroke-width="2.5"/>
+            <line x1="20" y1="10" x2="20" y2="16" stroke="${color}" stroke-width="2.5"/>
+            <ellipse cx="20" cy="24" rx="11" ry="7" fill="none" stroke="${color}" stroke-width="2"/>
         </svg>`,
 
         // --- Row 4: Vehicles & Artillery ---
-        // Tank: track ellipse with gun barrel (vertical line) extending upward
+        // Tank: track ellipse with gun barrel extending upward
         tank: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <ellipse cx="20" cy="25" rx="10" ry="5" fill="none" stroke="${color}" stroke-width="2"/>
-            <line x1="20" y1="20" x2="20" y2="12" stroke="${color}" stroke-width="2.5"/>
+            <ellipse cx="20" cy="26" rx="14" ry="7" fill="none" stroke="${color}" stroke-width="2.5"/>
+            <line x1="20" y1="19" x2="20" y2="6" stroke="${color}" stroke-width="3"/>
         </svg>`,
-        // APC/IFV (Armored Vehicle): track ellipse only, no gun barrel
+        // APC/IFV: track ellipse only
         armored_vehicle: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <ellipse cx="20" cy="25" rx="10" ry="5" fill="none" stroke="${color}" stroke-width="2"/>
+            <ellipse cx="20" cy="20" rx="14" ry="8" fill="none" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
-        // Howitzer/Field Artillery: filled circle (artillery dot)
+        // Howitzer/Field Artillery: filled circle
         howitzer: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <circle cx="20" cy="24" r="6" fill="${color}"/>
+            <circle cx="20" cy="20" r="10" fill="${color}"/>
         </svg>`,
-        // Rocket Artillery / MRL: three upward-pointing arrow lines
+        // Rocket Artillery / MRL: three upward arrows
         rocket_arty: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="14" y1="32" x2="14" y2="16" stroke="${color}" stroke-width="1.8"/>
-            <line x1="14" y1="16" x2="11" y2="20" stroke="${color}" stroke-width="1.5"/>
-            <line x1="14" y1="16" x2="17" y2="20" stroke="${color}" stroke-width="1.5"/>
-            <line x1="20" y1="32" x2="20" y2="12" stroke="${color}" stroke-width="1.8"/>
-            <line x1="20" y1="12" x2="17" y2="16" stroke="${color}" stroke-width="1.5"/>
-            <line x1="20" y1="12" x2="23" y2="16" stroke="${color}" stroke-width="1.5"/>
-            <line x1="26" y1="32" x2="26" y2="16" stroke="${color}" stroke-width="1.8"/>
-            <line x1="26" y1="16" x2="23" y2="20" stroke="${color}" stroke-width="1.5"/>
-            <line x1="26" y1="16" x2="29" y2="20" stroke="${color}" stroke-width="1.5"/>
+            <line x1="12" y1="36" x2="12" y2="12" stroke="${color}" stroke-width="2"/>
+            <line x1="12" y1="12" x2="8" y2="18" stroke="${color}" stroke-width="2"/>
+            <line x1="12" y1="12" x2="16" y2="18" stroke="${color}" stroke-width="2"/>
+            <line x1="20" y1="36" x2="20" y2="6" stroke="${color}" stroke-width="2"/>
+            <line x1="20" y1="6" x2="16" y2="12" stroke="${color}" stroke-width="2"/>
+            <line x1="20" y1="6" x2="24" y2="12" stroke="${color}" stroke-width="2"/>
+            <line x1="28" y1="36" x2="28" y2="12" stroke="${color}" stroke-width="2"/>
+            <line x1="28" y1="12" x2="24" y2="18" stroke="${color}" stroke-width="2"/>
+            <line x1="28" y1="12" x2="32" y2="18" stroke="${color}" stroke-width="2"/>
         </svg>`,
-        // Radar: parabolic dish curve with small filled circle (emitter)
+        // Radar: parabolic dish with emitter dot
         radar: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <path d="M12 30 Q20 10 28 30" fill="none" stroke="${color}" stroke-width="2"/>
-            <circle cx="20" cy="24" r="2.5" fill="${color}"/>
+            <path d="M6 34 Q20 4 34 34" fill="none" stroke="${color}" stroke-width="2.5"/>
+            <circle cx="20" cy="26" r="3.5" fill="${color}"/>
         </svg>`,
-        // AA Radar: radar dish + horizontal air-defense line below
+        // AA Radar: radar dish + air-defense line below
         aa_radar: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <path d="M12 27 Q20 10 28 27" fill="none" stroke="${color}" stroke-width="2"/>
-            <circle cx="20" cy="22" r="2.5" fill="${color}"/>
-            <line x1="12" y1="32" x2="28" y2="32" stroke="${color}" stroke-width="2"/>
+            <path d="M6 30 Q20 4 34 30" fill="none" stroke="${color}" stroke-width="2.5"/>
+            <circle cx="20" cy="22" r="3" fill="${color}"/>
+            <line x1="6" y1="36" x2="34" y2="36" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
 
         // --- Row 5: Specialty ---
-        // Sniper: crosshair (vertical + horizontal lines forming a cross) with circle
+        // Sniper: crosshair circle with cross
         sniper: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <circle cx="20" cy="22" r="6" fill="none" stroke="${color}" stroke-width="1.5"/>
-            <line x1="20" y1="13" x2="20" y2="31" stroke="${color}" stroke-width="1.5"/>
-            <line x1="11" y1="22" x2="29" y2="22" stroke="${color}" stroke-width="1.5"/>
+            <circle cx="20" cy="20" r="10" fill="none" stroke="${color}" stroke-width="2"/>
+            <line x1="20" y1="6" x2="20" y2="34" stroke="${color}" stroke-width="2"/>
+            <line x1="6" y1="20" x2="34" y2="20" stroke="${color}" stroke-width="2"/>
         </svg>`,
-        // Mine/IED: "M" centered in a small diamond inside the triangle
+        // Mine/IED: diamond with "M" inside
         mine: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <polygon points="20,12 28,22 20,32 12,22" fill="none" stroke="${color}" stroke-width="1.5"/>
-            <text x="20" y="26" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold" font-family="Arial,sans-serif">M</text>
+            <polygon points="20,4 36,20 20,36 4,20" fill="none" stroke="${color}" stroke-width="2.5"/>
+            <text x="20" y="25" text-anchor="middle" fill="${color}" font-size="14" font-weight="bold" font-family="Arial,sans-serif">M</text>
         </svg>`,
-        // CBRN/Chemical: inverted "Y" shape (NBC trefoil simplified)
+        // CBRN: inverted Y (trefoil simplified)
         cbrn: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="20" y1="22" x2="20" y2="32" stroke="${color}" stroke-width="2"/>
-            <line x1="20" y1="22" x2="12" y2="13" stroke="${color}" stroke-width="2"/>
-            <line x1="20" y1="22" x2="28" y2="13" stroke="${color}" stroke-width="2"/>
-            <circle cx="20" cy="22" r="2" fill="${color}"/>
+            <line x1="20" y1="20" x2="20" y2="36" stroke="${color}" stroke-width="2.5"/>
+            <line x1="20" y1="20" x2="8" y2="6" stroke="${color}" stroke-width="2.5"/>
+            <line x1="20" y1="20" x2="32" y2="6" stroke="${color}" stroke-width="2.5"/>
+            <circle cx="20" cy="20" r="3" fill="${color}"/>
         </svg>`,
-        // Supply Point: open circle with horizontal line through center
+        // Supply Point: circle with horizontal line through center
         supply: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <circle cx="20" cy="23" r="7" fill="none" stroke="${color}" stroke-width="2"/>
-            <line x1="13" y1="23" x2="27" y2="23" stroke="${color}" stroke-width="2"/>
+            <circle cx="20" cy="20" r="12" fill="none" stroke="${color}" stroke-width="2.5"/>
+            <line x1="8" y1="20" x2="32" y2="20" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
-        // Command Post: flag shape (small rectangle on a vertical pole)
+        // Command Post: flag on a pole
         command_post: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="15" y1="32" x2="15" y2="12" stroke="${color}" stroke-width="2"/>
-            <rect x="15" y="12" width="12" height="8" fill="none" stroke="${color}" stroke-width="1.5"/>
+            <line x1="10" y1="36" x2="10" y2="4" stroke="${color}" stroke-width="2.5"/>
+            <rect x="10" y="4" width="20" height="14" fill="none" stroke="${color}" stroke-width="2"/>
         </svg>`,
-        // Electronic Warfare: lightning bolt / zigzag pattern
+        // Electronic Warfare: zigzag / lightning bolt
         electronic_warfare: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <path d="M12 28 L16 14 L20 24 L24 14 L28 28" fill="none" stroke="${color}" stroke-width="2"/>
+            <path d="M4 32 L12 8 L20 28 L28 8 L36 32" fill="none" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
-        // UAV/Drone: simplified fixed-wing silhouette, smaller and without tail
+        // UAV/Drone: small fixed-wing silhouette with nose cone
         uav: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="20" y1="14" x2="20" y2="30" stroke="${color}" stroke-width="1.5"/>
-            <line x1="11" y1="22" x2="29" y2="22" stroke="${color}" stroke-width="1.5"/>
-            <path d="M18 14 L20 10 L22 14" fill="none" stroke="${color}" stroke-width="1.5"/>
+            <line x1="20" y1="8" x2="20" y2="34" stroke="${color}" stroke-width="2"/>
+            <line x1="6" y1="22" x2="34" y2="22" stroke="${color}" stroke-width="2"/>
+            <path d="M17 8 L20 2 L23 8" fill="none" stroke="${color}" stroke-width="2"/>
         </svg>`,
-        // MANPADS (Man-Portable Air-Defense System): single upward arrow with horizontal air-defense line
+        // MANPADS: upward arrow with air-defense line below
         manpads: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <line x1="20" y1="12" x2="20" y2="28" stroke="${color}" stroke-width="2"/>
-            <line x1="16" y1="16" x2="20" y2="12" stroke="${color}" stroke-width="2"/>
-            <line x1="24" y1="16" x2="20" y2="12" stroke="${color}" stroke-width="2"/>
-            <line x1="12" y1="32" x2="28" y2="32" stroke="${color}" stroke-width="2"/>
+            <line x1="20" y1="6" x2="20" y2="28" stroke="${color}" stroke-width="2.5"/>
+            <line x1="14" y1="12" x2="20" y2="6" stroke="${color}" stroke-width="2.5"/>
+            <line x1="26" y1="12" x2="20" y2="6" stroke="${color}" stroke-width="2.5"/>
+            <line x1="6" y1="36" x2="34" y2="36" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
-        // ATGM Vehicle: ATGM text with track ellipse
+        // ATGM Vehicle: ATGM text above track ellipse
         at_missile_veh: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            ${tri}
-            <ellipse cx="20" cy="27" rx="9" ry="4" fill="none" stroke="${color}" stroke-width="1.5"/>
-            <text x="20" y="20" text-anchor="middle" fill="${color}" font-size="8" font-weight="bold" font-family="Arial,sans-serif">ATGM</text>
+            <ellipse cx="20" cy="28" rx="13" ry="6" fill="none" stroke="${color}" stroke-width="2"/>
+            <text x="20" y="16" text-anchor="middle" fill="${color}" font-size="10" font-weight="bold" font-family="Arial,sans-serif">ATGM</text>
         </svg>`,
     };
     return svgs[key] || svgs.rifle;
