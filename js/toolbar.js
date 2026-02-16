@@ -251,6 +251,13 @@ function buildColorSubmenu() {
         set('fillOpacity', parseInt(slider.value) / 100);
         valueLabel.textContent = slider.value + '%';
     });
+
+    var swSlider = document.getElementById('stroke-width-slider');
+    var swLabel = document.getElementById('stroke-width-value');
+    swSlider.addEventListener('input', function () {
+        set('symbolStrokeWidth', parseInt(swSlider.value));
+        swLabel.textContent = swSlider.value;
+    });
 }
 
 // ===== Text Sub-menu =====

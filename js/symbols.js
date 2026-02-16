@@ -7,154 +7,295 @@
 
 // ===== Equipment Symbol SVGs =====
 // NATO APP-6 equipment modifier icons — exact replicas of reference chart
-// Standalone symbols centered in a 40x40 viewBox, no enclosing frame
-export function equipmentSVG(key, color) {
+// All symbols use a 350x350 viewBox with parameterized color and stroke width
+export function equipmentSVG(key, color, strokeWidth) {
     color = color || '#FF0000';
+    strokeWidth = strokeWidth || 2;
+    const sw = strokeWidth;
+    const c = color;
     const svgs = {
-        // --- Row 1: Small Arms ---
-        // Rifle: diagonal barrel lower-left to upper-right, short perpendicular stock at upper end
+        // Rifle
         rifle: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="50" x2="175" y2="250" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <line x1="125" y1="100" x2="175" y2="50" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <line x1="225" y1="100" x2="175" y2="50" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <path d="M100,300 Q175,200 250,300" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <line x1="175" y1="25" x2="100" y2="100" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <line x1="175" y1="25" x2="250" y2="100" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Machine Gun: simple X-cross (two diagonal lines)
-        machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="6" y1="34" x2="34" y2="6" stroke="${color}" stroke-width="2.5"/>
-            <line x1="6" y1="6" x2="34" y2="34" stroke="${color}" stroke-width="2.5"/>
-        </svg>`,
-        // Grenade Launcher: vertical line with short horizontal crossbar at top
+        // Light Machine Gun
+        light_machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Medium Machine Gun
+        medium_machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Heavy Machine Gun
+        heavy_machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Grenade Launcher
         grenade_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="50" x2="175" y2="250" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <line x1="125" y1="100" x2="175" y2="50" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <line x1="225" y1="100" x2="175" y2="50" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <path d="M100,300 Q175,200 250,300" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <line x1="175" y1="25" x2="100" y2="100" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <line x1="175" y1="25" x2="250" y2="100" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="50" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="50" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="50" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="125" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
-        // Flame Thrower: vertical line with teardrop/flame shape at top
-        flame_thrower: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="20" y1="36" x2="20" y2="18" stroke="${color}" stroke-width="2.5"/>
-            <path d="M14 18 Q14 8 20 4 Q26 8 26 18" fill="none" stroke="${color}" stroke-width="2"/>
-        </svg>`,
-        // Antitank Rifle: rifle symbol with horizontal line across bottom
-        at_rifle: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="8" y1="30" x2="30" y2="8" stroke="${color}" stroke-width="2.5"/>
-            <line x1="27" y1="5" x2="33" y2="11" stroke="${color}" stroke-width="2.5"/>
-            <line x1="6" y1="36" x2="34" y2="36" stroke="${color}" stroke-width="2.5"/>
-        </svg>`,
-        // Recoilless Rifle: diagonal barrel with open circle at breech (lower-left)
-        recoilless_rifle: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="12" y1="30" x2="32" y2="10" stroke="${color}" stroke-width="2.5"/>
-            <circle cx="10" cy="31" r="5" fill="none" stroke="${color}" stroke-width="2"/>
-        </svg>`,
-
-        // --- Row 2: Indirect Fire ---
-        // Mortar: vertical tube with open circle at base (baseplate)
-        mortar: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="20" y1="4" x2="20" y2="24" stroke="${color}" stroke-width="2.5"/>
-            <circle cx="20" cy="30" r="6" fill="none" stroke="${color}" stroke-width="2.5"/>
-        </svg>`,
-        // Howitzer: large filled circle (solid dot)
-        howitzer: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <circle cx="20" cy="20" r="10" fill="${color}"/>
-        </svg>`,
-        // Gun: single thick diagonal line (barrel) from lower-left to upper-right
-        gun: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="8" y1="32" x2="32" y2="8" stroke="${color}" stroke-width="3"/>
-        </svg>`,
-        // Rocket Launcher: single vertical shaft with upward-pointing arrowhead
-        rocket_launcher: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="20" y1="36" x2="20" y2="8" stroke="${color}" stroke-width="2.5"/>
-            <line x1="13" y1="15" x2="20" y2="8" stroke="${color}" stroke-width="2.5"/>
-            <line x1="27" y1="15" x2="20" y2="8" stroke="${color}" stroke-width="2.5"/>
-        </svg>`,
-        // Missile Launcher: vertical shaft with arrowhead and small fins at base
-        missile_launcher: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="20" y1="36" x2="20" y2="8" stroke="${color}" stroke-width="2.5"/>
-            <line x1="13" y1="15" x2="20" y2="8" stroke="${color}" stroke-width="2.5"/>
-            <line x1="27" y1="15" x2="20" y2="8" stroke="${color}" stroke-width="2.5"/>
-            <line x1="13" y1="36" x2="20" y2="30" stroke="${color}" stroke-width="2"/>
-            <line x1="27" y1="36" x2="20" y2="30" stroke="${color}" stroke-width="2"/>
-        </svg>`,
-        // SSM (Surface-to-Surface Missile): text label "SSM"
-        ssm: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <text x="20" y="26" text-anchor="middle" fill="${color}" font-size="14" font-weight="bold" font-family="Arial,sans-serif">SSM</text>
-        </svg>`,
-
-        // --- Row 3: Antitank / Air Defense ---
-        // Antitank Gun: diagonal barrel with filled circle at breech (lower-left)
-        at_gun: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="12" y1="30" x2="32" y2="10" stroke="${color}" stroke-width="2.5"/>
-            <circle cx="10" cy="31" r="4" fill="${color}"/>
-        </svg>`,
-        // Air Defense Gun: vertical barrel pointing upward from a horizontal base
-        ad_gun: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="20" y1="4" x2="20" y2="28" stroke="${color}" stroke-width="2.5"/>
-            <line x1="8" y1="36" x2="32" y2="36" stroke="${color}" stroke-width="2.5"/>
-            <line x1="20" y1="28" x2="8" y2="36" stroke="${color}" stroke-width="2"/>
-            <line x1="20" y1="28" x2="32" y2="36" stroke="${color}" stroke-width="2"/>
-        </svg>`,
-        // SAM (Surface-to-Air Missile): upward arrow (missile) with horizontal air defense line at base
-        sam: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="20" y1="4" x2="20" y2="28" stroke="${color}" stroke-width="2.5"/>
-            <line x1="13" y1="11" x2="20" y2="4" stroke="${color}" stroke-width="2.5"/>
-            <line x1="27" y1="11" x2="20" y2="4" stroke="${color}" stroke-width="2.5"/>
-            <line x1="6" y1="36" x2="34" y2="36" stroke="${color}" stroke-width="2.5"/>
-        </svg>`,
-        // ATGM (Anti-Tank Guided Missile): horizontal arrow pointing right with tail fins
-        atgm: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="4" y1="20" x2="30" y2="20" stroke="${color}" stroke-width="2.5"/>
-            <line x1="30" y1="20" x2="24" y2="14" stroke="${color}" stroke-width="2.5"/>
-            <line x1="30" y1="20" x2="24" y2="26" stroke="${color}" stroke-width="2.5"/>
-            <line x1="4" y1="14" x2="4" y2="26" stroke="${color}" stroke-width="2"/>
-        </svg>`,
-        // Tank: track ellipse with vertical gun barrel extending upward
-        tank: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <ellipse cx="20" cy="26" rx="14" ry="7" fill="none" stroke="${color}" stroke-width="2.5"/>
-            <line x1="20" y1="19" x2="20" y2="6" stroke="${color}" stroke-width="3"/>
-        </svg>`,
-        // APC (Armored Personnel Carrier): track ellipse only, no gun
-        apc: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <ellipse cx="20" cy="20" rx="14" ry="8" fill="none" stroke="${color}" stroke-width="2.5"/>
-        </svg>`,
-
-        // --- Row 4: Support / Aircraft ---
-        // Radar: parabolic dish arc with small filled emitter dot
-        radar: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <path d="M6 34 Q20 4 34 34" fill="none" stroke="${color}" stroke-width="2.5"/>
-            <circle cx="20" cy="26" r="3.5" fill="${color}"/>
-        </svg>`,
-        // Fixed Wing: vertical fuselage, horizontal wings, smaller horizontal tail
-        fixed_wing: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="20" y1="4" x2="20" y2="36" stroke="${color}" stroke-width="2.5"/>
-            <line x1="4" y1="18" x2="36" y2="18" stroke="${color}" stroke-width="2.5"/>
-            <line x1="12" y1="32" x2="28" y2="32" stroke="${color}" stroke-width="2"/>
-        </svg>`,
-        // Rotary Wing: horizontal rotor, vertical mast, fuselage ellipse
-        rotary_wing: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="4" y1="10" x2="36" y2="10" stroke="${color}" stroke-width="2.5"/>
-            <line x1="20" y1="10" x2="20" y2="16" stroke="${color}" stroke-width="2.5"/>
-            <ellipse cx="20" cy="24" rx="11" ry="7" fill="none" stroke="${color}" stroke-width="2"/>
-        </svg>`,
-        // UAV: smaller fixed-wing shape with pointed nose
-        uav: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="20" y1="8" x2="20" y2="34" stroke="${color}" stroke-width="2"/>
-            <line x1="6" y1="22" x2="34" y2="22" stroke="${color}" stroke-width="2"/>
-            <path d="M17 8 L20 2 L23 8" fill="none" stroke="${color}" stroke-width="2"/>
-        </svg>`,
-        // Observation Post: eye-shaped symbol (two arcs)
-        observation_post: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <path d="M4 20 Q20 4 36 20 Q20 36 4 20 Z" fill="none" stroke="${color}" stroke-width="2.5"/>
-            <circle cx="20" cy="20" r="4" fill="${color}"/>
-        </svg>`,
-        // Electronic Warfare: zigzag lightning bolt pattern
-        electronic_warfare: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <path d="M4 32 L12 8 L20 28 L28 8 L36 32" fill="none" stroke="${color}" stroke-width="2.5"/>
-        </svg>`,
+        // Anti-tank Rocket Launcher
+        at_rocket_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="150" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="200" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="175" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="275" x2="175" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="175" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Mortar
+        mortar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="250" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="225" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Howitzer
+        howitzer: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="250" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
+</svg>`,
+        // Anti-tank Gun
+        at_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="275" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Air Defense Gun
+        ad_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <path d="M125,275 Q175,175 225,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="275" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Multiple Rocket Launcher
+        multiple_rocket_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="250" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="250" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="150" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="200" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Short Range Air Defense Missile Launcher
+        shorad: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,275 Q175,225 200,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Medium Range Air Defense Missile Launcher
+        mrad: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,275 Q175,225 200,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Long Range Air Defense Missile Launcher
+        lrad: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,275 Q175,225 200,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Anti-tank Missile Launcher
+        at_missile_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="150" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Armored Fighting Vehicle
+        afv: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="125" y1="75" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="275" x2="225" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="125" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="225" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="125" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="225" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Armored Personnel Carrier
+        apc: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="125" y1="75" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="275" x2="225" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="100" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="275" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="125" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Tank
+        tank: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="125" y1="75" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="275" x2="225" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="100" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="250" x2="225" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Sensor
+        sensor: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <path d="M175,125 Q175,175 225,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,125 Q175,175 125,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M225,175 Q175,175 175,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,225 Q175,175 125,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Radar
+        radar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <path d="M75,75 Q50,300 275,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="225" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="200" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Antenna
+        antenna: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="175" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="75" x2="175" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="125" x2="125" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Helicopter
+        helicopter: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <polygon points="75,125 75,225 275,125 275,225 75,125" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+</svg>`,
+        // Unmanned Aircraft
+        uav: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <polygon points="175,175 250,125 175,150 100,125 175,175 175,175" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+</svg>`,
+        // Autonomous Robot
+        autonomous_robot: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <polygon points="175,200 200,150 275,200 175,100 75,200 150,150 175,200" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <circle cx="75" cy="210" r="11" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="175" cy="215" r="14" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="275" cy="210" r="11" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+</svg>`,
+        // Directed Energy
+        directed_energy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="275" x2="150" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="250" x2="150" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="250" x2="200" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="250" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="175" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="225" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="225" x2="150" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="175" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="125" x2="150" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="125" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="150" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="175" x2="175" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="200" x2="175" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Isolated Person
+        isolated_person: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="125" x2="175" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="115" r="11" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="135" x2="225" y2="115" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="135" x2="130" y2="120" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Bridge (Vertical)
+        bridge_v: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="225" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="125" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="250" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="250" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="250" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="250" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Bridge (Horizontal)
+        bridge_h: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="275" y1="125" x2="250" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="225" x2="250" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="125" x2="100" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="200" x2="75" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="150" x2="250" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="200" x2="250" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Observation Post
+        observation_post: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Reconnaissance Observation Post
+        recon_op: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="225" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Forward Observer
+        forward_observer: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="200" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
+</svg>`,
+        // Sensor Observation Post
+        sensor_op: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,175 Q175,200 200,200" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,175 Q175,200 150,200" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,200 Q175,200 175,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M200,200 Q175,200 175,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Combat Outpost
+        combat_outpost: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="125" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="175" x2="250" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="250" y1="225" x2="275" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="125" x2="125" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="175" x2="100" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="225" x2="75" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="275" x2="225" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="300" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
     };
     return svgs[key] || svgs.rifle;
 }
@@ -184,34 +325,45 @@ export function unitSVG(key, color) {
 // ===== Definition Lists =====
 
 export const EQUIPMENT_LIST = [
-    // Row 1: Small Arms
+    // Row 1: Small Arms & Infantry Weapons
     { key: 'rifle', name: 'Rifle' },
-    { key: 'machine_gun', name: 'Machine Gun' },
+    { key: 'light_machine_gun', name: 'LMG' },
+    { key: 'medium_machine_gun', name: 'MMG' },
+    { key: 'heavy_machine_gun', name: 'HMG' },
     { key: 'grenade_launcher', name: 'Grenade Lnchr' },
-    { key: 'flame_thrower', name: 'Flame Thrower' },
-    { key: 'at_rifle', name: 'AT Rifle' },
-    { key: 'recoilless_rifle', name: 'Recoilless' },
+    { key: 'at_rocket_launcher', name: 'AT Rocket Lnchr' },
     // Row 2: Indirect Fire
     { key: 'mortar', name: 'Mortar' },
     { key: 'howitzer', name: 'Howitzer' },
-    { key: 'gun', name: 'Gun' },
-    { key: 'rocket_launcher', name: 'Rocket Lnchr' },
-    { key: 'missile_launcher', name: 'Missile Lnchr' },
-    { key: 'ssm', name: 'SSM' },
-    // Row 3: Antitank / Air Defense
     { key: 'at_gun', name: 'AT Gun' },
     { key: 'ad_gun', name: 'AD Gun' },
-    { key: 'sam', name: 'SAM' },
-    { key: 'atgm', name: 'ATGM' },
-    { key: 'tank', name: 'Tank' },
-    { key: 'apc', name: 'APC' },
-    // Row 4: Support / Aircraft
+    { key: 'multiple_rocket_launcher', name: 'MRL' },
+    { key: 'directed_energy', name: 'Directed Energy' },
+    // Row 3: Air Defense / Missiles
+    { key: 'shorad', name: 'SHORAD' },
+    { key: 'mrad', name: 'MRAD' },
+    { key: 'lrad', name: 'LRAD' },
+    { key: 'at_missile_launcher', name: 'AT Missile Lnchr' },
+    { key: 'sensor', name: 'Sensor' },
     { key: 'radar', name: 'Radar' },
-    { key: 'fixed_wing', name: 'Fixed Wing' },
-    { key: 'rotary_wing', name: 'Rotary Wing' },
+    // Row 4: Vehicles
+    { key: 'afv', name: 'AFV' },
+    { key: 'apc', name: 'APC' },
+    { key: 'tank', name: 'Tank' },
+    { key: 'antenna', name: 'Antenna' },
+    { key: 'helicopter', name: 'Helicopter' },
     { key: 'uav', name: 'UAV' },
+    // Row 5: Special
+    { key: 'autonomous_robot', name: 'Auton Robot' },
+    { key: 'isolated_person', name: 'Isolated Person' },
+    { key: 'bridge_v', name: 'Bridge (V)' },
+    { key: 'bridge_h', name: 'Bridge (H)' },
     { key: 'observation_post', name: 'Obs Post' },
-    { key: 'electronic_warfare', name: 'EW' },
+    { key: 'recon_op', name: 'Recon OP' },
+    // Row 6: Observation Posts
+    { key: 'forward_observer', name: 'Fwd Observer' },
+    { key: 'sensor_op', name: 'Sensor OP' },
+    { key: 'combat_outpost', name: 'Combat OP' },
 ];
 
 export const UNIT_LIST = [
@@ -260,10 +412,24 @@ export function escapeXml(str) {
 
 /**
  * Build an SVG that includes the symbol + optional left/right text labels.
+ * Handles both legacy 40x40 viewBox (units) and new 350x350 viewBox (equipment).
  */
 export function buildSymbolWithLabels(svgInner, leftText, rightText, color) {
     const totalWidth = 120;
     const totalHeight = 50;
+
+    // Detect viewBox to determine how to scale the inner symbol
+    const vbMatch = svgInner.match(/viewBox="0 0 (\d+) (\d+)"/);
+    const vbW = vbMatch ? parseInt(vbMatch[1]) : 40;
+    const vbH = vbMatch ? parseInt(vbMatch[2]) : 40;
+
+    // Symbol display area: 40x40 centered in the middle of the output SVG
+    const symW = 40;
+    const symH = 40;
+    const symX = 40; // left edge of symbol area
+    const symY = 5;  // top edge of symbol area
+    const scaleX = symW / vbW;
+    const scaleY = symH / vbH;
 
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}">`;
 
@@ -271,7 +437,8 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color) {
         svg += `<text x="38" y="30" text-anchor="end" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(leftText)}</text>`;
     }
 
-    svg += `<g transform="translate(40, 5)">${stripSvgWrapper(svgInner)}</g>`;
+    // Scale the inner SVG content to fit the 40x40 display area
+    svg += `<g transform="translate(${symX}, ${symY}) scale(${scaleX}, ${scaleY})">${stripSvgWrapper(svgInner)}</g>`;
 
     if (rightText) {
         svg += `<text x="82" y="30" text-anchor="start" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(rightText)}</text>`;

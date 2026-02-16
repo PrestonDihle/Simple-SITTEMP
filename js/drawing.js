@@ -224,10 +224,11 @@ function placeSymbol(latLng, leftText, rightText) {
     if (!type || !key) return;
 
     const color = get('lineColor');
-    const svgString = type === 'equipment' ? equipmentSVG(key, color) : unitSVG(key, color);
+    const strokeWidth = get('symbolStrokeWidth') || 2;
+    const svgString = type === 'equipment' ? equipmentSVG(key, color, strokeWidth) : unitSVG(key, color);
     const fullSVG = buildSymbolWithLabels(svgString, leftText, rightText, color);
 
-    const sittemp = { type, key, leftText, rightText, color };
+    const sittemp = { type, key, leftText, rightText, color, strokeWidth };
     createMapMarker(latLng, fullSVG, new google.maps.Size(120, 50), new google.maps.Point(60, 25), sittemp);
     pushUndoState();
 }
@@ -563,7 +564,8 @@ function recreateMarker(data) {
     let svgString, size, anchor;
 
     if (info.type === 'equipment') {
-        svgString = buildSymbolWithLabels(equipmentSVG(info.key, info.color), info.leftText, info.rightText, info.color);
+        const sw = info.strokeWidth || 2;
+        svgString = buildSymbolWithLabels(equipmentSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color);
         size = new google.maps.Size(120, 50);
         anchor = new google.maps.Point(60, 25);
     } else if (info.type === 'unit') {
