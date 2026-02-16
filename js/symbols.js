@@ -23,10 +23,14 @@ export function equipmentSVG(key, color) {
             <line x1="6" y1="6" x2="34" y2="34" stroke="${color}" stroke-width="2.5"/>
         </svg>`,
         // Grenade Launcher: vertical line with short horizontal crossbar at top
-        grenade_launcher: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="20" y1="6" x2="20" y2="34" stroke="${color}" stroke-width="2.5"/>
-            <line x1="12" y1="6" x2="28" y2="6" stroke="${color}" stroke-width="2.5"/>
-        </svg>`,
+        grenade_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="50" x2="175" y2="250" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="125" y1="100" x2="175" y2="50" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="225" y1="100" x2="175" y2="50" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <path d="M100,300 Q175,200 250,300" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="25" x2="100" y2="100" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="25" x2="250" y2="100" stroke="black" stroke-width="2" stroke-linecap="round"/>
+</svg>`,
         // Flame Thrower: vertical line with teardrop/flame shape at top
         flame_thrower: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
             <line x1="20" y1="36" x2="20" y2="18" stroke="${color}" stroke-width="2.5"/>
