@@ -7,6 +7,25 @@
 import { get, set } from './state.js';
 import { showToast } from './toolbar.js';
 
+// ===== MGRS Formatting =====
+
+/**
+ * Format an MGRS string with a space between the Grid Zone Designator +
+ * 100,000-meter Square ID and the numeric grid reference.
+ * e.g. "11SNA12345678" → "11SNA 12345678"
+ */
+function formatMGRS(mgrsStr) {
+    var match = mgrsStr.match(/^(\d{1,2}[A-Z])([A-Z]{2})(\d+)$/);
+    if (match) {
+        var digits = match[3];
+        var half = digits.length / 2;
+        var easting = digits.slice(0, half);
+        var northing = digits.slice(half);
+        return match[1] + ' ' + match[2] + ' ' + easting + ' ' + northing;
+    }
+    return mgrsStr;
+}
+
 // ===== Coordinate Display =====
 
 export function setupCoordinateDisplay() {
@@ -23,8 +42,8 @@ export function setupCoordinateDisplay() {
             lat.toFixed(6) + ', ' + lng.toFixed(6);
 
         try {
-            const mgrsStr = mgrs.forward([lng, lat], 5);
-            document.getElementById('coord-mgrs').textContent = mgrsStr;
+            const mgrsStr = mgrs.forward([lng, lat], 4);
+            document.getElementById('coord-mgrs').textContent = formatMGRS(mgrsStr);
         } catch (err) {
             document.getElementById('coord-mgrs').textContent = '---';
         }
@@ -41,7 +60,7 @@ export function setupRightClickMGRS() {
         const lat = e.latLng.lat();
         const lng = e.latLng.lng();
         try {
-            const mgrsStr = mgrs.forward([lng, lat], 5);
+            const mgrsStr = formatMGRS(mgrs.forward([lng, lat], 4));
             navigator.clipboard.writeText(mgrsStr).then(function () {
                 showToast('MGRS copied: ' + mgrsStr);
             }).catch(function () {
