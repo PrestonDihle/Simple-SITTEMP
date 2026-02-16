@@ -11,7 +11,9 @@
 export function equipmentSVG(key, color, strokeWidth) {
     color = color || '#FF0000';
     strokeWidth = strokeWidth || 2;
-    const sw = strokeWidth;
+    // The 350×350 viewBox is scaled down to ~40×40 for display (factor ≈ 8.75),
+    // so multiply the user-facing stroke width to keep it visually correct.
+    const sw = strokeWidth * (350 / 40);
     const c = color;
     const svgs = {
         // Rifle — original bbox: x=150-200, y=75-275 → scaled to fill 350x350
