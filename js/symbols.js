@@ -13,10 +13,14 @@ export function equipmentSVG(key, color) {
     const svgs = {
         // --- Row 1: Small Arms ---
         // Rifle: diagonal barrel lower-left to upper-right, short perpendicular stock at upper end
-        rifle: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-            <line x1="8" y1="32" x2="30" y2="10" stroke="${color}" stroke-width="2.5"/>
-            <line x1="27" y1="7" x2="33" y2="13" stroke="${color}" stroke-width="2.5"/>
-        </svg>`,
+        rifle: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="175" y1="50" x2="175" y2="250" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="125" y1="100" x2="175" y2="50" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="225" y1="100" x2="175" y2="50" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <path d="M100,300 Q175,200 250,300" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="25" x2="100" y2="100" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="25" x2="250" y2="100" stroke="black" stroke-width="2" stroke-linecap="round"/>
+</svg>`,
         // Machine Gun: simple X-cross (two diagonal lines)
         machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
             <line x1="6" y1="34" x2="34" y2="6" stroke="${color}" stroke-width="2.5"/>
