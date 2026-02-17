@@ -29,6 +29,7 @@ export function showToast(message, duration) {
 
 export function setupToolbar() {
     buildShapesSubmenu();
+    buildLinesSubmenu();
     buildEquipmentSubmenu();
     buildUnitsSubmenu();
     buildColorSubmenu();
@@ -48,6 +49,13 @@ export function setupToolbar() {
         exitSymbolPlacement();
         exitTextPlacement();
         toggleSubmenu('submenu-shapes', 'btn-shapes');
+    });
+
+    document.getElementById('btn-lines').addEventListener('click', function (e) {
+        e.stopPropagation();
+        exitSymbolPlacement();
+        exitTextPlacement();
+        toggleSubmenu('submenu-lines', 'btn-lines');
     });
 
     document.getElementById('btn-equipment').addEventListener('click', function (e) {
@@ -99,6 +107,7 @@ export function setupToolbar() {
 function positionSubmenus() {
     const menuMap = {
         'btn-shapes': 'submenu-shapes',
+        'btn-lines': 'submenu-lines',
         'btn-equipment': 'submenu-equipment',
         'btn-units': 'submenu-units',
         'btn-text': 'submenu-text',
@@ -134,7 +143,7 @@ function closeAllSubmenus() {
 
 export function setActiveTool(tool) {
     document.querySelectorAll('.toolbar-btn').forEach(function (btn) { btn.classList.remove('active'); });
-    const btnMap = { select: 'btn-select', shapes: 'btn-shapes', equipment: 'btn-equipment', units: 'btn-units', text: 'btn-text' };
+    const btnMap = { select: 'btn-select', shapes: 'btn-shapes', lines: 'btn-lines', equipment: 'btn-equipment', units: 'btn-units', text: 'btn-text' };
     if (btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
     set('currentMode', tool);
 }
@@ -162,7 +171,11 @@ function buildShapesSubmenu() {
         });
         grid.appendChild(item);
     });
+}
 
+// ===== Lines Sub-menu =====
+
+function buildLinesSubmenu() {
     const list = document.getElementById('line-type-list');
     LINE_TYPES.forEach(function (lt) {
         const item = document.createElement('div');

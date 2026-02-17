@@ -52,6 +52,13 @@
                     <polygon points="7,14 3,21 11,21"/>
                 </svg>
             </button>
+            <button class="toolbar-btn" id="btn-lines" data-tooltip="Lines" aria-label="Line types">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="4,3"/>
+                    <line x1="3" y1="18" x2="21" y2="18" stroke-dasharray="1,3"/>
+                </svg>
+            </button>
             <button class="toolbar-btn" id="btn-equipment" data-tooltip="Equipment" aria-label="Equipment symbols">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
                     <polygon points="12,3 22,21 2,21"/>
@@ -116,6 +123,10 @@
         <div class="submenu" id="submenu-shapes">
             <h3>Shapes</h3>
             <div class="submenu-grid" id="shape-grid"></div>
+        </div>
+
+        <!-- Lines Sub-menu -->
+        <div class="submenu" id="submenu-lines">
             <h3>Line Types</h3>
             <div class="submenu-list" id="line-type-list"></div>
         </div>
