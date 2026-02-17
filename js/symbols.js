@@ -11,292 +11,290 @@
 export function equipmentSVG(key, color, strokeWidth) {
     color = color || '#FF0000';
     strokeWidth = strokeWidth || 2;
-    // The 350×350 viewBox is scaled down to ~40×40 for display (factor ≈ 8.75),
-    // so multiply the user-facing stroke width to keep it visually correct.
     const sw = strokeWidth * (350 / 40);
     const c = color;
     const svgs = {
-        // Rifle — original bbox: x=150-200, y=75-275 → scaled to fill 350x350
+        // Rifle
         rifle: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="340" x2="175" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="134" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="216" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Light Machine Gun — user-scaled to 0-350
+        // Light Machine Gun
         light_machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="0" x2="125" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="0" x2="225" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="0" x2="175" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="125" y1="350" x2="225" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="125" y1="175" x2="225" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Medium Machine Gun — original bbox: x=150-200, y=75-275 → scaled to fill
+        // Medium Machine Gun
         medium_machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="93" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="257" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="340" x2="257" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="340" x2="175" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="175" x2="257" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="216" x2="257" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Heavy Machine Gun — original bbox: x=150-200, y=75-275 → scaled to fill
+        // Heavy Machine Gun
         heavy_machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="93" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="257" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="340" x2="257" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="340" x2="175" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="175" x2="257" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="216" x2="257" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="134" x2="257" y2="134" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Grenade Launcher — original bbox: x=150-200, y=50-300 → scaled to fill
+        // Grenade Launcher
         grenade_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="175" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="134" y2="76" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="216" y2="76" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <circle cx="175" cy="109" r="41" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="50" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="50" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="50" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="125" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
-        // Anti-tank Rocket Launcher — original bbox: x=150-200, y=75-275 → scaled to fill
+        // Anti-tank Rocket Launcher
         at_rocket_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="93" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="257" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="51" x2="93" y2="93" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="51" x2="257" y2="93" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="340" x2="175" y2="299" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="340" x2="175" y2="299" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="175" y2="299" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="150" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="200" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="175" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="275" x2="175" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="175" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Mortar — original bbox: x=150-200, y=75-275 → scaled to fill
+        // Mortar
         mortar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="134" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="216" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <circle cx="175" cy="299" r="41" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="175" y1="258" x2="175" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="250" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="225" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Howitzer — original bbox: x=150-200, y=75-275 → scaled to fill
+        // Howitzer
         howitzer: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="175" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="51" x2="93" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="51" x2="257" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <circle cx="175" cy="299" r="41" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="75" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="250" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
-        // Anti-tank Gun — original bbox: x=150-200, y=75-275 → scaled to fill
+        // Anti-tank Gun
         at_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="175" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="51" x2="93" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="51" x2="257" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="340" x2="175" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="340" x2="175" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="275" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Air Defense Gun — original bbox: x=125-225, y=75-275 → scaled to fill
+        // Air Defense Gun
         ad_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M10,340 Q175,175 340,340" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="175" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="51" x2="93" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="51" x2="257" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="340" x2="340" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M125,275 Q175,175 225,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="275" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Multiple Rocket Launcher — original bbox: x=150-200, y=75-275 → scaled to fill
+        // Multiple Rocket Launcher
         multiple_rocket_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="340" x2="175" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="299" x2="93" y2="134" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="299" x2="257" y2="134" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="93" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="257" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="51" x2="93" y2="93" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="51" x2="257" y2="93" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="250" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="250" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="150" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="200" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Short Range Air Defense Missile Launcher — original bbox: x=150-200, y=50-275 → scaled
+        // Short Range Air Defense Missile Launcher
         shorad: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M93,51 Q175,10 257,51" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M93,340 Q175,299 257,340" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="299" x2="175" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="51" x2="93" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="51" x2="257" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="134" x2="257" y2="134" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="340" x2="257" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,275 Q175,225 200,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Medium Range Air Defense Missile Launcher — scaled to fill
+        // Medium Range Air Defense Missile Launcher
         mrad: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M93,51 Q175,10 257,51" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M93,340 Q175,299 257,340" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="299" x2="175" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="51" x2="93" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="51" x2="257" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="134" x2="257" y2="134" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="340" x2="257" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="175" x2="257" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,275 Q175,225 200,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Long Range Air Defense Missile Launcher — scaled to fill
+        // Long Range Air Defense Missile Launcher
         lrad: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M93,51 Q175,10 257,51" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M93,340 Q175,299 257,340" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="299" x2="175" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="51" x2="93" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="51" x2="257" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="134" x2="257" y2="134" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="340" x2="257" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="175" x2="257" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="216" x2="257" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,275 Q175,225 200,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Anti-tank Missile Launcher — original bbox: x=150-200, y=50-275 → scaled
+        // Anti-tank Missile Launcher
         at_missile_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M93,51 Q175,10 257,51" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="299" x2="175" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="51" x2="93" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="51" x2="257" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="299" x2="93" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="299" x2="257" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="150" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Armored Fighting Vehicle — original bbox: x=125-225, y=75-275 → scaled
+        // Armored Fighting Vehicle
         afv: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="10" y1="10" x2="10" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="340" y1="340" x2="340" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="10" y2="134" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="340" y2="134" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="340" x2="10" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="340" x2="340" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="75" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="275" x2="225" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="125" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="225" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="125" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="225" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Armored Personnel Carrier — original bbox: x=125-225, y=75-275 → scaled
+        // Armored Personnel Carrier
         apc: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="10" y1="10" x2="10" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="340" y1="340" x2="340" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="51" x2="340" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="340" x2="340" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="10" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="340" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="75" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="275" x2="225" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="100" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="275" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="125" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Tank — original bbox: x=125-225, y=75-275 → scaled
+        // Tank
         tank: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="10" y1="10" x2="10" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="340" y1="340" x2="340" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="51" x2="340" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="299" x2="340" y2="299" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="75" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="275" x2="225" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="100" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="250" x2="225" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Sensor — original bbox: x=125-225, y=125-225 → scaled to fill
+        // Sensor
         sensor: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M175,10 Q175,175 340,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M175,10 Q175,175 10,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M340,175 Q175,175 175,340" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M175,340 Q175,175 10,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,125 Q175,175 225,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,125 Q175,175 125,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M225,175 Q175,175 175,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,225 Q175,175 125,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Radar — original bbox: x=50-275, y=75-300 → scaled to fill
+        // Radar
         radar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M37,10 Q7,340 340,303" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="73" y1="232" x2="147" y2="121" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="147" y1="195" x2="147" y2="121" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="147" y1="195" x2="220" y2="84" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M75,75 Q50,300 275,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="225" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="200" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Antenna — original bbox: x=125-225, y=75-275 → scaled to fill
+        // Antenna
         antenna: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="175" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="340" y1="10" x2="175" y2="93" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="93" x2="10" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="175" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="75" x2="175" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="125" x2="125" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Helicopter — original bbox: x=75-275, y=125-225 → scaled to fill
+        // Helicopter
         helicopter: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <polygon points="10,10 10,340 340,10 340,340 10,10" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <polygon points="75,125 75,225 275,125 275,225 75,125" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
 </svg>`,
-        // Unmanned Aircraft — original bbox: x=100-250, y=125-175 → scaled to fill
+        // Unmanned Aircraft
         uav: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <polygon points="175,340 340,10 175,175 10,10 175,340 175,340" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <polygon points="175,175 250,125 175,150 100,125 175,175 175,175" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
 </svg>`,
-        // Autonomous Robot — original bbox: x=64-286, y=100-229 → scaled to fill
+        // Autonomous Robot
         autonomous_robot: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <polygon points="175,289 213,145 340,289 175,0 10,289 150,145 175,289" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <circle cx="10" cy="318" r="17" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
-  <circle cx="175" cy="332" r="21" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
-  <circle cx="340" cy="318" r="17" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <polygon points="175,200 200,150 275,200 175,100 75,200 150,150 175,200" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <circle cx="75" cy="210" r="11" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="175" cy="215" r="14" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="275" cy="210" r="11" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
-        // Directed Energy — original bbox: x=150-200, y=75-275 → scaled to fill
+        // Directed Energy
         directed_energy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="93" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="257" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="340" x2="93" y2="299" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="299" x2="93" y2="299" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="299" x2="257" y2="299" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="299" x2="93" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="175" y2="93" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="258" x2="257" y2="258" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="258" x2="93" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="216" x2="175" y2="216" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="93" x2="93" y2="93" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="93" x2="257" y2="134" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="134" x2="93" y2="134" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="134" x2="257" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="175" x2="175" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="216" x2="175" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="275" x2="150" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="250" x2="150" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="250" x2="200" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="250" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="175" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="225" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="225" x2="150" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="200" x2="175" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="125" x2="150" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="125" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="150" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="175" x2="175" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="200" x2="175" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Isolated Person — original bbox: x=130-225, y=104-275 → scaled to fill
+        // Isolated Person
         isolated_person: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="117" y1="340" x2="233" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="73" x2="175" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <circle cx="175" cy="55" r="20" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="175" y1="90" x2="340" y2="55" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="90" x2="21" y2="63" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="125" x2="175" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="115" r="11" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="135" x2="225" y2="115" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="135" x2="130" y2="120" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Bridge (Vertical) — original bbox: x=125-225, y=75-275 → scaled to fill
+        // Bridge (Vertical)
         bridge_v: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="340" y1="10" x2="257" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="51" x2="10" y2="10" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="299" x2="340" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="299" x2="10" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="93" y1="299" x2="93" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="257" y1="299" x2="257" y2="51" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="100" x2="125" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="250" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="250" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="250" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="250" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Bridge (Horizontal) — original bbox: x=75-275, y=125-225 → scaled to fill
+        // Bridge (Horizontal)
         bridge_h: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="340" y1="10" x2="299" y2="93" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="340" y1="340" x2="299" y2="257" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="10" x2="51" y2="93" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="51" y1="257" x2="10" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="51" y1="93" x2="299" y2="93" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="51" y1="257" x2="299" y2="257" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="125" x2="250" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="225" x2="250" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="125" x2="100" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="200" x2="75" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="150" x2="250" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="200" x2="250" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Observation Post — original bbox: x=75-275, y=75-275 → scaled to fill
+        // Observation Post
         observation_post: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="10" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="340" x2="340" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="340" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Reconnaissance Observation Post — original bbox: x=75-275, y=75-275 → scaled
+        // Reconnaissance Observation Post
         recon_op: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="10" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="340" x2="340" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="340" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="340" x2="257" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="225" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Forward Observer — original bbox: x=75-275, y=75-275 → scaled
+        // Forward Observer
         forward_observer: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="10" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="340" x2="340" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="340" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <circle cx="175" cy="216" r="41" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="200" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
-        // Sensor Observation Post — original bbox: x=75-275, y=75-275 → scaled
+        // Sensor Observation Post
         sensor_op: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="10" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="340" x2="340" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="340" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M175,175 Q175,216 257,216" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M175,175 Q175,216 93,216" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M93,216 Q175,216 175,257" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M257,216 Q175,216 175,257" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,175 Q175,200 200,200" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,175 Q175,200 150,200" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,200 Q175,200 175,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M200,200 Q175,200 175,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Combat Outpost — original bbox: x=75-275, y=75-300 → scaled to fill
+        // Combat Outpost
         combat_outpost: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="10" x2="10" y2="303" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="10" y1="303" x2="340" y2="303" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="10" x2="340" y2="303" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="211" y1="83" x2="248" y2="47" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="248" y1="156" x2="285" y2="120" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="285" y1="230" x2="322" y2="193" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="139" y1="83" x2="102" y2="47" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="102" y1="156" x2="65" y2="120" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="65" y1="230" x2="28" y2="193" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="303" x2="175" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="248" y1="303" x2="248" y2="340" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="102" y1="340" x2="102" y2="303" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="125" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="175" x2="250" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="250" y1="225" x2="275" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="125" x2="125" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="175" x2="100" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="225" x2="75" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="275" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="275" x2="225" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="300" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
     };
     return svgs[key] || svgs.rifle;
