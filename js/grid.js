@@ -158,7 +158,7 @@ function drawMGRSGrid() {
 
         try {
             const mgrsStr = mgrs.forward([sw.lng() + 0.001, lat], 5);
-            const northing = mgrsStr.slice(-5);
+            const northing = mgrsStr.slice(-5, -3);
             addGridLabel(lat, sw.lng() + 0.003, northing, color, map, gridLabels);
         } catch (e) { /* skip */ }
     }
@@ -174,7 +174,7 @@ function drawMGRSGrid() {
 
         try {
             const mgrsStr = mgrs.forward([lng, sw.lat() + 0.001], 5);
-            const easting = mgrsStr.slice(-10, -5);
+            const easting = mgrsStr.slice(-10, -8);
             addGridLabel(sw.lat() + 0.002, lng, easting, color, map, gridLabels);
         } catch (e) { /* skip */ }
     }
