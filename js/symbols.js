@@ -267,7 +267,7 @@ export function equipmentSVG(key, color, strokeWidth) {
         // Forward Observer
         forward_observer: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <polygon points="0,350 175,0 350,350 0,350 0,350" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <circle cx="175" cy="250" r="35" fill="black" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="175" cy="250" r="35" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
         // Sensor Observation Post
         sensor_op: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
