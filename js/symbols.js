@@ -259,24 +259,21 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Reconnaissance Observation Post
         recon_op: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M175,175 Q175,225 225,225" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <path d="M175,175 Q175,225 125,225" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <path d="M225,225 Q175,225 175,275" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <path d="M175,275 Q175,225 125,225" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <polygon points="175,25 25,325 325,325 175,25" fill="none" stroke="black" stroke-width="2" stroke-linejoin="round"/>
+  <polygon points="175,50 50,300 300,300 175,50 175,50" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="50" y1="300" x2="250" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Forward Observer
         forward_observer: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <polygon points="0,350 175,0 350,350 0,350 0,350" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <circle cx="175" cy="250" r="35" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <polygon points="175,50 50,300 300,300 175,50 175,50" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <circle cx="175" cy="225" r="35" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
         // Sensor Observation Post
         sensor_op: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <polygon points="175,50 50,300 300,300 175,50 175,50" fill="none" stroke="black" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M175,175 Q175,225 225,225" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <path d="M175,175 Q175,225 125,225" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <path d="M225,225 Q175,225 175,275" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
-  <path d="M175,275 Q175,225 125,225" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"/>
+  <path d="M175,175 Q175,225 225,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,175 Q175,225 125,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M225,225 Q175,225 175,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,275 Q175,225 125,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Combat Outpost
         combat_outpost: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
