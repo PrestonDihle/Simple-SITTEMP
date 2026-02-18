@@ -642,10 +642,19 @@ function recreateMarker(data) {
  * Create a Google Maps Polyline overlay for a given line type.
  * Returns null for 'solid' (no overlay needed).
  */
+// Legacy mapping for old saved data
+const LEGACY_LINE_TYPE_MAP = {
+    'minebelt': 'at_mine',
+    'wire': 'single_concertina',
+    'tankditch': 'atditch_a',
+};
+
 function createLineOverlay(path, lineType, color, map) {
+    // Map legacy types to new equivalents
+    const resolvedType = LEGACY_LINE_TYPE_MAP[lineType] || lineType;
     let polyline = null;
 
-    switch (lineType) {
+    switch (resolvedType) {
         case 'dashed':
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
@@ -670,24 +679,198 @@ function createLineOverlay(path, lineType, color, map) {
                 map
             });
             break;
-        case 'minebelt':
+        case 'flot_a':
+            // FLOT A — upward bumps (semicircles above the line)
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
-                icons: [{ icon: { path: google.maps.SymbolPath.CIRCLE, fillOpacity: 1, fillColor: color, strokeColor: color, strokeWeight: 1, scale: 4 }, offset: '0', repeat: '20px' }],
+                icons: [{
+                    icon: {
+                        path: 'M -5,0 L -4,-3 L -2,-5 L 0,-6 L 2,-5 L 4,-3 L 5,0',
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: 2,
+                        fillOpacity: 0, scale: 2
+                    },
+                    offset: '0', repeat: '24px'
+                }],
                 map
             });
             break;
-        case 'wire':
+        case 'flot_b':
+            // FLOT B — downward bumps (semicircles below the line)
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
-                icons: [{ icon: { path: google.maps.SymbolPath.CIRCLE, fillOpacity: 0, strokeColor: color, strokeWeight: 1.5, scale: 4 }, offset: '0', repeat: '18px' }],
+                icons: [{
+                    icon: {
+                        path: 'M -5,0 L -4,3 L -2,5 L 0,6 L 2,5 L 4,3 L 5,0',
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: 2,
+                        fillOpacity: 0, scale: 2
+                    },
+                    offset: '0', repeat: '24px'
+                }],
                 map
             });
             break;
-        case 'tankditch':
+        case 'low_wire':
+            // Low Wire Fence — X cross marks on base line
+            polyline = new google.maps.Polyline({
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                icons: [{
+                    icon: {
+                        path: 'M -3,-4 L 3,4 M -3,4 L 3,-4',
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: 2,
+                        scale: 1.5
+                    },
+                    offset: '0', repeat: '20px'
+                }],
+                map
+            });
+            break;
+        case 'single_concertina':
+            // Single Concertina — unfilled circles on base line
+            polyline = new google.maps.Polyline({
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                icons: [{
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 5
+                    },
+                    offset: '0', repeat: '22px'
+                }],
+                map
+            });
+            break;
+        case 'triple_concertina':
+            // Triple Concertina — unfilled circles + tick marks above/below
+            polyline = new google.maps.Polyline({
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                icons: [
+                    {
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 5
+                        },
+                        offset: '0', repeat: '22px'
+                    },
+                    {
+                        icon: {
+                            path: 'M 0,-8 L 0,-5',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
+                        },
+                        offset: '0', repeat: '22px'
+                    },
+                    {
+                        icon: {
+                            path: 'M 0,5 L 0,8',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
+                        },
+                        offset: '0', repeat: '22px'
+                    }
+                ],
+                map
+            });
+            break;
+        case 'atditch_a':
+            // AT Ditch A — upward filled triangles, no visible base line
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
-                icons: [{ icon: { path: google.maps.SymbolPath.FORWARD_OPEN_ARROW, fillOpacity: 1, fillColor: color, strokeColor: color, strokeWeight: 1, scale: 3 }, offset: '0', repeat: '14px' }],
+                icons: [{
+                    icon: {
+                        path: 'M -4,3 L 0,-4 L 4,3 Z',
+                        fillOpacity: 1, fillColor: color,
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: 1, scale: 2.5
+                    },
+                    offset: '0', repeat: '18px'
+                }],
+                map
+            });
+            break;
+        case 'atditch_b':
+            // AT Ditch B — downward filled triangles, no visible base line
+            polyline = new google.maps.Polyline({
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
+                icons: [{
+                    icon: {
+                        path: 'M -4,-3 L 0,4 L 4,-3 Z',
+                        fillOpacity: 1, fillColor: color,
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: 1, scale: 2.5
+                    },
+                    offset: '0', repeat: '18px'
+                }],
+                map
+            });
+            break;
+        case 'ap_mine':
+            // Antipersonnel Mine — filled circle + X cross + tick marks above/below
+            polyline = new google.maps.Polyline({
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                icons: [
+                    // Filled circle
+                    {
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            fillOpacity: 1, fillColor: color,
+                            strokeColor: color, strokeWeight: 1, scale: 4
+                        },
+                        offset: '0', repeat: '30px'
+                    },
+                    // X cross mark
+                    {
+                        icon: {
+                            path: 'M -3,-3 L 3,3 M -3,3 L 3,-3',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
+                        },
+                        offset: '0', repeat: '30px'
+                    },
+                    // Tick mark above
+                    {
+                        icon: {
+                            path: 'M 0,-7 L 0,-4',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
+                        },
+                        offset: '0', repeat: '30px'
+                    },
+                    // Tick mark below
+                    {
+                        icon: {
+                            path: 'M 0,4 L 0,7',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
+                        },
+                        offset: '0', repeat: '30px'
+                    }
+                ],
+                map
+            });
+            break;
+        case 'at_mine':
+            // Anti-tank Mine — filled circle + tick marks above/below
+            polyline = new google.maps.Polyline({
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                icons: [
+                    // Filled circle
+                    {
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            fillOpacity: 1, fillColor: color,
+                            strokeColor: color, strokeWeight: 1, scale: 4
+                        },
+                        offset: '0', repeat: '30px'
+                    },
+                    // Tick mark above
+                    {
+                        icon: {
+                            path: 'M 0,-7 L 0,-4',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
+                        },
+                        offset: '0', repeat: '30px'
+                    },
+                    // Tick mark below
+                    {
+                        icon: {
+                            path: 'M 0,4 L 0,7',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
+                        },
+                        offset: '0', repeat: '30px'
+                    }
+                ],
                 map
             });
             break;
