@@ -71,6 +71,9 @@ const initialState = {
     // Line type overlay polylines keyed by feature ID
     lineOverlays: {},
 
+    // Line type per feature ID (e.g., { 'abc123': 'dashed' })
+    featureLineTypes: {},
+
     // MGRS grid
     mgrsGridVisible: true,
     mgrsGridLines: [],

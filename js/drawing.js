@@ -494,7 +494,8 @@ export function pushUndoState() {
                 position: { lat: m.getPosition().lat(), lng: m.getPosition().lng() },
                 sittemp: m._sittemp,
             };
-        })
+        }),
+        featureLineTypes: Object.assign({}, get('featureLineTypes'))
     };
 
     undoStack.push(JSON.stringify(snapshot));
@@ -535,6 +536,7 @@ function restoreState(stateJson) {
     const draw = get('draw');
     const markers = get('markers');
     const lineOverlays = get('lineOverlays');
+    const featureLineTypes = get('featureLineTypes');
 
     // Clear line overlays
     for (const id of Object.keys(lineOverlays)) {
@@ -542,11 +544,38 @@ function restoreState(stateJson) {
         delete lineOverlays[id];
     }
 
+    // Restore feature line types
+    for (const id of Object.keys(featureLineTypes)) {
+        delete featureLineTypes[id];
+    }
+    if (saved.featureLineTypes) {
+        Object.assign(featureLineTypes, saved.featureLineTypes);
+    }
+
     // Restore Terra Draw features
     if (draw && get('ready')) {
         draw.clear();
         if (saved.features.length > 0) {
             try { draw.addFeatures(saved.features); } catch (e) { /* ignore */ }
+        }
+    }
+
+    // Re-apply line type overlays for restored features
+    const map = get('map');
+    if (saved.featureLineTypes) {
+        for (const [fId, lt] of Object.entries(saved.featureLineTypes)) {
+            if (lt === 'solid') continue;
+            try {
+                const feature = draw.getSnapshotFeature(fId);
+                if (feature && feature.geometry.type === 'LineString') {
+                    const path = feature.geometry.coordinates.map(function (c) { return { lat: c[1], lng: c[0] }; });
+                    const color = get('lineColor');
+                    const polyline = createLineOverlay(path, lt, color, map);
+                    if (polyline) {
+                        lineOverlays[fId] = polyline;
+                    }
+                }
+            } catch (e) { /* feature may not exist */ }
         }
     }
 
@@ -609,20 +638,12 @@ function recreateMarker(data) {
 
 // ===== Line Type Styling =====
 
-function applyLineType(featureId) {
-    const lineType = get('lineType');
-    if (lineType === 'solid') return;
-
-    const draw = get('draw');
-    if (!draw) return;
-
-    const feature = draw.getSnapshotFeature(featureId);
-    if (!feature || feature.geometry.type !== 'LineString') return;
-
-    const path = feature.geometry.coordinates.map(function (c) { return { lat: c[1], lng: c[0] }; });
-    const color = get('lineColor');
-    const map = get('map');
-    let polyline;
+/**
+ * Create a Google Maps Polyline overlay for a given line type.
+ * Returns null for 'solid' (no overlay needed).
+ */
+function createLineOverlay(path, lineType, color, map) {
+    let polyline = null;
 
     switch (lineType) {
         case 'dashed':
@@ -672,8 +693,77 @@ function applyLineType(featureId) {
             break;
     }
 
+    return polyline;
+}
+
+function applyLineType(featureId) {
+    const lineType = get('lineType');
+
+    // Store the line type for this feature
+    const featureLineTypes = get('featureLineTypes');
+    featureLineTypes[featureId] = lineType;
+
+    if (lineType === 'solid') return;
+
+    const draw = get('draw');
+    if (!draw) return;
+
+    const feature = draw.getSnapshotFeature(featureId);
+    if (!feature || feature.geometry.type !== 'LineString') return;
+
+    const path = feature.geometry.coordinates.map(function (c) { return { lat: c[1], lng: c[0] }; });
+    const color = get('lineColor');
+    const map = get('map');
+
+    const polyline = createLineOverlay(path, lineType, color, map);
     if (polyline) {
         const overlays = get('lineOverlays');
         overlays[featureId] = polyline;
     }
+}
+
+/**
+ * Change the line type of the currently selected LineString feature.
+ * Called from the toolbar when the user picks a new line type while a line is selected.
+ * @param {string} newLineType - The new line type key
+ * @returns {boolean} true if a line was updated, false otherwise
+ */
+export function changeLineType(newLineType) {
+    const draw = get('draw');
+    const selectedId = get('selectedFeatureId');
+    if (!draw || !selectedId) return false;
+
+    let feature;
+    try {
+        feature = draw.getSnapshotFeature(selectedId);
+    } catch (e) {
+        return false;
+    }
+    if (!feature || feature.geometry.type !== 'LineString') return false;
+
+    const overlays = get('lineOverlays');
+    const featureLineTypes = get('featureLineTypes');
+
+    // Remove old overlay if present
+    if (overlays[selectedId]) {
+        overlays[selectedId].setMap(null);
+        delete overlays[selectedId];
+    }
+
+    // Store the new line type
+    featureLineTypes[selectedId] = newLineType;
+
+    // Create new overlay (unless solid)
+    if (newLineType !== 'solid') {
+        const path = feature.geometry.coordinates.map(function (c) { return { lat: c[1], lng: c[0] }; });
+        const color = get('lineColor');
+        const map = get('map');
+        const polyline = createLineOverlay(path, newLineType, color, map);
+        if (polyline) {
+            overlays[selectedId] = polyline;
+        }
+    }
+
+    pushUndoState();
+    return true;
 }

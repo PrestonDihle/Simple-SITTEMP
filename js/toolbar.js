@@ -12,7 +12,8 @@ import {
 import {
     activateShape, enterSymbolPlacement, exitSymbolPlacement,
     enterTextPlacement, exitTextPlacement, clearSelected,
-    performUndo, performRedo, buildTextSVG, pushUndoState
+    performUndo, performRedo, buildTextSVG, pushUndoState,
+    changeLineType
 } from './drawing.js';
 
 // ===== Toast =====
@@ -186,6 +187,14 @@ function buildLinesSubmenu() {
         item.addEventListener('click', function () {
             set('lineType', lt.key);
             highlightSubmenuItem(list, item);
+
+            // If a line is currently selected, change its type
+            if (get('selectedFeatureId')) {
+                var changed = changeLineType(lt.key);
+                if (changed) {
+                    showToast('Line type changed to ' + lt.name);
+                }
+            }
         });
         if (lt.key === 'solid') item.classList.add('active');
         list.appendChild(item);
