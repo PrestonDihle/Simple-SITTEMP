@@ -16,9 +16,9 @@ export function equipmentSVG(key, color, strokeWidth) {
     const svgs = {
         // Rifle
         rifle: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="350" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="75" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="0" x2="225" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Light Machine Gun
         light_machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
