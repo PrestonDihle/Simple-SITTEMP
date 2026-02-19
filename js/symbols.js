@@ -96,13 +96,13 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Multiple Rocket Launcher
         multiple_rocket_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="250" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="250" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="100" x2="150" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="100" x2="200" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="350" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="0" x2="125" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="0" x2="225" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="50" x2="125" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="50" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="300" x2="125" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="150" x2="225" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Short Range Air Defense Missile Launcher
         shorad: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -139,12 +139,12 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Anti-tank Missile Launcher
         at_missile_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="250" x2="150" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="250" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M125,50 Q175,0 225,50" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="350" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="350" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="300" x2="175" y2="25" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="50" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="275" x2="125" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Armored Fighting Vehicle
         afv: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -172,23 +172,23 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Sensor
         sensor: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M175,125 Q175,175 225,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M175,125 Q175,175 125,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M225,175 Q175,175 175,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M175,225 Q175,175 125,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,0 Q175,175 350,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,0 Q175,175 0,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M0,175 Q175,175 175,350" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M175,350 Q175,175 350,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Radar
         radar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M75,75 Q50,300 275,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="100" y1="225" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="200" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="200" x2="200" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M25,25 Q0,350 325,325" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="250" x2="175" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="200" x2="175" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="200" x2="250" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Antenna
         antenna: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="75" x2="175" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="225" y1="75" x2="175" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="125" x2="125" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="350" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="275" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="75" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Helicopter
         helicopter: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -196,7 +196,7 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Unmanned Aircraft
         uav: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <polygon points="175,175 250,125 175,150 100,125 175,175 175,175" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <polygon points="0,125 175,175 350,125 175,250 0,125 0,125" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
 </svg>`,
         // Autonomous Robot
         autonomous_robot: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -227,29 +227,29 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Isolated Person
         isolated_person: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="125" x2="175" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <circle cx="175" cy="115" r="11" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="175" y1="135" x2="225" y2="115" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="135" x2="130" y2="120" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="275" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="100" x2="75" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="40" r="32" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="350" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="350" x2="250" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Bridge (Vertical)
         bridge_v: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="225" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="100" x2="125" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="250" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="250" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="250" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="250" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="50" y1="0" x2="100" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="50" x2="100" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="300" x2="50" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="250" y1="50" x2="300" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="250" y1="50" x2="250" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="250" y1="300" x2="300" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Bridge (Horizontal)
         bridge_h: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="275" y1="125" x2="250" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="275" y1="225" x2="250" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="75" y1="125" x2="100" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="100" y1="200" x2="75" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="100" y1="150" x2="250" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="100" y1="200" x2="250" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="50" y1="100" x2="0" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="50" y1="100" x2="300" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="300" y1="100" x2="350" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="50" y1="250" x2="0" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="50" y1="250" x2="300" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="300" y1="250" x2="350" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Observation Post
         observation_post: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
