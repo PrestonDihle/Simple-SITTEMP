@@ -731,21 +731,6 @@ function createLineOverlay(path, lineType, color, map) {
                 map
             });
             break;
-        case 'flot_b':
-            // FLOT B — downward arc only, no base line (matches original SVG)
-            polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
-                icons: [{
-                    icon: {
-                        path: 'M -5,0 L -4,3 L -2,5 L 0,6 L 2,5 L 4,3 L 5,0',
-                        strokeOpacity: 1, strokeColor: color, strokeWeight: 2,
-                        fillOpacity: 0, scale: 2
-                    },
-                    offset: '0', repeat: '24px'
-                }],
-                map
-            });
-            break;
         case 'low_wire':
             // Low Wire Fence — base line + picket diagonals (V shape, matches original SVG)
             polyline = new google.maps.Polyline({

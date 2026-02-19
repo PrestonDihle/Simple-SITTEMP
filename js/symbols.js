@@ -390,8 +390,7 @@ export const LINE_TYPES = [
     { key: 'dashed', name: 'Dashed' },
     { key: 'dotted', name: 'Dotted' },
     { key: 'dashdot', name: 'Dash-Dot' },
-    { key: 'flot_a', name: 'FLOT A' },
-    { key: 'flot_b', name: 'FLOT B' },
+    { key: 'flot_a', name: 'FLOT' },
     { key: 'low_wire', name: 'Low Wire Fence' },
     { key: 'single_concertina', name: 'Single Concertina' },
     { key: 'triple_concertina', name: 'Triple Concertina' },
@@ -463,9 +462,6 @@ export function getLinePreviewSVG(type) {
         case 'flot_a':
             // Rightward-bulging arc (no base line) — matches original SVG
             return `<svg width="40" height="14"><path d="M5,1 Q15,7 5,13" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M25,1 Q35,7 25,13" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
-        case 'flot_b':
-            // Downward arc only (no base line) — matches original SVG
-            return `<svg width="40" height="12"><path d="M5,2 Q10,11 15,2" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M25,2 Q30,11 35,2" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'low_wire':
             // Horizontal line + picket diagonals (triangle/V shape) — matches original SVG
             return `<svg width="40" height="12"><line x1="0" y1="8" x2="40" y2="8" stroke="${c}" stroke-width="1.5"/><line x1="5" y1="8" x2="12" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="5" y1="2" x2="12" y2="8" stroke="${c}" stroke-width="1.5"/><line x1="25" y1="8" x2="32" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="25" y1="2" x2="32" y2="8" stroke="${c}" stroke-width="1.5"/></svg>`;
