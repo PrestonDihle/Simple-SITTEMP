@@ -395,6 +395,7 @@ export const LINE_TYPES = [
     { key: 'single_concertina', name: 'Single Concertina' },
     { key: 'triple_concertina', name: 'Triple Concertina' },
     { key: 'atditch_a', name: 'AT Ditch' },
+    { key: 'atditch_unfin', name: 'Unfinished AT Ditch' },
     { key: 'ap_mine', name: 'AP Mine' },
     { key: 'at_mine', name: 'AT Mine' },
 ];
@@ -473,6 +474,9 @@ export function getLinePreviewSVG(type) {
         case 'atditch_a':
             // Rightward-pointing filled triangle (no base line) — matches original SVG
             return `<svg width="40" height="14"><polygon points="5,1 5,13 15,7" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,1 25,13 35,7" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
+        case 'atditch_unfin':
+            // Rightward-pointing unfilled triangle (no base line) — matches original SVG
+            return `<svg width="40" height="14"><polygon points="5,1 5,13 15,7" fill="none" stroke="${c}" stroke-width="1.5"/><polygon points="25,1 25,13 35,7" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'ap_mine':
             // Filled circle between two horizontal lines + inverted V chevron from top line to circle — matches original SVG
             return `<svg width="40" height="14"><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/><circle cx="20" cy="7" r="3" fill="${c}"/><line x1="24" y1="2" x2="20" y2="7" stroke="${c}" stroke-width="1.5"/><line x1="16" y1="2" x2="20" y2="7" stroke="${c}" stroke-width="1.5"/></svg>`;

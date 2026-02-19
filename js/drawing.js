@@ -797,7 +797,7 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'atditch_a':
-            // AT Ditch — rightward-pointing filled triangle, no visible base line (matches original SVG)
+            // AT Ditch — rightward-pointing filled triangle, no visible base line
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
                 icons: [{
@@ -805,6 +805,21 @@ function createLineOverlay(path, lineType, color, map) {
                         path: 'M 0,-5 L 7,0 L 0,5 Z',
                         fillOpacity: 1, fillColor: color,
                         strokeOpacity: 1, strokeColor: color, strokeWeight: 1, scale: 2.5
+                    },
+                    offset: '0', repeat: '20px'
+                }],
+                map
+            });
+            break;
+        case 'atditch_unfin':
+            // Unfinished AT Ditch — rightward-pointing unfilled triangle, no visible base line
+            polyline = new google.maps.Polyline({
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
+                icons: [{
+                    icon: {
+                        path: 'M 0,-5 L 7,0 L 0,5 Z',
+                        fillOpacity: 0,
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 2.5
                     },
                     offset: '0', repeat: '20px'
                 }],
