@@ -478,11 +478,11 @@ export function getLinePreviewSVG(type) {
             // Rightward-pointing unfilled triangle (no base line) — matches original SVG
             return `<svg width="40" height="14"><polygon points="5,1 5,13 15,7" fill="none" stroke="${c}" stroke-width="1.5"/><polygon points="25,1 25,13 35,7" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'ap_mine':
-            // Filled circle between two horizontal lines + inverted V chevron from top line to circle — matches original SVG
-            return `<svg width="40" height="14"><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/><circle cx="20" cy="7" r="3" fill="${c}"/><line x1="24" y1="2" x2="20" y2="7" stroke="${c}" stroke-width="1.5"/><line x1="16" y1="2" x2="20" y2="7" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Filled circle between two perpendicular lines + chevron from right line to circle — matches original SVG
+            return `<svg width="40" height="14"><line x1="3" y1="0" x2="3" y2="14" stroke="${c}" stroke-width="1.5"/><line x1="17" y1="0" x2="17" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="10" cy="7" r="4" fill="${c}"/><line x1="17" y1="3" x2="10" y2="7" stroke="${c}" stroke-width="2"/><line x1="17" y1="11" x2="10" y2="7" stroke="${c}" stroke-width="2"/><line x1="23" y1="0" x2="23" y2="14" stroke="${c}" stroke-width="1.5"/><line x1="37" y1="0" x2="37" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="7" r="4" fill="${c}"/><line x1="37" y1="3" x2="30" y2="7" stroke="${c}" stroke-width="2"/><line x1="37" y1="11" x2="30" y2="7" stroke="${c}" stroke-width="2"/></svg>`;
         case 'at_mine':
-            // Filled circle between two horizontal lines — matches original SVG
-            return `<svg width="40" height="14"><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/><circle cx="20" cy="7" r="3" fill="${c}"/></svg>`;
+            // Filled circle between two perpendicular lines — matches original SVG
+            return `<svg width="40" height="14"><line x1="3" y1="0" x2="3" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="10" cy="7" r="4" fill="${c}"/><line x1="17" y1="0" x2="17" y2="14" stroke="${c}" stroke-width="1.5"/><line x1="23" y1="0" x2="23" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="7" r="4" fill="${c}"/><line x1="37" y1="0" x2="37" y2="14" stroke="${c}" stroke-width="1.5"/></svg>`;
         default: return '';
     }
 }
