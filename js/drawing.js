@@ -749,59 +749,59 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'single_concertina':
-            // Single Concertina — circle to the right, line to the left (matches original SVG)
+            // Single Concertina — circle to the right, perpendicular line to the left (matches original SVG)
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
                 icons: [
-                    // Vertical line (along the path, to the left)
+                    // Perpendicular line (X axis = perpendicular to polyline direction)
                     {
                         icon: {
-                            path: 'M 0,-6 L 0,6',
+                            path: 'M -7,0 L 7,0',
                             strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
                         },
-                        offset: '0', repeat: '22px'
+                        offset: '0', repeat: '28px'
                     },
-                    // Circle offset to the right
+                    // Circle offset to the right of the path
                     {
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
-                            fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 5,
-                            anchor: new google.maps.Point(-5, 0)
+                            fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 6,
+                            anchor: new google.maps.Point(-6, 0)
                         },
-                        offset: '11px', repeat: '22px'
+                        offset: '14px', repeat: '28px'
                     }
                 ],
                 map
             });
             break;
         case 'triple_concertina':
-            // Triple Concertina — circle center, vertical lines on left and right (matches original SVG)
+            // Triple Concertina — circle center, perpendicular lines on left and right (matches original SVG)
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
                 icons: [
-                    // Vertical line on the left
+                    // Perpendicular line on the left
                     {
                         icon: {
-                            path: 'M 0,-6 L 0,6',
+                            path: 'M -7,0 L 7,0',
                             strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
                         },
-                        offset: '0', repeat: '26px'
+                        offset: '0', repeat: '30px'
                     },
-                    // Circle centered
+                    // Circle centered on path
                     {
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
-                            fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 5
+                            fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 6
                         },
-                        offset: '13px', repeat: '26px'
+                        offset: '15px', repeat: '30px'
                     },
-                    // Vertical line on the right
+                    // Perpendicular line on the right
                     {
                         icon: {
-                            path: 'M 0,-6 L 0,6',
+                            path: 'M -7,0 L 7,0',
                             strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
                         },
-                        offset: '25px', repeat: '26px'
+                        offset: '29px', repeat: '30px'
                     }
                 ],
                 map
