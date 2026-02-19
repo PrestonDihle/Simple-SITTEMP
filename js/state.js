@@ -38,6 +38,7 @@ const initialState = {
     fillOpacity: 0.6,
     lineType: 'solid',
     symbolStrokeWidth: 2,
+    symbolScale: 1.0,
 
     // Font settings for text labels
     fontSize: 14,

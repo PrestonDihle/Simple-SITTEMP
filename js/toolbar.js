@@ -280,6 +280,13 @@ function buildColorSubmenu() {
         set('symbolStrokeWidth', parseInt(swSlider.value));
         swLabel.textContent = swSlider.value;
     });
+
+    var scaleSlider = document.getElementById('symbol-scale-slider');
+    var scaleLabel = document.getElementById('symbol-scale-value');
+    scaleSlider.addEventListener('input', function () {
+        set('symbolScale', parseFloat(scaleSlider.value));
+        scaleLabel.textContent = parseFloat(scaleSlider.value).toFixed(1) + 'x';
+    });
 }
 
 // ===== Text Sub-menu =====

@@ -265,8 +265,9 @@ function placeSymbol(latLng, leftText, rightText) {
     const svgString = type === 'equipment' ? equipmentSVG(key, color, strokeWidth) : unitSVG(key, color);
     const fullSVG = buildSymbolWithLabels(svgString, leftText, rightText, color);
 
-    const sittemp = { type, key, leftText, rightText, color, strokeWidth };
-    createMapMarker(latLng, fullSVG, new google.maps.Size(120, 50), new google.maps.Point(60, 25), sittemp);
+    const scale = get('symbolScale') || 1.0;
+    const sittemp = { type, key, leftText, rightText, color, strokeWidth, symbolScale: scale };
+    createMapMarker(latLng, fullSVG, new google.maps.Size(120 * scale, 50 * scale), new google.maps.Point(60 * scale, 25 * scale), sittemp);
     pushUndoState();
 }
 
@@ -292,7 +293,8 @@ function placeStarMarker(latLng) {
             fill="${fill}" fill-opacity="${opacity}" stroke="${color}" stroke-width="2"/>
     </svg>`;
 
-    createMapMarker(latLng, svg, new google.maps.Size(30, 30), new google.maps.Point(15, 15), { type: 'star', color, fill, fillOpacity: opacity });
+    const scale = get('symbolScale') || 1.0;
+    createMapMarker(latLng, svg, new google.maps.Size(30 * scale, 30 * scale), new google.maps.Point(15 * scale, 15 * scale), { type: 'star', color, fill, fillOpacity: opacity, symbolScale: scale });
     pushUndoState();
 }
 
@@ -318,7 +320,8 @@ function placeTriangleMarker(latLng) {
             fill="${fill}" fill-opacity="${opacity}" stroke="${color}" stroke-width="2"/>
     </svg>`;
 
-    createMapMarker(latLng, svg, new google.maps.Size(30, 30), new google.maps.Point(15, 15), { type: 'triangle', color, fill, fillOpacity: opacity });
+    const scale = get('symbolScale') || 1.0;
+    createMapMarker(latLng, svg, new google.maps.Size(30 * scale, 30 * scale), new google.maps.Point(15 * scale, 15 * scale), { type: 'triangle', color, fill, fillOpacity: opacity, symbolScale: scale });
     pushUndoState();
 }
 
@@ -628,16 +631,17 @@ function restoreState(stateJson) {
 function recreateMarker(data) {
     const info = data.sittemp;
     let svgString, size, anchor;
+    const scale = info.symbolScale || 1.0;
 
     if (info.type === 'equipment') {
         const sw = info.strokeWidth || 2;
         svgString = buildSymbolWithLabels(equipmentSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color);
-        size = new google.maps.Size(120, 50);
-        anchor = new google.maps.Point(60, 25);
+        size = new google.maps.Size(120 * scale, 50 * scale);
+        anchor = new google.maps.Point(60 * scale, 25 * scale);
     } else if (info.type === 'unit') {
         svgString = buildSymbolWithLabels(unitSVG(info.key, info.color), info.leftText, info.rightText, info.color);
-        size = new google.maps.Size(120, 50);
-        anchor = new google.maps.Point(60, 25);
+        size = new google.maps.Size(120 * scale, 50 * scale);
+        anchor = new google.maps.Point(60 * scale, 25 * scale);
     } else if (info.type === 'star') {
         const fill = info.fill || info.color;
         const opacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
@@ -645,8 +649,8 @@ function recreateMarker(data) {
             <polygon points="15,1 18.5,11 29,11 20.5,17.5 23.5,28 15,22 6.5,28 9.5,17.5 1,11 11.5,11"
                 fill="${fill}" fill-opacity="${opacity}" stroke="${info.color}" stroke-width="2"/>
         </svg>`;
-        size = new google.maps.Size(30, 30);
-        anchor = new google.maps.Point(15, 15);
+        size = new google.maps.Size(30 * scale, 30 * scale);
+        anchor = new google.maps.Point(15 * scale, 15 * scale);
     } else if (info.type === 'triangle') {
         const fill = info.fill || info.color;
         const opacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
@@ -654,8 +658,8 @@ function recreateMarker(data) {
             <polygon points="15,2 28,28 2,28"
                 fill="${fill}" fill-opacity="${opacity}" stroke="${info.color}" stroke-width="2"/>
         </svg>`;
-        size = new google.maps.Size(30, 30);
-        anchor = new google.maps.Point(15, 15);
+        size = new google.maps.Size(30 * scale, 30 * scale);
+        anchor = new google.maps.Point(15 * scale, 15 * scale);
     } else if (info.type === 'text') {
         const fs = info.fontSize !== undefined ? info.fontSize : 14;
         const fb = info.fontBold !== undefined ? info.fontBold : true;
