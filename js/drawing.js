@@ -775,33 +775,33 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'triple_concertina':
-            // Triple Concertina — circle center, full lines above and below (matches original SVG)
+            // Triple Concertina — circle center, vertical lines on left and right (matches original SVG)
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
                 icons: [
-                    // Circle centered on the path
+                    // Vertical line on the left
+                    {
+                        icon: {
+                            path: 'M 0,-6 L 0,6',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                        },
+                        offset: '0', repeat: '26px'
+                    },
+                    // Circle centered
                     {
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
                             fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 5
                         },
-                        offset: '0', repeat: '22px'
+                        offset: '13px', repeat: '26px'
                     },
-                    // Line above
+                    // Vertical line on the right
                     {
                         icon: {
-                            path: 'M 0,-8 L 0,-8',
+                            path: 'M 0,-6 L 0,6',
                             strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
                         },
-                        offset: '0', repeat: '1px'
-                    },
-                    // Line below
-                    {
-                        icon: {
-                            path: 'M 0,8 L 0,8',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
-                        },
-                        offset: '0', repeat: '1px'
+                        offset: '25px', repeat: '26px'
                     }
                 ],
                 map

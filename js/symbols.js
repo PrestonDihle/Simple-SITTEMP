@@ -469,8 +469,8 @@ export function getLinePreviewSVG(type) {
             // Circle to the right, vertical line to the left — matches original SVG
             return `<svg width="40" height="14"><line x1="4" y1="0" x2="4" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="12" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="24" y1="0" x2="24" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="32" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'triple_concertina':
-            // Circle center, full horizontal lines above and below — matches original SVG
-            return `<svg width="40" height="14"><circle cx="10" cy="7" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="7" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Circle center, vertical lines on left and right — matches original SVG
+            return `<svg width="40" height="14"><line x1="3" y1="0" x2="3" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="10" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="17" y1="0" x2="17" y2="14" stroke="${c}" stroke-width="1.5"/><line x1="23" y1="0" x2="23" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="37" y1="0" x2="37" y2="14" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'atditch_a':
             // Rightward-pointing filled triangle (no base line) — matches original SVG
             return `<svg width="40" height="14"><polygon points="5,1 5,13 15,7" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,1 25,13 35,7" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
