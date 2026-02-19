@@ -148,28 +148,27 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Armored Fighting Vehicle
         afv: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="125" y1="75" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="225" y1="275" x2="225" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="125" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="225" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="275" x2="125" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="275" x2="225" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="0" x2="75" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="0" x2="275" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="0" x2="75" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="200" x2="175" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="350" x2="275" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="150" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Armored Personnel Carrier
         apc: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="125" y1="75" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="225" y1="275" x2="225" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="125" y1="100" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="125" y1="275" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="125" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="0" x2="75" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="0" x2="275" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="325" x2="275" y2="325" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="0" x2="275" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="0" x2="75" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Tank
         tank: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="125" y1="75" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="225" y1="275" x2="225" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="125" y1="100" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="125" y1="250" x2="225" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="0" x2="75" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="0" x2="275" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="75" x2="75" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Sensor
         sensor: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -201,10 +200,10 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Autonomous Robot
         autonomous_robot: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <polygon points="175,200 200,150 275,200 175,100 75,200 150,150 175,200" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <circle cx="75" cy="210" r="11" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
-  <circle cx="175" cy="215" r="14" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
-  <circle cx="275" cy="210" r="11" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="25" cy="275" r="25" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="175" cy="275" r="25" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="325" cy="275" r="25" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <polygon points="25,250 150,175 175,250 200,175 325,250 175,75 25,250 25,250" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
 </svg>`,
         // Directed Energy
         directed_energy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
