@@ -717,16 +717,16 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'flot_a':
-            // FLOT A — upward arc only, no base line (matches original SVG)
+            // FLOT A — rightward-bulging arc, no base line (matches original SVG)
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
                 icons: [{
                     icon: {
-                        path: 'M -5,0 L -4,-3 L -2,-5 L 0,-6 L 2,-5 L 4,-3 L 5,0',
+                        path: 'M 0,-6 L 2,-5 L 4,-3 L 5,0 L 4,3 L 2,5 L 0,6',
                         strokeOpacity: 1, strokeColor: color, strokeWeight: 2,
                         fillOpacity: 0, scale: 2
                     },
-                    offset: '0', repeat: '24px'
+                    offset: '0', repeat: '28px'
                 }],
                 map
             });

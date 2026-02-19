@@ -461,8 +461,8 @@ export function getLinePreviewSVG(type) {
         case 'dashdot':
             return `<svg width="40" height="10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2" stroke-dasharray="8,3,2,3"/></svg>`;
         case 'flot_a':
-            // Upward arc only (no base line) — matches original SVG
-            return `<svg width="40" height="12"><path d="M5,10 Q10,1 15,10" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M25,10 Q30,1 35,10" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Rightward-bulging arc (no base line) — matches original SVG
+            return `<svg width="40" height="14"><path d="M5,1 Q15,7 5,13" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M25,1 Q35,7 25,13" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'flot_b':
             // Downward arc only (no base line) — matches original SVG
             return `<svg width="40" height="12"><path d="M5,2 Q10,11 15,2" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M25,2 Q30,11 35,2" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
