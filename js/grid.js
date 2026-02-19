@@ -10,18 +10,33 @@ import { showToast } from './toolbar.js';
 // ===== MGRS Formatting =====
 
 /**
- * Format an MGRS string with a space between the Grid Zone Designator +
- * 100,000-meter Square ID and the numeric grid reference.
- * e.g. "11SNA12345678" → "11SNA 12345678"
+ * Parse an MGRS string into its structural components.
+ * Returns { gzd, sqid, easting, northing } or null on failure.
+ * e.g. "11SNA12345678" → { gzd: "11S", sqid: "NA", easting: "1234", northing: "5678" }
+ */
+function parseMGRS(mgrsStr) {
+    var match = mgrsStr.match(/^(\d{1,2}[A-Z])([A-Z]{2})(\d+)$/);
+    if (!match) return null;
+    var digits = match[3];
+    var half = digits.length / 2;
+    // Digits length must be even for a valid MGRS string
+    if (digits.length % 2 !== 0) return null;
+    return {
+        gzd: match[1],
+        sqid: match[2],
+        easting: digits.slice(0, half),
+        northing: digits.slice(half)
+    };
+}
+
+/**
+ * Format an MGRS string with spaces between components.
+ * e.g. "11SNA12345678" → "11S NA 1234 5678"
  */
 function formatMGRS(mgrsStr) {
-    var match = mgrsStr.match(/^(\d{1,2}[A-Z])([A-Z]{2})(\d+)$/);
-    if (match) {
-        var digits = match[3];
-        var half = digits.length / 2;
-        var easting = digits.slice(0, half);
-        var northing = digits.slice(half);
-        return match[1] + ' ' + match[2] + ' ' + easting + ' ' + northing;
+    var parsed = parseMGRS(mgrsStr);
+    if (parsed) {
+        return parsed.gzd + ' ' + parsed.sqid + ' ' + parsed.easting + ' ' + parsed.northing;
     }
     return mgrsStr;
 }
@@ -135,9 +150,11 @@ function drawMGRSGrid() {
     const endLng = Math.ceil(ne.lng() / degLng) * degLng;
 
     const maxLines = 100;
-    const latLines = Math.min(Math.ceil((endLat - startLat) / degLat), maxLines);
-    const lngLines = Math.min(Math.ceil((endLng - startLng) / degLng), maxLines);
-    if (latLines > maxLines || lngLines > maxLines) return;
+    const latLinesRaw = Math.ceil((endLat - startLat) / degLat);
+    const lngLinesRaw = Math.ceil((endLng - startLng) / degLng);
+    if (latLinesRaw > maxLines || lngLinesRaw > maxLines) return;
+    const latLines = latLinesRaw;
+    const lngLines = lngLinesRaw;
 
     const gridLines = get('mgrsGridLines');
     const gridLabels = get('mgrsGridLabels');
@@ -153,8 +170,12 @@ function drawMGRSGrid() {
 
         try {
             const mgrsStr = mgrs.forward([sw.lng() + 0.001, lat], 5);
-            const northing = mgrsStr.slice(-5, -3);
-            addGridLabel(lat, sw.lng() + 0.003, northing, color, map, gridLabels);
+            const parsed = parseMGRS(mgrsStr);
+            if (parsed) {
+                // Show the first 2 digits of northing as the row label
+                const northingLabel = parsed.northing.slice(0, 2);
+                addGridLabel(lat, sw.lng() + 0.003, northingLabel, color, map, gridLabels);
+            }
         } catch (e) { /* skip */ }
     }
 
@@ -169,8 +190,12 @@ function drawMGRSGrid() {
 
         try {
             const mgrsStr = mgrs.forward([lng, sw.lat() + 0.001], 5);
-            const easting = mgrsStr.slice(-10, -8);
-            addGridLabel(sw.lat() + 0.002, lng, easting, color, map, gridLabels);
+            const parsed = parseMGRS(mgrsStr);
+            if (parsed) {
+                // Show the first 2 digits of easting as the column label
+                const eastingLabel = parsed.easting.slice(0, 2);
+                addGridLabel(sw.lat() + 0.002, lng, eastingLabel, color, map, gridLabels);
+            }
         } catch (e) { /* skip */ }
     }
 }

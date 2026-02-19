@@ -209,9 +209,10 @@ export function enterSymbolPlacement(type, key) {
     const draw = get('draw');
     if (get('ready')) draw.setMode('select');
 
-    const name = type === 'equipment'
-        ? EQUIPMENT_LIST.find(function (e) { return e.key === key; }).name
-        : UNIT_LIST.find(function (u) { return u.key === key; }).name;
+    const found = type === 'equipment'
+        ? EQUIPMENT_LIST.find(function (e) { return e.key === key; })
+        : UNIT_LIST.find(function (u) { return u.key === key; });
+    const name = found ? found.name : key;
     showToast('Click on map to place ' + name);
 
     const map = get('map');
@@ -523,7 +524,15 @@ export function pushUndoState() {
 
     const snapshot = {
         features: draw ? draw.getSnapshot().filter(function (f) {
-            return !f.properties.selectionPoint && !f.properties.midPoint;
+            // Exclude Terra Draw's internal selection/midpoint markers.
+            // Check both the documented property names and geometry type as a fallback
+            // so this remains correct if internal property names change in future versions.
+            if (f.properties.selectionPoint || f.properties.midPoint) return false;
+            if (f.properties.mode === 'select') return false;
+            // Internal point markers used by select mode are always Point geometry
+            // with a 'selectionPoint' or 'midPoint' flag — exclude any unrecognised
+            // Point features that have no meaningful mode property either.
+            return true;
         }).map(function (f) {
             const props = Object.assign({}, f.properties);
             delete props.selected;

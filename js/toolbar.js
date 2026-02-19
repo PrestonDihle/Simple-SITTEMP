@@ -208,12 +208,27 @@ function buildEquipmentSubmenu() {
     EQUIPMENT_LIST.forEach(function (eq) {
         const item = document.createElement('div');
         item.className = 'submenu-item';
-        item.innerHTML = `<div style="width:28px;height:28px;">${equipmentSVG(eq.key, get('lineColor'))}</div><span>${eq.name}</span>`;
+        item.dataset.eqKey = eq.key;
+        const iconDiv = document.createElement('div');
+        iconDiv.style.cssText = 'width:28px;height:28px;';
+        iconDiv.innerHTML = equipmentSVG(eq.key, get('lineColor'));
+        item.appendChild(iconDiv);
+        const label = document.createElement('span');
+        label.textContent = eq.name;
+        item.appendChild(label);
         item.addEventListener('click', function () {
             enterSymbolPlacement('equipment', eq.key);
             closeAllSubmenus();
         });
         grid.appendChild(item);
+    });
+
+    // Update icons when line color changes
+    subscribe('lineColor', function (color) {
+        grid.querySelectorAll('.submenu-item[data-eq-key]').forEach(function (item) {
+            const key = item.dataset.eqKey;
+            item.querySelector('div').innerHTML = equipmentSVG(key, color);
+        });
     });
 }
 
@@ -224,12 +239,27 @@ function buildUnitsSubmenu() {
     UNIT_LIST.forEach(function (unit) {
         const item = document.createElement('div');
         item.className = 'submenu-item';
-        item.innerHTML = `<div style="width:28px;height:28px;">${unitSVG(unit.key, get('lineColor'))}</div><span>${unit.name}</span>`;
+        item.dataset.unitKey = unit.key;
+        const iconDiv = document.createElement('div');
+        iconDiv.style.cssText = 'width:28px;height:28px;';
+        iconDiv.innerHTML = unitSVG(unit.key, get('lineColor'));
+        item.appendChild(iconDiv);
+        const label = document.createElement('span');
+        label.textContent = unit.name;
+        item.appendChild(label);
         item.addEventListener('click', function () {
             enterSymbolPlacement('unit', unit.key);
             closeAllSubmenus();
         });
         grid.appendChild(item);
+    });
+
+    // Update icons when line color changes
+    subscribe('lineColor', function (color) {
+        grid.querySelectorAll('.submenu-item[data-unit-key]').forEach(function (item) {
+            const key = item.dataset.unitKey;
+            item.querySelector('div').innerHTML = unitSVG(key, color);
+        });
     });
 }
 

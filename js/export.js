@@ -156,13 +156,15 @@ function exportPDF(pageSize) {
 function exportScreenshot() {
     const container = document.getElementById('map-container');
     const banner = document.getElementById('banner-ad');
+    // Save the current display value so we can restore it exactly after capture
+    const originalDisplay = banner.style.display || '';
     banner.style.display = 'none';
 
     showToast('Capturing screenshot...');
 
     html2canvas(container, { useCORS: true, allowTaint: true, scale: 2, logging: false })
         .then(function (canvas) {
-            banner.style.display = 'flex';
+            banner.style.display = originalDisplay;
             canvas.toBlob(function (blob) {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -174,7 +176,7 @@ function exportScreenshot() {
             });
         })
         .catch(function (err) {
-            banner.style.display = 'flex';
+            banner.style.display = originalDisplay;
             showToast('Screenshot failed');
             console.error('Screenshot error:', err);
         });
