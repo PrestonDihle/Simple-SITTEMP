@@ -25,8 +25,8 @@ export function equipmentSVG(key, color, strokeWidth) {
   <line x1="125" y1="50" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="225" y1="50" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="175" y1="350" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="125" y1="350" x2="200" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="125" y1="175" x2="225" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="350" x2="225" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Medium Machine Gun
         medium_machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
