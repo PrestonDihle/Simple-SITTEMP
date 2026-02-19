@@ -185,7 +185,7 @@ function addGridLabel(lat, lng, text, color, map, gridLabels) {
         position: { lat, lng },
         map,
         icon: { path: google.maps.SymbolPath.CIRCLE, scale: 0 },
-        label: { text, color, fontSize: '10px', fontWeight: 'bold', className: 'mgrs-grid-label' },
+        label: { text, color, fontSize: '12px', fontWeight: 'bold', className: 'mgrs-grid-label' },
         clickable: false,
         zIndex: -1,
     });

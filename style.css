@@ -84,7 +84,7 @@ html, body {
 /* ===== Toolbar (Left Side) ===== */
 #toolbar {
     position: absolute;
-    left: 10px;
+    left: 20px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -588,7 +588,7 @@ html, body {
 /* ===== Ad Banner (Bottom Center) ===== */
 #banner-ad {
     position: absolute;
-    bottom: 10px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     width: 728px;
