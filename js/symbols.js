@@ -466,11 +466,11 @@ export function getLinePreviewSVG(type) {
             // Horizontal line + picket diagonals (triangle/V shape) — matches original SVG
             return `<svg width="40" height="12"><line x1="0" y1="8" x2="40" y2="8" stroke="${c}" stroke-width="1.5"/><line x1="5" y1="8" x2="12" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="5" y1="2" x2="12" y2="8" stroke="${c}" stroke-width="1.5"/><line x1="25" y1="8" x2="32" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="25" y1="2" x2="32" y2="8" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'single_concertina':
-            // Circle to the right, vertical line to the left — matches original SVG
-            return `<svg width="40" height="14"><line x1="4" y1="0" x2="4" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="12" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="24" y1="0" x2="24" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="32" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Overlapping circles (coils) on a base line
+            return `<svg width="40" height="14"><line x1="0" y1="10" x2="40" y2="10" stroke="${c}" stroke-width="1.5"/><circle cx="5" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="13" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="21" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="29" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="37" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.2"/></svg>`;
         case 'triple_concertina':
-            // Circle center, vertical lines on left and right — matches original SVG
-            return `<svg width="40" height="14"><line x1="3" y1="0" x2="3" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="10" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="17" y1="0" x2="17" y2="14" stroke="${c}" stroke-width="1.5"/><line x1="23" y1="0" x2="23" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="37" y1="0" x2="37" y2="14" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Overlapping circles (coils) between two parallel lines
+            return `<svg width="40" height="14"><line x1="0" y1="1" x2="40" y2="1" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="13" x2="40" y2="13" stroke="${c}" stroke-width="1.5"/><circle cx="5" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="13" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="21" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="29" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="37" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.2"/></svg>`;
         case 'atditch_a':
             // Rightward-pointing filled triangle (no base line) — matches original SVG
             return `<svg width="40" height="14"><polygon points="5,1 5,13 15,7" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,1 25,13 35,7" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;

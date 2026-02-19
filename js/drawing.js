@@ -749,59 +749,48 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'single_concertina':
-            // Single Concertina — circle to the right, perpendicular line to the left (matches original SVG)
+            // Single Concertina — overlapping coil circles on a base line
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
-                icons: [
-                    // Perpendicular line (X axis = perpendicular to polyline direction)
-                    {
-                        icon: {
-                            path: 'M -7,0 L 7,0',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
-                        },
-                        offset: '0', repeat: '28px'
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                icons: [{
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 6,
+                        anchor: new google.maps.Point(0, 3)
                     },
-                    // Circle offset to the right of the path
-                    {
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 6,
-                            anchor: new google.maps.Point(-6, 0)
-                        },
-                        offset: '14px', repeat: '28px'
-                    }
-                ],
+                    offset: '0', repeat: '10px'
+                }],
                 map
             });
             break;
         case 'triple_concertina':
-            // Triple Concertina — circle center, perpendicular lines on left and right (matches original SVG)
+            // Triple Concertina — overlapping coil circles between two parallel lines
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
                 icons: [
-                    // Perpendicular line on the left
+                    // Parallel line above
                     {
                         icon: {
-                            path: 'M -7,0 L 7,0',
+                            path: 'M 0,-8 L 0,-8',
                             strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
                         },
-                        offset: '0', repeat: '30px'
+                        offset: '0', repeat: '1px'
                     },
-                    // Circle centered on path
+                    // Parallel line below
+                    {
+                        icon: {
+                            path: 'M 0,8 L 0,8',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                        },
+                        offset: '0', repeat: '1px'
+                    },
+                    // Overlapping coil circles
                     {
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
                             fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 6
                         },
-                        offset: '15px', repeat: '30px'
-                    },
-                    // Perpendicular line on the right
-                    {
-                        icon: {
-                            path: 'M -7,0 L 7,0',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
-                        },
-                        offset: '29px', repeat: '30px'
+                        offset: '0', repeat: '10px'
                     }
                 ],
                 map
