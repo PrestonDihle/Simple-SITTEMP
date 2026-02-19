@@ -461,32 +461,32 @@ export function getLinePreviewSVG(type) {
         case 'dashdot':
             return `<svg width="40" height="10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2" stroke-dasharray="8,3,2,3"/></svg>`;
         case 'flot_a':
-            // Upward bumps on base line
-            return `<svg width="40" height="12"><line x1="0" y1="9" x2="40" y2="9" stroke="${c}" stroke-width="1.5"/><path d="M5,9 Q5,2 10,2 Q15,2 15,9" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M25,9 Q25,2 30,2 Q35,2 35,9" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Upward arc only (no base line) — matches original SVG
+            return `<svg width="40" height="12"><path d="M5,10 Q10,1 15,10" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M25,10 Q30,1 35,10" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'flot_b':
-            // Downward bumps on base line
-            return `<svg width="40" height="12"><line x1="0" y1="3" x2="40" y2="3" stroke="${c}" stroke-width="1.5"/><path d="M5,3 Q5,10 10,10 Q15,10 15,3" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M25,3 Q25,10 30,10 Q35,10 35,3" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Downward arc only (no base line) — matches original SVG
+            return `<svg width="40" height="12"><path d="M5,2 Q10,11 15,2" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M25,2 Q30,11 35,2" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'low_wire':
-            // X cross marks on base line
-            return `<svg width="40" height="12"><line x1="0" y1="6" x2="40" y2="6" stroke="${c}" stroke-width="1.5"/><line x1="7" y1="2" x2="13" y2="10" stroke="${c}" stroke-width="1.5"/><line x1="13" y1="2" x2="7" y2="10" stroke="${c}" stroke-width="1.5"/><line x1="27" y1="2" x2="33" y2="10" stroke="${c}" stroke-width="1.5"/><line x1="33" y1="2" x2="27" y2="10" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Horizontal line + picket diagonals (triangle/V shape) — matches original SVG
+            return `<svg width="40" height="12"><line x1="0" y1="8" x2="40" y2="8" stroke="${c}" stroke-width="1.5"/><line x1="5" y1="8" x2="12" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="5" y1="2" x2="12" y2="8" stroke="${c}" stroke-width="1.5"/><line x1="25" y1="8" x2="32" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="25" y1="2" x2="32" y2="8" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'single_concertina':
-            // Unfilled circles on base line
-            return `<svg width="40" height="12"><line x1="0" y1="6" x2="40" y2="6" stroke="${c}" stroke-width="1.5"/><circle cx="10" cy="6" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="6" r="4" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Circle above, single line below — matches original SVG
+            return `<svg width="40" height="14"><circle cx="10" cy="5" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="5" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="11" x2="40" y2="11" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'triple_concertina':
-            // Circles with tick marks above/below on base line
-            return `<svg width="40" height="14"><line x1="0" y1="7" x2="40" y2="7" stroke="${c}" stroke-width="1.5"/><circle cx="10" cy="7" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="7" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="10" y1="1" x2="10" y2="3" stroke="${c}" stroke-width="1.5"/><line x1="10" y1="11" x2="10" y2="13" stroke="${c}" stroke-width="1.5"/><line x1="30" y1="1" x2="30" y2="3" stroke="${c}" stroke-width="1.5"/><line x1="30" y1="11" x2="30" y2="13" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Circle center, full horizontal lines above and below — matches original SVG
+            return `<svg width="40" height="14"><circle cx="10" cy="7" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="7" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'atditch_a':
-            // Upward filled triangles (no base line)
+            // Upward triangle, base at bottom (no base line) — matches original SVG
             return `<svg width="40" height="12"><polygon points="5,10 10,2 15,10" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,10 30,2 35,10" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
         case 'atditch_b':
-            // Downward filled triangles (no base line)
+            // Downward triangle, base at top (no base line) — matches original SVG
             return `<svg width="40" height="12"><polygon points="5,2 10,10 15,2" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,2 30,10 35,2" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
         case 'ap_mine':
-            // Filled circle + X + tick lines above/below
-            return `<svg width="40" height="14"><line x1="0" y1="7" x2="40" y2="7" stroke="${c}" stroke-width="1.5"/><circle cx="20" cy="7" r="3" fill="${c}"/><line x1="17" y1="4" x2="23" y2="10" stroke="${c}" stroke-width="1.5"/><line x1="23" y1="4" x2="17" y2="10" stroke="${c}" stroke-width="1.5"/><line x1="20" y1="1" x2="20" y2="4" stroke="${c}" stroke-width="1.5"/><line x1="20" y1="10" x2="20" y2="13" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Filled circle between two horizontal lines + inverted V chevron from top line to circle — matches original SVG
+            return `<svg width="40" height="14"><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/><circle cx="20" cy="7" r="3" fill="${c}"/><line x1="24" y1="2" x2="20" y2="7" stroke="${c}" stroke-width="1.5"/><line x1="16" y1="2" x2="20" y2="7" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'at_mine':
-            // Filled circle + tick lines above/below
-            return `<svg width="40" height="14"><line x1="0" y1="7" x2="40" y2="7" stroke="${c}" stroke-width="1.5"/><circle cx="20" cy="7" r="3" fill="${c}"/><line x1="20" y1="1" x2="20" y2="4" stroke="${c}" stroke-width="1.5"/><line x1="20" y1="10" x2="20" y2="13" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Filled circle between two horizontal lines — matches original SVG
+            return `<svg width="40" height="14"><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/><circle cx="20" cy="7" r="3" fill="${c}"/></svg>`;
         default: return '';
     }
 }

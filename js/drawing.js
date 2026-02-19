@@ -680,9 +680,9 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'flot_a':
-            // FLOT A — upward bumps (semicircles above the line)
+            // FLOT A — upward arc only, no base line (matches original SVG)
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
                 icons: [{
                     icon: {
                         path: 'M -5,0 L -4,-3 L -2,-5 L 0,-6 L 2,-5 L 4,-3 L 5,0',
@@ -695,9 +695,9 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'flot_b':
-            // FLOT B — downward bumps (semicircles below the line)
+            // FLOT B — downward arc only, no base line (matches original SVG)
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
                 icons: [{
                     icon: {
                         path: 'M -5,0 L -4,3 L -2,5 L 0,6 L 2,5 L 4,3 L 5,0',
@@ -710,12 +710,12 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'low_wire':
-            // Low Wire Fence — X cross marks on base line
+            // Low Wire Fence — base line + picket diagonals (V shape, matches original SVG)
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
                 icons: [{
                     icon: {
-                        path: 'M -3,-4 L 3,4 M -3,4 L 3,-4',
+                        path: 'M -4,0 L 0,-5 M -4,-5 L 0,0',
                         strokeOpacity: 1, strokeColor: color, strokeWeight: 2,
                         scale: 1.5
                     },
@@ -725,13 +725,14 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'single_concertina':
-            // Single Concertina — unfilled circles on base line
+            // Single Concertina — circle above, line below (matches original SVG)
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
                 icons: [{
                     icon: {
                         path: google.maps.SymbolPath.CIRCLE,
-                        fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 5
+                        fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 5,
+                        anchor: new google.maps.Point(0, 5)
                     },
                     offset: '0', repeat: '22px'
                 }],
@@ -739,10 +740,11 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'triple_concertina':
-            // Triple Concertina — unfilled circles + tick marks above/below
+            // Triple Concertina — circle center, full lines above and below (matches original SVG)
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
                 icons: [
+                    // Circle centered on the path
                     {
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
@@ -750,19 +752,21 @@ function createLineOverlay(path, lineType, color, map) {
                         },
                         offset: '0', repeat: '22px'
                     },
+                    // Line above
                     {
                         icon: {
-                            path: 'M 0,-8 L 0,-5',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
+                            path: 'M 0,-8 L 0,-8',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
                         },
-                        offset: '0', repeat: '22px'
+                        offset: '0', repeat: '1px'
                     },
+                    // Line below
                     {
                         icon: {
-                            path: 'M 0,5 L 0,8',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
+                            path: 'M 0,8 L 0,8',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
                         },
-                        offset: '0', repeat: '22px'
+                        offset: '0', repeat: '1px'
                     }
                 ],
                 map
@@ -799,10 +803,26 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'ap_mine':
-            // Antipersonnel Mine — filled circle + X cross + tick marks above/below
+            // Antipersonnel Mine — filled circle between two lines + inverted V chevron (matches original SVG)
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
                 icons: [
+                    // Line above
+                    {
+                        icon: {
+                            path: 'M 0,-8 L 0,-8',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                        },
+                        offset: '0', repeat: '1px'
+                    },
+                    // Line below
+                    {
+                        icon: {
+                            path: 'M 0,8 L 0,8',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                        },
+                        offset: '0', repeat: '1px'
+                    },
                     // Filled circle
                     {
                         icon: {
@@ -812,27 +832,19 @@ function createLineOverlay(path, lineType, color, map) {
                         },
                         offset: '0', repeat: '30px'
                     },
-                    // X cross mark
+                    // Inverted V chevron — left diagonal from top line to circle
                     {
                         icon: {
-                            path: 'M -3,-3 L 3,3 M -3,3 L 3,-3',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
+                            path: 'M -3,-8 L 0,0',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
                         },
                         offset: '0', repeat: '30px'
                     },
-                    // Tick mark above
+                    // Inverted V chevron — right diagonal from top line to circle
                     {
                         icon: {
-                            path: 'M 0,-7 L 0,-4',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
-                        },
-                        offset: '0', repeat: '30px'
-                    },
-                    // Tick mark below
-                    {
-                        icon: {
-                            path: 'M 0,4 L 0,7',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
+                            path: 'M 3,-8 L 0,0',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
                         },
                         offset: '0', repeat: '30px'
                     }
@@ -841,32 +853,32 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'at_mine':
-            // Anti-tank Mine — filled circle + tick marks above/below
+            // Anti-tank Mine — filled circle between two horizontal lines (matches original SVG)
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
                 icons: [
+                    // Line above
+                    {
+                        icon: {
+                            path: 'M 0,-8 L 0,-8',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                        },
+                        offset: '0', repeat: '1px'
+                    },
+                    // Line below
+                    {
+                        icon: {
+                            path: 'M 0,8 L 0,8',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                        },
+                        offset: '0', repeat: '1px'
+                    },
                     // Filled circle
                     {
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
                             fillOpacity: 1, fillColor: color,
                             strokeColor: color, strokeWeight: 1, scale: 4
-                        },
-                        offset: '0', repeat: '30px'
-                    },
-                    // Tick mark above
-                    {
-                        icon: {
-                            path: 'M 0,-7 L 0,-4',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
-                        },
-                        offset: '0', repeat: '30px'
-                    },
-                    // Tick mark below
-                    {
-                        icon: {
-                            path: 'M 0,4 L 0,7',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1.5
                         },
                         offset: '0', repeat: '30px'
                     }
