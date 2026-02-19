@@ -38,7 +38,15 @@ export function initTerraDraw() {
                 styles: { pointColor: lineColor, pointWidth: 6, pointOutlineColor: '#000000', pointOutlineWidth: 2 }
             }),
             new TerraDrawLineStringMode({
-                styles: { lineStringColor: lineColor, lineStringWidth: 3 }
+                styles: {
+                    lineStringColor: lineColor,
+                    lineStringWidth: 3,
+                    lineStringOpacity: function (feature) {
+                        var flt = get('featureLineTypes');
+                        var lt = flt[feature.id];
+                        return (lt && lt !== 'solid') ? 0 : 1;
+                    }
+                }
             }),
             new TerraDrawPolygonMode({
                 styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: 2 }
@@ -66,7 +74,11 @@ export function initTerraDraw() {
                     selectedPolygonFillOpacity: 0.4,
                     selectedPolygonOutlineColor: '#FFFFFF',
                     selectedPolygonOutlineWidth: 2,
-                    selectedLineStringColor: '#FFFFFF',
+                    selectedLineStringColor: function (feature) {
+                        var flt = get('featureLineTypes');
+                        var lt = flt[feature.id];
+                        return (lt && lt !== 'solid') ? 'rgba(0,0,0,0)' : '#FFFFFF';
+                    },
                     selectedLineStringWidth: 3,
                     selectedPointColor: '#FFFFFF',
                     selectedPointWidth: 8,
@@ -116,6 +128,24 @@ export function initTerraDraw() {
 
     draw.on('change', function (ids, type) {
         if (type === 'delete') pushUndoState();
+
+        // Sync overlay positions when features are updated (dragged/edited)
+        if (type === 'update') {
+            var overlays = get('lineOverlays');
+            ids.forEach(function (id) {
+                if (overlays[id]) {
+                    try {
+                        var feature = draw.getSnapshotFeature(id);
+                        if (feature && feature.geometry.type === 'LineString') {
+                            var newPath = feature.geometry.coordinates.map(function (c) {
+                                return { lat: c[1], lng: c[0] };
+                            });
+                            overlays[id].setPath(newPath);
+                        }
+                    } catch (e) { /* feature may not exist yet */ }
+                }
+            });
+        }
     });
 }
 
@@ -135,7 +165,14 @@ function updateDrawStyles() {
         draw.updateModeOptions('rectangle', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: 2 } });
         draw.updateModeOptions('circle', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: 2 } });
         draw.updateModeOptions('freehand', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: 2 } });
-        draw.updateModeOptions('linestring', { styles: { lineStringColor: lineColor, lineStringWidth: 3 } });
+        draw.updateModeOptions('linestring', { styles: {
+            lineStringColor: lineColor, lineStringWidth: 3,
+            lineStringOpacity: function (feature) {
+                var flt = get('featureLineTypes');
+                var lt = flt[feature.id];
+                return (lt && lt !== 'solid') ? 0 : 1;
+            }
+        } });
         draw.updateModeOptions('point', { styles: { pointColor: lineColor, pointWidth: 6, pointOutlineColor: '#000000', pointOutlineWidth: 2 } });
     } catch (e) {
         // Styles may fail if mode not yet ready
