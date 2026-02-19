@@ -49,34 +49,34 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Grenade Launcher
         grenade_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="50" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="50" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="50" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <circle cx="175" cy="125" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="125" y1="50" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="50" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="350" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="150" r="56" fill="none" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
         // Anti-tank Rocket Launcher
         at_rocket_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="100" x2="150" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="100" x2="200" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="275" x2="175" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="275" x2="175" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="175" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="50" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="50" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="50" x2="125" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="50" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="350" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="300" x2="225" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="0" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Mortar
         mortar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <circle cx="175" cy="250" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="175" y1="225" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="50" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="50" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="175" cy="275" r="56" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="220" x2="175" y2="5" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Howitzer
         howitzer: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="75" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="100" x2="150" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="100" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <circle cx="175" cy="250" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="175" cy="305" r="43" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="260" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="75" x2="125" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="75" x2="225" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Anti-tank Gun
         at_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
