@@ -466,8 +466,8 @@ export function getLinePreviewSVG(type) {
             // Horizontal line + picket diagonals (triangle/V shape) — matches original SVG
             return `<svg width="40" height="12"><line x1="0" y1="8" x2="40" y2="8" stroke="${c}" stroke-width="1.5"/><line x1="5" y1="8" x2="12" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="5" y1="2" x2="12" y2="8" stroke="${c}" stroke-width="1.5"/><line x1="25" y1="8" x2="32" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="25" y1="2" x2="32" y2="8" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'single_concertina':
-            // Circle above, single line below — matches original SVG
-            return `<svg width="40" height="14"><circle cx="10" cy="5" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="5" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="11" x2="40" y2="11" stroke="${c}" stroke-width="1.5"/></svg>`;
+            // Circle to the right, vertical line to the left — matches original SVG
+            return `<svg width="40" height="14"><line x1="4" y1="0" x2="4" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="12" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="24" y1="0" x2="24" y2="14" stroke="${c}" stroke-width="1.5"/><circle cx="32" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'triple_concertina':
             // Circle center, full horizontal lines above and below — matches original SVG
             return `<svg width="40" height="14"><circle cx="10" cy="7" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="7" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/></svg>`;

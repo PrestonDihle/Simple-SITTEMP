@@ -749,17 +749,28 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'single_concertina':
-            // Single Concertina — circle above, line below (matches original SVG)
+            // Single Concertina — circle to the right, line to the left (matches original SVG)
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
-                icons: [{
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 5,
-                        anchor: new google.maps.Point(0, 5)
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
+                icons: [
+                    // Vertical line (along the path, to the left)
+                    {
+                        icon: {
+                            path: 'M 0,-6 L 0,6',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                        },
+                        offset: '0', repeat: '22px'
                     },
-                    offset: '0', repeat: '22px'
-                }],
+                    // Circle offset to the right
+                    {
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 5,
+                            anchor: new google.maps.Point(-5, 0)
+                        },
+                        offset: '11px', repeat: '22px'
+                    }
+                ],
                 map
             });
             break;
