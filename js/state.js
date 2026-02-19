@@ -37,7 +37,7 @@ const initialState = {
     fillColor: '#FF0000',
     fillOpacity: 0.6,
     lineType: 'solid',
-    symbolStrokeWidth: 2,
+    symbolStrokeWidth: 8,
     symbolScale: 1.0,
 
     // Font settings for text labels

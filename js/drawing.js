@@ -262,8 +262,8 @@ function placeSymbol(latLng, leftText, rightText) {
     if (!type || !key) return;
 
     const color = get('lineColor');
-    const strokeWidth = get('symbolStrokeWidth') || 2;
-    const svgString = type === 'equipment' ? equipmentSVG(key, color, strokeWidth) : unitSVG(key, color);
+    const strokeWidth = get('symbolStrokeWidth') || 8;
+    const svgString = type === 'equipment' ? equipmentSVG(key, color, strokeWidth) : unitSVG(key, color, strokeWidth);
     const fullSVG = buildSymbolWithLabels(svgString, leftText, rightText, color);
 
     const scale = get('symbolScale') || 1.0;
@@ -648,7 +648,8 @@ function recreateMarker(data) {
         size = new google.maps.Size(120 * scale, 50 * scale);
         anchor = new google.maps.Point(60 * scale, 25 * scale);
     } else if (info.type === 'unit') {
-        svgString = buildSymbolWithLabels(unitSVG(info.key, info.color), info.leftText, info.rightText, info.color);
+        const sw = info.strokeWidth || 8;
+        svgString = buildSymbolWithLabels(unitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color);
         size = new google.maps.Size(120 * scale, 50 * scale);
         anchor = new google.maps.Point(60 * scale, 25 * scale);
     } else if (info.type === 'star') {
