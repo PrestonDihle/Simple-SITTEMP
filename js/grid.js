@@ -84,11 +84,6 @@ export function setupMGRSGrid() {
         drawMGRSGrid();
     });
 
-    document.getElementById('grid-scale').addEventListener('change', function () {
-        set('mgrsGridScale', parseInt(this.value));
-        drawMGRSGrid();
-    });
-
     document.getElementById('grid-color').addEventListener('change', function () {
         set('mgrsGridColor', this.value);
         drawMGRSGrid();
