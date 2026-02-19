@@ -80,19 +80,19 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Anti-tank Gun
         at_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="75" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="100" x2="150" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="100" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="275" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="275" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="300" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="75" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="75" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="300" x2="225" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="300" x2="125" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Air Defense Gun
         ad_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M125,275 Q175,175 225,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="100" x2="150" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="100" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="125" y1="275" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M125,350 Q175,250 225,350" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="350" x2="225" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="300" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="75" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="75" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Multiple Rocket Launcher
         multiple_rocket_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -106,36 +106,36 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Short Range Air Defense Missile Launcher
         shorad: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M150,275 Q175,225 200,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="150" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M125,50 Q175,0 225,50" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M125,350 Q175,250 225,350" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="25" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="350" x2="225" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="50" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="50" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="150" x2="225" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Medium Range Air Defense Missile Launcher
         mrad: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M150,275 Q175,225 200,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="150" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M125,50 Q175,0 225,50" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M125,350 Q175,250 225,350" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="25" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="350" x2="225" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="50" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="50" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="200" x2="125" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="125" x2="225" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Long Range Air Defense Missile Launcher
         lrad: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M150,100 Q175,50 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M150,275 Q175,225 200,275" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="250" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="100" x2="150" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="200" y1="100" x2="200" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="150" x2="200" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="200" x2="200" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M125,50 Q175,0 225,50" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M125,350 Q175,250 225,350" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="25" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="350" x2="225" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="50" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="50" x2="225" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="150" x2="225" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="100" x2="225" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="200" x2="225" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Anti-tank Missile Launcher
         at_missile_launcher: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
