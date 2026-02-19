@@ -296,24 +296,108 @@ export function equipmentSVG(key, color, strokeWidth) {
 
 // ===== Unit Symbol SVGs =====
 // NATO friendly rectangle frame with unit type modifier inside
+// All symbols use a 350x350 viewBox matching the equipment symbol format
 export function unitSVG(key, color) {
     color = color || '#0000FF';
-    const frame = `<rect x="2" y="6" width="36" height="24" fill="none" stroke="${color}" stroke-width="2.5" rx="1"/>`;
-    const modifiers = {
-        infantry: `${frame}<line x1="6" y1="10" x2="34" y2="26" stroke="${color}" stroke-width="2"/><line x1="34" y1="10" x2="6" y2="26" stroke="${color}" stroke-width="2"/>`,
-        armor: `${frame}<ellipse cx="20" cy="18" rx="12" ry="7" fill="none" stroke="${color}" stroke-width="2"/>`,
-        armored_infantry: `${frame}<ellipse cx="20" cy="18" rx="12" ry="7" fill="none" stroke="${color}" stroke-width="1.5"/><line x1="10" y1="12" x2="30" y2="24" stroke="${color}" stroke-width="1.5"/><line x1="30" y1="12" x2="10" y2="24" stroke="${color}" stroke-width="1.5"/>`,
-        artillery: `${frame}<circle cx="20" cy="18" r="5" fill="${color}"/>`,
-        engineers: `${frame}<text x="20" y="23" text-anchor="middle" fill="${color}" font-size="14" font-weight="bold">E</text>`,
-        aviation: `${frame}<path d="M10 18 L20 10 L30 18" fill="none" stroke="${color}" stroke-width="2"/>`,
-        military_intel: `${frame}<text x="20" y="23" text-anchor="middle" fill="${color}" font-size="12" font-weight="bold">MI</text>`,
-        military_police: `${frame}<text x="20" y="23" text-anchor="middle" fill="${color}" font-size="12" font-weight="bold">MP</text>`,
-        recon: `${frame}<line x1="6" y1="26" x2="34" y2="10" stroke="${color}" stroke-width="2"/>`,
-        signal: `${frame}<path d="M12 24 L16 12 L24 24 L28 12" fill="none" stroke="${color}" stroke-width="2"/>`,
-        electronic_warfare: `${frame}<path d="M10 24 L14 12 L22 24 L26 12" fill="none" stroke="${color}" stroke-width="1.5"/><line x1="30" y1="12" x2="30" y2="24" stroke="${color}" stroke-width="1.5"/>`,
+    const c = color;
+    const svgs = {
+        // Aviation — hourglass/butterfly polygon inside rect
+        aviation: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <polygon points="0,50 175,175 350,50 350,300 175,175 0,300" fill="none" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // Infantry — X crosses inside rect
+        infantry: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="2"/>
+  <line x1="0" y1="50" x2="350" y2="300" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // Armor — oval/track shape inside rect
+        armor: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <ellipse cx="175" cy="175" rx="130" ry="75" fill="none" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // Combined Arms — armor oval + infantry X inside rect
+        combined_arms: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <ellipse cx="175" cy="175" rx="130" ry="75" fill="none" stroke="${c}" stroke-width="2"/>
+  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="2"/>
+  <line x1="0" y1="50" x2="350" y2="300" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // Artillery — filled circle inside rect
+        artillery: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <circle cx="175" cy="175" r="75" fill="${c}" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // Engineer — E/comb shape inside rect
+        engineers: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <text x="175" y="230" text-anchor="middle" fill="${c}" font-size="200" font-weight="bold" font-family="Arial,sans-serif">E</text>
+</svg>`,
+        // Military Intel — MI letters inside rect
+        military_intel: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <text x="175" y="230" text-anchor="middle" fill="${c}" font-size="160" font-weight="bold" font-family="Arial,sans-serif">MI</text>
+</svg>`,
+        // Military Police — MP letters inside rect
+        military_police: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <text x="175" y="230" text-anchor="middle" fill="${c}" font-size="160" font-weight="bold" font-family="Arial,sans-serif">MP</text>
+</svg>`,
+        // Cavalry — single diagonal line inside rect
+        cavalry: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // Signal — lightning bolt/zigzag inside rect
+        signal: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <polyline points="100,75 150,175 100,175 200,275 250,175 200,175 250,75" fill="none" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // Air Defense — arc/curve inside rect
+        air_defense: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <path d="M50,275 Q175,50 300,275" fill="none" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // EW Jamming — complex wave pattern + EW text inside rect
+        ew_jamming: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <text x="175" y="230" text-anchor="middle" fill="${c}" font-size="160" font-weight="bold" font-family="Arial,sans-serif">EW</text>
+</svg>`,
+        // CBRN — CBRN symbol inside rect
+        cbrn: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <circle cx="175" cy="175" r="80" fill="none" stroke="${c}" stroke-width="2"/>
+  <line x1="175" y1="95" x2="175" y2="50" stroke="${c}" stroke-width="2"/>
+  <line x1="175" y1="255" x2="175" y2="300" stroke="${c}" stroke-width="2"/>
+  <line x1="95" y1="175" x2="50" y2="175" stroke="${c}" stroke-width="2"/>
+  <line x1="255" y1="175" x2="300" y2="175" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // Medical — cross/plus inside rect
+        medical: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <line x1="175" y1="75" x2="175" y2="275" stroke="${c}" stroke-width="2"/>
+  <line x1="75" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // Armored Infantry — armor oval + infantry X (legacy, kept for compatibility)
+        armored_infantry: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <ellipse cx="175" cy="175" rx="130" ry="75" fill="none" stroke="${c}" stroke-width="2"/>
+  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="2"/>
+  <line x1="0" y1="50" x2="350" y2="300" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // Recon — single diagonal (legacy alias for cavalry)
+        recon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="2"/>
+</svg>`,
+        // Electronic Warfare (legacy alias for ew_jamming)
+        electronic_warfare: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="2"/>
+  <text x="175" y="230" text-anchor="middle" fill="${c}" font-size="160" font-weight="bold" font-family="Arial,sans-serif">EW</text>
+</svg>`,
     };
-    const inner = modifiers[key] || modifiers.infantry;
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="36" viewBox="0 0 40 36">${inner}</svg>`;
+    return svgs[key] || svgs.infantry;
 }
 
 // ===== Definition Lists =====
@@ -363,15 +447,19 @@ export const EQUIPMENT_LIST = [
 export const UNIT_LIST = [
     { key: 'infantry', name: 'Infantry' },
     { key: 'armor', name: 'Armor' },
+    { key: 'combined_arms', name: 'Combined Arms' },
     { key: 'armored_infantry', name: 'Armored Inf' },
     { key: 'artillery', name: 'Artillery' },
-    { key: 'engineers', name: 'Engineers' },
     { key: 'aviation', name: 'Aviation' },
+    { key: 'engineers', name: 'Engineers' },
     { key: 'military_intel', name: 'Mil Intel' },
     { key: 'military_police', name: 'Mil Police' },
-    { key: 'recon', name: 'Recon' },
+    { key: 'cavalry', name: 'Cavalry' },
     { key: 'signal', name: 'Signal' },
-    { key: 'electronic_warfare', name: 'EW' },
+    { key: 'air_defense', name: 'Air Defense' },
+    { key: 'ew_jamming', name: 'EW Jamming' },
+    { key: 'cbrn', name: 'CBRN' },
+    { key: 'medical', name: 'Medical' },
 ];
 
 export const SHAPE_LIST = [
