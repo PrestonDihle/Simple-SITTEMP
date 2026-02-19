@@ -838,84 +838,52 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'ap_mine':
-            // Antipersonnel Mine — perpendicular lines left/right, filled circle, chevron from right line to circle
+            // Antipersonnel Mine — filled circle + chevron diagonals from right
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
                 icons: [
-                    // Perpendicular line on the left
-                    {
-                        icon: {
-                            path: 'M -7,0 L 7,0',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
-                        },
-                        offset: '0', repeat: '30px'
-                    },
-                    // Filled circle centered
+                    // Filled circle
                     {
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
                             fillOpacity: 1, fillColor: color,
                             strokeColor: color, strokeWeight: 1, scale: 5
                         },
-                        offset: '15px', repeat: '30px'
+                        offset: '0', repeat: '28px'
                     },
-                    // Perpendicular line on the right
-                    {
-                        icon: {
-                            path: 'M -7,0 L 7,0',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
-                        },
-                        offset: '29px', repeat: '30px'
-                    },
-                    // Chevron — diagonal from right line upper to circle
+                    // Chevron — diagonal from right to circle center (upper)
                     {
                         icon: {
                             path: 'M 5,-5 L 0,0',
                             strokeOpacity: 1, strokeColor: color, strokeWeight: 3, scale: 1.5
                         },
-                        offset: '15px', repeat: '30px'
+                        offset: '0', repeat: '28px'
                     },
-                    // Chevron — diagonal from right line lower to circle
+                    // Chevron — diagonal from right to circle center (lower)
                     {
                         icon: {
                             path: 'M 5,5 L 0,0',
                             strokeOpacity: 1, strokeColor: color, strokeWeight: 3, scale: 1.5
                         },
-                        offset: '15px', repeat: '30px'
+                        offset: '0', repeat: '28px'
                     }
                 ],
                 map
             });
             break;
         case 'at_mine':
-            // Anti-tank Mine — perpendicular lines left/right, filled circle centered
+            // Anti-tank Mine — filled circle on base line
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
                 icons: [
-                    // Perpendicular line on the left
-                    {
-                        icon: {
-                            path: 'M -7,0 L 7,0',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
-                        },
-                        offset: '0', repeat: '30px'
-                    },
-                    // Filled circle centered
+                    // Filled circle
                     {
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
                             fillOpacity: 1, fillColor: color,
                             strokeColor: color, strokeWeight: 1, scale: 5
                         },
-                        offset: '15px', repeat: '30px'
-                    },
-                    // Perpendicular line on the right
-                    {
-                        icon: {
-                            path: 'M -7,0 L 7,0',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
-                        },
-                        offset: '29px', repeat: '30px'
+                        offset: '0', repeat: '28px'
                     }
                 ],
                 map
