@@ -684,6 +684,8 @@ const LEGACY_LINE_TYPE_MAP = {
     'minebelt': 'at_mine',
     'wire': 'single_concertina',
     'tankditch': 'atditch_a',
+    'atditch_b': 'atditch_a',
+    'flot_b': 'flot_a',
 };
 
 function createLineOverlay(path, lineType, color, map) {
@@ -795,31 +797,16 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'atditch_a':
-            // AT Ditch A — upward filled triangles, no visible base line
+            // AT Ditch — rightward-pointing filled triangle, no visible base line (matches original SVG)
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
                 icons: [{
                     icon: {
-                        path: 'M -4,3 L 0,-4 L 4,3 Z',
+                        path: 'M 0,-5 L 7,0 L 0,5 Z',
                         fillOpacity: 1, fillColor: color,
                         strokeOpacity: 1, strokeColor: color, strokeWeight: 1, scale: 2.5
                     },
-                    offset: '0', repeat: '18px'
-                }],
-                map
-            });
-            break;
-        case 'atditch_b':
-            // AT Ditch B — downward filled triangles, no visible base line
-            polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
-                icons: [{
-                    icon: {
-                        path: 'M -4,-3 L 0,4 L 4,-3 Z',
-                        fillOpacity: 1, fillColor: color,
-                        strokeOpacity: 1, strokeColor: color, strokeWeight: 1, scale: 2.5
-                    },
-                    offset: '0', repeat: '18px'
+                    offset: '0', repeat: '20px'
                 }],
                 map
             });

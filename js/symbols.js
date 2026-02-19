@@ -394,8 +394,7 @@ export const LINE_TYPES = [
     { key: 'low_wire', name: 'Low Wire Fence' },
     { key: 'single_concertina', name: 'Single Concertina' },
     { key: 'triple_concertina', name: 'Triple Concertina' },
-    { key: 'atditch_a', name: 'AT Ditch A' },
-    { key: 'atditch_b', name: 'AT Ditch B' },
+    { key: 'atditch_a', name: 'AT Ditch' },
     { key: 'ap_mine', name: 'AP Mine' },
     { key: 'at_mine', name: 'AT Mine' },
 ];
@@ -472,11 +471,8 @@ export function getLinePreviewSVG(type) {
             // Circle center, full horizontal lines above and below — matches original SVG
             return `<svg width="40" height="14"><circle cx="10" cy="7" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="30" cy="7" r="4" fill="none" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'atditch_a':
-            // Upward triangle, base at bottom (no base line) — matches original SVG
-            return `<svg width="40" height="12"><polygon points="5,10 10,2 15,10" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,10 30,2 35,10" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
-        case 'atditch_b':
-            // Downward triangle, base at top (no base line) — matches original SVG
-            return `<svg width="40" height="12"><polygon points="5,2 10,10 15,2" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,2 30,10 35,2" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
+            // Rightward-pointing filled triangle (no base line) — matches original SVG
+            return `<svg width="40" height="14"><polygon points="5,1 5,13 15,7" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,1 25,13 35,7" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
         case 'ap_mine':
             // Filled circle between two horizontal lines + inverted V chevron from top line to circle — matches original SVG
             return `<svg width="40" height="14"><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/><circle cx="20" cy="7" r="3" fill="${c}"/><line x1="24" y1="2" x2="20" y2="7" stroke="${c}" stroke-width="1.5"/><line x1="16" y1="2" x2="20" y2="7" stroke="${c}" stroke-width="1.5"/></svg>`;
