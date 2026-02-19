@@ -481,8 +481,8 @@ export function getLinePreviewSVG(type) {
             // Filled circle + chevron diagonals from right — matches original SVG
             return `<svg width="40" height="14"><circle cx="10" cy="7" r="5" fill="${c}"/><line x1="17" y1="2" x2="10" y2="7" stroke="${c}" stroke-width="2"/><line x1="17" y1="12" x2="10" y2="7" stroke="${c}" stroke-width="2"/><circle cx="30" cy="7" r="5" fill="${c}"/><line x1="37" y1="2" x2="30" y2="7" stroke="${c}" stroke-width="2"/><line x1="37" y1="12" x2="30" y2="7" stroke="${c}" stroke-width="2"/></svg>`;
         case 'at_mine':
-            // Filled circle only — matches original SVG
-            return `<svg width="40" height="14"><circle cx="10" cy="7" r="5" fill="${c}"/><circle cx="30" cy="7" r="5" fill="${c}"/></svg>`;
+            // Filled circle between two horizontal lines — matches original SVG
+            return `<svg width="40" height="14"><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/><circle cx="10" cy="7" r="4" fill="${c}"/><circle cx="30" cy="7" r="4" fill="${c}"/></svg>`;
         default: return '';
     }
 }

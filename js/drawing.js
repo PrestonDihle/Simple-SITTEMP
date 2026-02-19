@@ -872,10 +872,26 @@ function createLineOverlay(path, lineType, color, map) {
             });
             break;
         case 'at_mine':
-            // Anti-tank Mine — filled circle on base line
+            // Anti-tank Mine — filled circle between two parallel lines above/below
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
                 icons: [
+                    // Parallel line above (dense dots simulate continuous line)
+                    {
+                        icon: {
+                            path: 'M 0,-8 L 0,-8',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                        },
+                        offset: '0', repeat: '1px'
+                    },
+                    // Parallel line below
+                    {
+                        icon: {
+                            path: 'M 0,8 L 0,8',
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                        },
+                        offset: '0', repeat: '1px'
+                    },
                     // Filled circle
                     {
                         icon: {
