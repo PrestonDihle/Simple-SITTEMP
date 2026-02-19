@@ -22,11 +22,11 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Light Machine Gun
         light_machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="175" y1="275" x2="175" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="150" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="75" x2="200" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="275" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="150" y1="175" x2="200" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="50" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="50" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="350" x2="175" y2="0" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="350" x2="200" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="175" x2="225" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Medium Machine Gun
         medium_machine_gun: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -193,7 +193,7 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Helicopter
         helicopter: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <polygon points="75,125 75,225 275,125 275,225 75,125" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <polygon points="0,50 0,300 350,50 350,300 0,50" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
 </svg>`,
         // Unmanned Aircraft
         uav: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
