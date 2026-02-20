@@ -566,7 +566,7 @@ html, body {
 #style-panel {
     position: absolute;
     right: 10px;
-    top: 60px;
+    top: calc(60px + 2vh);
     width: 186px;
     background: rgba(42, 42, 42, 0.95);
     color: #ddd;
