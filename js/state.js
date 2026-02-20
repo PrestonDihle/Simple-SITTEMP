@@ -81,7 +81,7 @@ const initialState = {
     mgrsGridLabels: [],
     mgrsGridScale: 1000,
     mgrsGridColor: '#000000',
-    mgrsGridWeight: 2,
+    mgrsGridWeight: 0.5,
 
     // Map display
     mapBaseType: 'terrain',
