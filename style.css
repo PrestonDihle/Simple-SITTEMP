@@ -104,48 +104,51 @@ html, body {
 /* ===== Toolbar (Left Side) ===== */
 #toolbar {
     position: absolute;
-    left: 20px;
+    left: 16px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
     z-index: 1000;
-    background: rgba(42, 42, 42, 0.95);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 14px;
     padding: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+                0 4px 12px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .toolbar-btn {
     position: relative;
-    width: 44px;
-    height: 44px;
-    background: #333;
-    border: 1px solid #555;
-    border-radius: 6px;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ddd;
-    transition: background 0.15s, border-color 0.15s;
+    color: #444;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
 .toolbar-btn:hover {
-    background: #444;
-    border-color: #777;
+    background: rgba(0, 0, 0, 0.06);
+    color: #222;
 }
 
 .toolbar-btn.active {
-    background: #555;
-    border-color: #aaa;
-    color: #fff;
+    background: rgba(0, 122, 255, 0.12);
+    color: #007AFF;
 }
 
 .toolbar-btn svg {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     fill: currentColor;
     stroke: currentColor;
 }
@@ -154,19 +157,22 @@ html, body {
 .toolbar-btn::after {
     content: attr(data-tooltip);
     position: absolute;
-    left: 52px;
+    left: 50px;
     top: 50%;
     transform: translateY(-50%);
-    background: #222;
-    color: #eee;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 12px;
+    background: rgba(30, 30, 30, 0.9);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
     white-space: nowrap;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.15s;
     z-index: 1001;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .toolbar-btn:hover::after {
@@ -175,25 +181,28 @@ html, body {
 
 /* Toolbar Divider */
 .toolbar-divider {
-    width: 32px;
+    width: 28px;
     height: 1px;
-    background: #555;
-    margin: 2px auto;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 3px auto;
 }
 
 /* ===== Sub-menus / Flyouts ===== */
 .submenu {
     position: absolute;
-    left: 62px;
-    background: rgba(42, 42, 42, 0.97);
-    border: 1px solid #555;
-    border-radius: 8px;
+    left: 58px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
     padding: 10px;
     z-index: 1001;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+                0 8px 24px rgba(0, 0, 0, 0.14);
     display: none;
     max-height: 70vh;
     overflow-y: auto;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .submenu.visible {
@@ -201,13 +210,14 @@ html, body {
 }
 
 .submenu h3 {
-    color: #aaa;
+    color: #86868b;
     font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     margin-bottom: 8px;
     padding-bottom: 4px;
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .submenu-grid {
@@ -219,7 +229,7 @@ html, body {
 
 /* Wider grid for equipment submenu (6 columns to match reference chart rows) */
 #submenu-equipment {
-    min-width: 460px;
+    min-width: 480px;
 }
 
 #equipment-grid {
@@ -232,27 +242,27 @@ html, body {
     align-items: center;
     gap: 3px;
     padding: 6px 4px;
-    background: #333;
-    border: 1px solid #444;
-    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
     cursor: pointer;
-    color: #ccc;
+    color: #333;
     font-size: 10px;
     text-align: center;
     min-width: 70px;
-    transition: background 0.1s;
+    transition: background 0.15s ease;
 }
 
 .submenu-item:hover {
-    background: #444;
-    border-color: #666;
-    color: #fff;
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #111;
 }
 
 .submenu-item.active {
-    background: #555;
-    border-color: #aaa;
-    color: #fff;
+    background: rgba(0, 122, 255, 0.1);
+    border-color: rgba(0, 122, 255, 0.2);
+    color: #007AFF;
 }
 
 .submenu-item svg {
@@ -273,25 +283,25 @@ html, body {
     align-items: center;
     gap: 8px;
     padding: 6px 10px;
-    background: #333;
-    border: 1px solid #444;
-    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 6px;
     cursor: pointer;
-    color: #ccc;
+    color: #333;
     font-size: 12px;
-    transition: background 0.1s;
+    transition: background 0.15s ease;
 }
 
 .submenu-list-item:hover {
-    background: #444;
-    border-color: #666;
-    color: #fff;
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #111;
 }
 
 .submenu-list-item.active {
-    background: #555;
-    border-color: #aaa;
-    color: #fff;
+    background: rgba(0, 122, 255, 0.1);
+    border-color: rgba(0, 122, 255, 0.2);
+    color: #007AFF;
 }
 
 .submenu-list-item .line-preview {
@@ -307,23 +317,24 @@ html, body {
 
 .color-section label {
     display: block;
-    color: #aaa;
+    color: #86868b;
     font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     margin-bottom: 6px;
 }
 
 /* Color Picker Selection Indicator */
 .color-selection-indicator {
-    background: #3a6;
+    background: #007AFF;
     color: #fff;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 5px 8px;
-    border-radius: 4px;
+    border-radius: 6px;
     margin-bottom: 10px;
     text-align: center;
 }
@@ -337,20 +348,20 @@ html, body {
 .color-swatch {
     width: 28px;
     height: 28px;
-    border-radius: 4px;
-    border: 2px solid #444;
+    border-radius: 6px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
     cursor: pointer;
-    transition: border-color 0.1s, transform 0.1s;
+    transition: border-color 0.15s ease, transform 0.15s ease;
 }
 
 .color-swatch:hover {
-    border-color: #888;
+    border-color: rgba(0, 0, 0, 0.3);
     transform: scale(1.1);
 }
 
 .color-swatch.active {
-    border-color: #fff;
-    box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+    border-color: #007AFF;
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
 }
 
 .opacity-section {
@@ -359,20 +370,21 @@ html, body {
 
 .opacity-section label {
     display: block;
-    color: #aaa;
+    color: #86868b;
     font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     margin-bottom: 6px;
 }
 
 .opacity-section input[type="range"] {
     width: 100%;
-    accent-color: #aaa;
+    accent-color: #007AFF;
 }
 
 .opacity-value {
-    color: #ccc;
+    color: #555;
     font-size: 12px;
     text-align: center;
     margin-top: 2px;
@@ -385,19 +397,19 @@ html, body {
     gap: 8px;
     width: 100%;
     padding: 8px 12px;
-    background: #4a7;
+    background: #007AFF;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     color: #fff;
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.1s;
+    transition: background 0.15s ease;
     margin-bottom: 4px;
 }
 
 .submenu-action-btn:hover {
-    background: #3a6;
+    background: #0066DD;
 }
 
 .submenu-action-btn svg {
@@ -410,15 +422,16 @@ html, body {
 .font-style-section {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid #444;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .font-style-section > label {
     display: block;
-    color: #aaa;
+    color: #86868b;
     font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     margin-bottom: 6px;
 }
 
@@ -431,47 +444,47 @@ html, body {
 .font-toggle {
     width: 32px;
     height: 32px;
-    background: #333;
-    border: 1px solid #444;
-    border-radius: 4px;
-    color: #ccc;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    color: #555;
     font-size: 14px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.1s, border-color 0.1s;
+    transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .font-toggle:hover {
-    background: #444;
-    border-color: #666;
-    color: #fff;
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.12);
+    color: #222;
 }
 
 .font-toggle.active {
-    background: #555;
-    border-color: #aaa;
-    color: #fff;
-    box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+    background: rgba(0, 122, 255, 0.1);
+    border-color: rgba(0, 122, 255, 0.2);
+    color: #007AFF;
 }
 
 .font-size-control label {
     display: block;
-    color: #aaa;
+    color: #86868b;
     font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     margin-bottom: 6px;
 }
 
 .font-size-control input[type="range"] {
     width: 100%;
-    accent-color: #aaa;
+    accent-color: #007AFF;
 }
 
 .font-size-value {
-    color: #ccc;
+    color: #555;
     font-size: 12px;
     text-align: center;
     margin-top: 2px;
@@ -487,23 +500,24 @@ html, body {
 .map-type-btn {
     flex: 1;
     padding: 8px 12px;
-    background: #333;
-    border: 1px solid #444;
-    border-radius: 4px;
-    color: #ccc;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    color: #555;
     font-size: 12px;
+    font-weight: 500;
     cursor: pointer;
-    transition: background 0.1s;
+    transition: background 0.15s ease;
 }
 
 .map-type-btn:hover {
-    background: #444;
-    color: #fff;
+    background: rgba(0, 0, 0, 0.08);
+    color: #222;
 }
 
 .map-type-btn.active {
-    background: #4a7;
-    border-color: #4a7;
+    background: #007AFF;
+    border-color: #007AFF;
     color: #fff;
 }
 
@@ -517,7 +531,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    color: #ccc;
+    color: #333;
     font-size: 13px;
     cursor: pointer;
     padding: 4px 0;
@@ -528,28 +542,29 @@ html, body {
 }
 
 .toggle-slider {
-    width: 36px;
-    height: 20px;
-    background: #555;
-    border-radius: 10px;
+    width: 40px;
+    height: 24px;
+    background: #e0e0e0;
+    border-radius: 12px;
     position: relative;
-    transition: background 0.2s;
+    transition: background 0.25s ease;
 }
 
 .toggle-slider::after {
     content: '';
     position: absolute;
-    width: 16px;
-    height: 16px;
-    background: #ccc;
+    width: 20px;
+    height: 20px;
+    background: #fff;
     border-radius: 50%;
     top: 2px;
     left: 2px;
-    transition: transform 0.2s;
+    transition: transform 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .toggle-row input:checked + .toggle-slider {
-    background: #4a7;
+    background: #34C759;
 }
 
 .toggle-row input:checked + .toggle-slider::after {
@@ -568,13 +583,16 @@ html, body {
     right: 10px;
     top: calc(60px + 2vh);
     width: 232px;
-    background: rgba(42, 42, 42, 0.95);
-    color: #ddd;
-    border: 1px solid #555;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.96);
+    color: #333;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 14px;
     padding: 8px;
     z-index: 1001;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+                0 4px 12px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .style-panel-section {
@@ -586,13 +604,14 @@ html, body {
 }
 
 .style-panel-section h3 {
-    color: #aaa;
+    color: #86868b;
     font-size: 10px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     margin-bottom: 4px;
     padding-bottom: 2px;
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 /* Line type compact grid */
@@ -624,8 +643,9 @@ html, body {
 }
 
 .color-row label {
-    color: #aaa;
+    color: #86868b;
     font-size: 10px;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     width: 24px;
@@ -641,7 +661,7 @@ html, body {
 .color-row .color-swatch {
     width: 16px;
     height: 16px;
-    border-radius: 3px;
+    border-radius: 4px;
     border-width: 1.5px;
 }
 
@@ -658,8 +678,9 @@ html, body {
 }
 
 .slider-row label {
-    color: #aaa;
+    color: #86868b;
     font-size: 10px;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     width: 40px;
@@ -669,12 +690,12 @@ html, body {
 .slider-row input[type="range"] {
     flex: 1;
     min-width: 0;
-    accent-color: #aaa;
+    accent-color: #007AFF;
     height: 14px;
 }
 
 .slider-val {
-    color: #ccc;
+    color: #555;
     font-size: 10px;
     width: 26px;
     text-align: right;
@@ -686,20 +707,25 @@ html, body {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: rgba(0, 0, 0, 0.75);
-    color: #fff;
+    background: rgba(255, 255, 255, 0.96);
+    color: #333;
     padding: 8px 14px;
-    border-radius: 6px;
-    font-family: 'Consolas', 'Courier New', monospace;
+    border-radius: 10px;
+    font-family: 'SF Mono', 'Consolas', 'Courier New', monospace;
     font-size: 13px;
     line-height: 1.5;
     z-index: 1000;
     pointer-events: none;
     user-select: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+                0 4px 12px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 #coord-display .label {
-    color: #aaa;
+    color: #86868b;
     font-size: 11px;
 }
 
@@ -1056,43 +1082,61 @@ html, body {
     position: absolute;
     top: 10px;
     left: 70px;
-    background: rgba(42, 42, 42, 0.95);
-    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 10px;
     padding: 6px 10px;
     display: flex;
     align-items: center;
     gap: 8px;
     z-index: 1000;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+                0 4px 12px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 #mgrs-controls label {
-    color: #ccc;
+    color: #555;
     font-size: 12px;
+    font-weight: 500;
 }
 
 #mgrs-controls select {
-    background: #444;
-    color: #fff;
-    border: 1px solid #666;
-    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.04);
+    color: #333;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
     padding: 4px 6px;
     font-size: 12px;
+    transition: border-color 0.15s ease;
+}
+
+#mgrs-controls select:focus {
+    border-color: #007AFF;
+    outline: none;
 }
 
 #mgrs-controls .grid-toggle {
     padding: 4px 10px;
-    background: #555;
-    color: #ccc;
-    border: 1px solid #666;
-    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.04);
+    color: #555;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
     cursor: pointer;
     font-size: 12px;
+    font-weight: 500;
+    transition: background 0.15s ease;
+}
+
+#mgrs-controls .grid-toggle:hover {
+    background: rgba(0, 0, 0, 0.08);
 }
 
 #mgrs-controls .grid-toggle.active {
-    background: #4a7;
+    background: #007AFF;
     color: #fff;
-    border-color: #4a7;
+    border-color: #007AFF;
 }
 
 /* ===== Scrollbar styling for sub-menus ===== */
@@ -1101,12 +1145,16 @@ html, body {
 }
 
 .submenu::-webkit-scrollbar-track {
-    background: #333;
+    background: transparent;
 }
 
 .submenu::-webkit-scrollbar-thumb {
-    background: #666;
+    background: rgba(0, 0, 0, 0.15);
     border-radius: 3px;
+}
+
+.submenu::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
 }
 
 /* ===== API Key Prompt ===== */
