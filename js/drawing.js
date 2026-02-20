@@ -26,6 +26,7 @@ export function initTerraDraw() {
     const lineColor = get('lineColor');
     const fillColor = get('fillColor');
     const fillOpacity = get('fillOpacity');
+    const sw = get('symbolStrokeWidth') || 2;
 
     const draw = new TerraDraw({
         adapter: new TerraDrawGoogleMapsAdapter({
@@ -40,7 +41,7 @@ export function initTerraDraw() {
             new TerraDrawLineStringMode({
                 styles: {
                     lineStringColor: lineColor,
-                    lineStringWidth: 3,
+                    lineStringWidth: sw,
                     lineStringOpacity: function (feature) {
                         var flt = get('featureLineTypes');
                         var lt = flt[feature.id];
@@ -49,16 +50,16 @@ export function initTerraDraw() {
                 }
             }),
             new TerraDrawPolygonMode({
-                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: 2 }
+                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: sw }
             }),
             new TerraDrawRectangleMode({
-                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: 2 }
+                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: sw }
             }),
             new TerraDrawCircleMode({
-                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: 2 }
+                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: sw }
             }),
             new TerraDrawFreehandMode({
-                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: 2 }
+                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: sw }
             }),
             new TerraDrawSelectMode({
                 flags: {
@@ -159,14 +160,15 @@ function updateDrawStyles() {
     const lineColor = get('lineColor');
     const fillColor = get('fillColor');
     const fillOpacity = get('fillOpacity');
+    const sw = get('symbolStrokeWidth') || 2;
 
     try {
-        draw.updateModeOptions('polygon', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: 2 } });
-        draw.updateModeOptions('rectangle', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: 2 } });
-        draw.updateModeOptions('circle', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: 2 } });
-        draw.updateModeOptions('freehand', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: 2 } });
+        draw.updateModeOptions('polygon', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: sw } });
+        draw.updateModeOptions('rectangle', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: sw } });
+        draw.updateModeOptions('circle', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: sw } });
+        draw.updateModeOptions('freehand', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: sw } });
         draw.updateModeOptions('linestring', { styles: {
-            lineStringColor: lineColor, lineStringWidth: 3,
+            lineStringColor: lineColor, lineStringWidth: sw,
             lineStringOpacity: function (feature) {
                 var flt = get('featureLineTypes');
                 var lt = flt[feature.id];
@@ -179,8 +181,8 @@ function updateDrawStyles() {
     }
 }
 
-// Auto-update draw styles when colors change
-subscribe(['lineColor', 'fillColor', 'fillOpacity'], updateDrawStyles);
+// Auto-update draw styles when colors or stroke width change
+subscribe(['lineColor', 'fillColor', 'fillOpacity', 'symbolStrokeWidth'], updateDrawStyles);
 
 // ===== Shape Activation =====
 
@@ -648,7 +650,7 @@ function recreateMarker(data) {
         size = new google.maps.Size(120 * scale, 50 * scale);
         anchor = new google.maps.Point(60 * scale, 25 * scale);
     } else if (info.type === 'unit') {
-        const sw = info.strokeWidth || 8;
+        const sw = info.strokeWidth || 2;
         svgString = buildSymbolWithLabels(unitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color);
         size = new google.maps.Size(120 * scale, 50 * scale);
         anchor = new google.maps.Point(60 * scale, 25 * scale);
@@ -702,32 +704,33 @@ const LEGACY_LINE_TYPE_MAP = {
     'flot_b': 'flot_a',
 };
 
-function createLineOverlay(path, lineType, color, map) {
+function createLineOverlay(path, lineType, color, map, strokeWidth) {
     // Map legacy types to new equivalents
     const resolvedType = LEGACY_LINE_TYPE_MAP[lineType] || lineType;
     let polyline = null;
+    const sw = strokeWidth || get('symbolStrokeWidth') || 2;
 
     switch (resolvedType) {
         case 'dashed':
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
-                icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeWeight: 3, scale: 3 }, offset: '0', repeat: '15px' }],
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
+                icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeWeight: sw, scale: 3 }, offset: '0', repeat: '15px' }],
                 map
             });
             break;
         case 'dotted':
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
-                icons: [{ icon: { path: google.maps.SymbolPath.CIRCLE, fillOpacity: 1, fillColor: color, strokeOpacity: 0, scale: 2 }, offset: '0', repeat: '10px' }],
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
+                icons: [{ icon: { path: google.maps.SymbolPath.CIRCLE, fillOpacity: 1, fillColor: color, strokeOpacity: 0, scale: Math.max(1, sw * 0.7) }, offset: '0', repeat: '10px' }],
                 map
             });
             break;
         case 'dashdot':
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
                 icons: [
-                    { icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeWeight: 3, scale: 3 }, offset: '0', repeat: '25px' },
-                    { icon: { path: google.maps.SymbolPath.CIRCLE, fillOpacity: 1, fillColor: color, strokeOpacity: 0, scale: 2 }, offset: '18px', repeat: '25px' }
+                    { icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, strokeWeight: sw, scale: 3 }, offset: '0', repeat: '25px' },
+                    { icon: { path: google.maps.SymbolPath.CIRCLE, fillOpacity: 1, fillColor: color, strokeOpacity: 0, scale: Math.max(1, sw * 0.7) }, offset: '18px', repeat: '25px' }
                 ],
                 map
             });
@@ -735,11 +738,11 @@ function createLineOverlay(path, lineType, color, map) {
         case 'flot_a':
             // FLOT A — rightward-bulging arc, no base line (matches original SVG)
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
                 icons: [{
                     icon: {
                         path: 'M 0,-6 L 2,-5 L 4,-3 L 5,0 L 4,3 L 2,5 L 0,6',
-                        strokeOpacity: 1, strokeColor: color, strokeWeight: 2,
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: sw,
                         fillOpacity: 0, scale: 2
                     },
                     offset: '0', repeat: '28px'
@@ -750,11 +753,11 @@ function createLineOverlay(path, lineType, color, map) {
         case 'low_wire':
             // Low Wire Fence — base line + picket diagonals (V shape, matches original SVG)
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: sw,
                 icons: [{
                     icon: {
                         path: 'M -4,0 L 0,-5 M -4,-5 L 0,0',
-                        strokeOpacity: 1, strokeColor: color, strokeWeight: 2,
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: sw,
                         scale: 1.5
                     },
                     offset: '0', repeat: '20px'
@@ -765,11 +768,11 @@ function createLineOverlay(path, lineType, color, map) {
         case 'single_concertina':
             // Single Concertina — overlapping coil circles on a base line
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: sw,
                 icons: [{
                     icon: {
                         path: google.maps.SymbolPath.CIRCLE,
-                        fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 6,
+                        fillOpacity: 0, strokeColor: color, strokeWeight: sw, scale: 6,
                         anchor: new google.maps.Point(0, 3)
                     },
                     offset: '0', repeat: '10px'
@@ -780,13 +783,13 @@ function createLineOverlay(path, lineType, color, map) {
         case 'triple_concertina':
             // Triple Concertina — overlapping coil circles between two parallel lines
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
                 icons: [
                     // Parallel line above
                     {
                         icon: {
                             path: 'M 0,-8 L 0,-8',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: sw, scale: 1
                         },
                         offset: '0', repeat: '1px'
                     },
@@ -794,7 +797,7 @@ function createLineOverlay(path, lineType, color, map) {
                     {
                         icon: {
                             path: 'M 0,8 L 0,8',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: sw, scale: 1
                         },
                         offset: '0', repeat: '1px'
                     },
@@ -802,7 +805,7 @@ function createLineOverlay(path, lineType, color, map) {
                     {
                         icon: {
                             path: google.maps.SymbolPath.CIRCLE,
-                            fillOpacity: 0, strokeColor: color, strokeWeight: 2, scale: 6
+                            fillOpacity: 0, strokeColor: color, strokeWeight: sw, scale: 6
                         },
                         offset: '0', repeat: '10px'
                     }
@@ -813,7 +816,7 @@ function createLineOverlay(path, lineType, color, map) {
         case 'atditch_a':
             // AT Ditch — rightward-pointing filled triangle, no visible base line
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
                 icons: [{
                     icon: {
                         path: 'M 0,-5 L 7,0 L 0,5 Z',
@@ -828,12 +831,12 @@ function createLineOverlay(path, lineType, color, map) {
         case 'atditch_unfin':
             // Unfinished AT Ditch — rightward-pointing unfilled triangle, no visible base line
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 3,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
                 icons: [{
                     icon: {
                         path: 'M 0,-5 L 7,0 L 0,5 Z',
                         fillOpacity: 0,
-                        strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 2.5
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: sw, scale: 2.5
                     },
                     offset: '0', repeat: '20px'
                 }],
@@ -843,7 +846,7 @@ function createLineOverlay(path, lineType, color, map) {
         case 'ap_mine':
             // Antipersonnel Mine — filled circle + chevron diagonals from right
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: sw,
                 icons: [
                     // Filled circle
                     {
@@ -877,13 +880,13 @@ function createLineOverlay(path, lineType, color, map) {
         case 'at_mine':
             // Anti-tank Mine — filled circle between two parallel lines above/below
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 2,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
                 icons: [
                     // Parallel line above (dense dots simulate continuous line)
                     {
                         icon: {
                             path: 'M 0,-8 L 0,-8',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: sw, scale: 1
                         },
                         offset: '0', repeat: '1px'
                     },
@@ -891,7 +894,7 @@ function createLineOverlay(path, lineType, color, map) {
                     {
                         icon: {
                             path: 'M 0,8 L 0,8',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: 2, scale: 1
+                            strokeOpacity: 1, strokeColor: color, strokeWeight: sw, scale: 1
                         },
                         offset: '0', repeat: '1px'
                     },

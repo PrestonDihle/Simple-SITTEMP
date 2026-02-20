@@ -41,6 +41,8 @@ html, body {
 }
 
 #map {
+    position: relative;
+    z-index: 0;
     width: 100%;
     height: 100%;
 }
@@ -568,10 +570,11 @@ html, body {
     bottom: 120px;
     width: 200px;
     background: rgba(42, 42, 42, 0.95);
+    color: #ddd;
     border: 1px solid #555;
     border-radius: 8px;
     padding: 10px;
-    z-index: 1000;
+    z-index: 1001;
     overflow-y: auto;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
