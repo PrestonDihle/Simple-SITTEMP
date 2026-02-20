@@ -173,7 +173,7 @@ function buildLinesSubmenu() {
         item.className = 'submenu-list-item';
         item.dataset.linetype = lt.key;
         const preview = getLinePreviewSVG(lt.key);
-        item.innerHTML = `<span style="width:40px;display:inline-block;">${preview}</span><span>${lt.name}</span>`;
+        item.innerHTML = `<span>${preview}</span><span>${lt.name}</span>`;
         item.addEventListener('click', function () {
             set('lineType', lt.key);
             highlightSubmenuItem(list, item);

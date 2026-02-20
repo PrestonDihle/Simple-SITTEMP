@@ -503,11 +503,11 @@ export const LINE_TYPES = [
     { key: 'dotted', name: 'Dotted' },
     { key: 'dashdot', name: 'Dash-Dot' },
     { key: 'flot_a', name: 'FLOT' },
-    { key: 'low_wire', name: 'Low Wire Fence' },
-    { key: 'single_concertina', name: 'Single Concertina' },
-    { key: 'triple_concertina', name: 'Triple Concertina' },
+    { key: 'low_wire', name: 'Low Wire' },
+    { key: 'single_concertina', name: '1x Conc.' },
+    { key: 'triple_concertina', name: '3x Conc.' },
     { key: 'atditch_a', name: 'AT Ditch' },
-    { key: 'atditch_unfin', name: 'Unfinished AT Ditch' },
+    { key: 'atditch_unfin', name: 'AT Unfin.' },
     { key: 'ap_mine', name: 'AP Mine' },
     { key: 'at_mine', name: 'AT Mine' },
 ];
@@ -562,39 +562,32 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color) {
 
 export function getLinePreviewSVG(type) {
     const c = '#ccc';
+    const w = 20, vb = '0 0 40';
     switch (type) {
         case 'solid':
-            return `<svg width="40" height="10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2.5"/></svg>`;
         case 'dashed':
-            return `<svg width="40" height="10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2" stroke-dasharray="6,4"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2.5" stroke-dasharray="6,4"/></svg>`;
         case 'dotted':
-            return `<svg width="40" height="10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2" stroke-dasharray="2,4"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2.5" stroke-dasharray="2,4"/></svg>`;
         case 'dashdot':
-            return `<svg width="40" height="10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2" stroke-dasharray="8,3,2,3"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2.5" stroke-dasharray="8,3,2,3"/></svg>`;
         case 'flot_a':
-            // Rightward-bulging arc (no base line) — matches original SVG
-            return `<svg width="40" height="14"><path d="M5,1 Q15,7 5,13" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M25,1 Q35,7 25,13" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 14"><path d="M5,1 Q15,7 5,13" fill="none" stroke="${c}" stroke-width="2"/><path d="M25,1 Q35,7 25,13" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
         case 'low_wire':
-            // Horizontal line + picket diagonals (triangle/V shape) — matches original SVG
-            return `<svg width="40" height="12"><line x1="0" y1="8" x2="40" y2="8" stroke="${c}" stroke-width="1.5"/><line x1="5" y1="8" x2="12" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="5" y1="2" x2="12" y2="8" stroke="${c}" stroke-width="1.5"/><line x1="25" y1="8" x2="32" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="25" y1="2" x2="32" y2="8" stroke="${c}" stroke-width="1.5"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 12"><line x1="0" y1="8" x2="40" y2="8" stroke="${c}" stroke-width="2"/><line x1="5" y1="8" x2="12" y2="2" stroke="${c}" stroke-width="2"/><line x1="5" y1="2" x2="12" y2="8" stroke="${c}" stroke-width="2"/><line x1="25" y1="8" x2="32" y2="2" stroke="${c}" stroke-width="2"/><line x1="25" y1="2" x2="32" y2="8" stroke="${c}" stroke-width="2"/></svg>`;
         case 'single_concertina':
-            // Overlapping circles (coils) on a base line
-            return `<svg width="40" height="14"><line x1="0" y1="10" x2="40" y2="10" stroke="${c}" stroke-width="1.5"/><circle cx="5" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="13" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="21" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="29" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="37" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.2"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 14"><line x1="0" y1="10" x2="40" y2="10" stroke="${c}" stroke-width="2"/><circle cx="5" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="13" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="21" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="29" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="37" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'triple_concertina':
-            // Overlapping circles (coils) between two parallel lines
-            return `<svg width="40" height="14"><line x1="0" y1="1" x2="40" y2="1" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="13" x2="40" y2="13" stroke="${c}" stroke-width="1.5"/><circle cx="5" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="13" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="21" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="29" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.2"/><circle cx="37" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.2"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 14"><line x1="0" y1="1" x2="40" y2="1" stroke="${c}" stroke-width="2"/><line x1="0" y1="13" x2="40" y2="13" stroke="${c}" stroke-width="2"/><circle cx="5" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="13" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="21" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="29" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="37" cy="7" r="5" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'atditch_a':
-            // Rightward-pointing filled triangle (no base line) — matches original SVG
-            return `<svg width="40" height="14"><polygon points="5,1 5,13 15,7" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,1 25,13 35,7" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 14"><polygon points="5,1 5,13 15,7" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,1 25,13 35,7" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
         case 'atditch_unfin':
-            // Rightward-pointing unfilled triangle (no base line) — matches original SVG
-            return `<svg width="40" height="14"><polygon points="5,1 5,13 15,7" fill="none" stroke="${c}" stroke-width="1.5"/><polygon points="25,1 25,13 35,7" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 14"><polygon points="5,1 5,13 15,7" fill="none" stroke="${c}" stroke-width="2"/><polygon points="25,1 25,13 35,7" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
         case 'ap_mine':
-            // Filled circle + chevron diagonals from right — matches original SVG
-            return `<svg width="40" height="14"><circle cx="10" cy="7" r="5" fill="${c}"/><line x1="17" y1="2" x2="10" y2="7" stroke="${c}" stroke-width="2"/><line x1="17" y1="12" x2="10" y2="7" stroke="${c}" stroke-width="2"/><circle cx="30" cy="7" r="5" fill="${c}"/><line x1="37" y1="2" x2="30" y2="7" stroke="${c}" stroke-width="2"/><line x1="37" y1="12" x2="30" y2="7" stroke="${c}" stroke-width="2"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 14"><circle cx="10" cy="7" r="5" fill="${c}"/><line x1="17" y1="2" x2="10" y2="7" stroke="${c}" stroke-width="2.5"/><line x1="17" y1="12" x2="10" y2="7" stroke="${c}" stroke-width="2.5"/><circle cx="30" cy="7" r="5" fill="${c}"/><line x1="37" y1="2" x2="30" y2="7" stroke="${c}" stroke-width="2.5"/><line x1="37" y1="12" x2="30" y2="7" stroke="${c}" stroke-width="2.5"/></svg>`;
         case 'at_mine':
-            // Filled circle between two horizontal lines — matches original SVG
-            return `<svg width="40" height="14"><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="1.5"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="1.5"/><circle cx="10" cy="7" r="4" fill="${c}"/><circle cx="30" cy="7" r="4" fill="${c}"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 14"><line x1="0" y1="2" x2="40" y2="2" stroke="${c}" stroke-width="2"/><line x1="0" y1="12" x2="40" y2="12" stroke="${c}" stroke-width="2"/><circle cx="10" cy="7" r="4" fill="${c}"/><circle cx="30" cy="7" r="4" fill="${c}"/></svg>`;
         default: return '';
     }
 }

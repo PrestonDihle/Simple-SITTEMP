@@ -147,35 +147,38 @@
         <div id="style-panel">
             <div class="style-panel-section">
                 <h3>Line Types</h3>
-                <div class="submenu-list" id="line-type-list"></div>
+                <div class="line-type-grid" id="line-type-list"></div>
             </div>
             <div class="style-panel-section">
                 <h3>Colors</h3>
                 <div id="color-selection-indicator" class="color-selection-indicator" style="display:none;">
                     <span id="color-selection-text">Editing: ---</span>
                 </div>
-                <div class="color-section">
-                    <label>Line Color</label>
+                <div class="color-row">
+                    <label>Line</label>
                     <div class="color-swatches" id="line-color-swatches"></div>
                 </div>
-                <div class="color-section">
-                    <label>Fill Color</label>
+                <div class="color-row">
+                    <label>Fill</label>
                     <div class="color-swatches" id="fill-color-swatches"></div>
                 </div>
-                <div class="opacity-section">
+            </div>
+            <div class="style-panel-section">
+                <h3>Settings</h3>
+                <div class="slider-row">
                     <label>Opacity</label>
                     <input type="range" id="opacity-slider" min="0" max="100" value="60">
-                    <div class="opacity-value" id="opacity-value">60%</div>
+                    <span class="slider-val" id="opacity-value">60%</span>
                 </div>
-                <div class="opacity-section">
-                    <label>Stroke Width</label>
+                <div class="slider-row">
+                    <label>Stroke</label>
                     <input type="range" id="stroke-width-slider" min="1" max="10" value="2" step="1">
-                    <div class="opacity-value" id="stroke-width-value">2</div>
+                    <span class="slider-val" id="stroke-width-value">2</span>
                 </div>
-                <div class="opacity-section">
-                    <label>Symbol Scale</label>
+                <div class="slider-row">
+                    <label>Scale</label>
                     <input type="range" id="symbol-scale-slider" min="0.5" max="3" value="1" step="0.1">
-                    <div class="opacity-value" id="symbol-scale-value">1.0x</div>
+                    <span class="slider-val" id="symbol-scale-value">1.0x</span>
                 </div>
             </div>
         </div>
