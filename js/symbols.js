@@ -299,104 +299,128 @@ export function equipmentSVG(key, color, strokeWidth) {
 // All symbols use a 350x350 viewBox matching the equipment symbol format
 export function unitSVG(key, color, strokeWidth) {
     color = color || '#0000FF';
-    strokeWidth = strokeWidth || 8;
+    strokeWidth = strokeWidth || 2;
     const c = color;
     const sw = strokeWidth;
     const svgs = {
-        // Aviation — hourglass/butterfly polygon inside rect
+        // Aviation
         aviation: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <polygon points="0,50 175,175 350,50 350,300 175,175 0,300" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <polygon points="50,100 50,250 300,100 300,250 50,100" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
 </svg>`,
-        // Infantry — X crosses inside rect
+        // Infantry
         infantry: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="0" y1="50" x2="350" y2="300" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="0" y1="50" x2="350" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Armor — oval/track shape inside rect
+        // Armor
         armor: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <ellipse cx="175" cy="175" rx="130" ry="75" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <path d="M250,125 Q325,175 250,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M100,125 Q25,175 100,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="125" x2="250" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="225" x2="250" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Combined Arms — armor oval + infantry X inside rect
+        // Combined Arms
         combined_arms: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <ellipse cx="175" cy="175" rx="130" ry="75" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="0" y1="50" x2="350" y2="300" stroke="${c}" stroke-width="${sw}"/>
+  <path d="M250,125 Q325,175 250,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M100,125 Q25,175 100,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="125" x2="250" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="225" x2="250" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="125" x2="250" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="250" y1="125" x2="100" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Artillery — filled circle inside rect
+        // Artillery
         artillery: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <circle cx="175" cy="175" r="75" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="175" cy="175" r="56" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
-        // Engineer — E/comb shape inside rect
+        // Engineer
         engineers: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <text x="175" y="230" text-anchor="middle" fill="${c}" font-size="200" font-weight="bold" font-family="Arial,sans-serif">E</text>
+  <line x1="75" y1="125" x2="75" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="175" y1="125" x2="175" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="275" y1="125" x2="275" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="275" y1="125" x2="75" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
 </svg>`,
-        // Military Intel — MI letters inside rect
+        // MI
         military_intel: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <text x="175" y="230" text-anchor="middle" fill="${c}" font-size="160" font-weight="bold" font-family="Arial,sans-serif">MI</text>
+  <line x1="150" y1="225" x2="150" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="150" y1="125" x2="100" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="100" y1="225" x2="50" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="50" y1="125" x2="50" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="225" y1="225" x2="300" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="225" y1="125" x2="300" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="265" y1="225" x2="265" y2="130" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
 </svg>`,
-        // Military Police — MP letters inside rect
+        // MP
         military_police: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <text x="175" y="230" text-anchor="middle" fill="${c}" font-size="160" font-weight="bold" font-family="Arial,sans-serif">MP</text>
+  <line x1="150" y1="225" x2="150" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="150" y1="125" x2="100" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="100" y1="225" x2="50" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="50" y1="125" x2="50" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="225" y1="125" x2="225" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="250" cy="150" r="25" fill="none" stroke="${c}" stroke-width="10"/>
 </svg>`,
-        // Cavalry — single diagonal line inside rect
+        // Cavalry
         cavalry: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Signal — lightning bolt/zigzag inside rect
+        // Signal
         signal: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <polyline points="100,75 150,175 100,175 200,275 250,175 200,175 250,75" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="200" x2="175" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="150" x2="350" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="200" x2="0" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Air Defense — arc/curve inside rect
+        // Air Defense
         air_defense: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <path d="M50,275 Q175,50 300,275" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <path d="M0,300 Q175,175 350,300" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // EW Jamming — EW text inside rect
+        // EW Jamming
         ew_jamming: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <text x="175" y="230" text-anchor="middle" fill="${c}" font-size="160" font-weight="bold" font-family="Arial,sans-serif">EW</text>
+  <path d="M0,100 Q25,50 50,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M50,100 Q75,150 100,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M100,100 Q125,50 150,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,100 Q175,150 200,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M200,100 Q225,50 250,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M250,100 Q275,150 300,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M300,100 Q325,50 350,100" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M0,125 Q25,75 50,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M50,125 Q75,175 100,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M100,125 Q125,75 150,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M150,125 Q175,175 200,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M200,125 Q225,75 250,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M250,125 Q275,175 300,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M300,125 Q325,75 350,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="175" x2="75" y2="175" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="75" y1="175" x2="75" y2="275" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="125" y2="275" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="125" y1="225" x2="75" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="175" y1="175" x2="200" y2="275" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="200" y1="275" x2="225" y2="175" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="225" y1="175" x2="250" y2="275" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="250" y1="275" x2="275" y2="175" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
 </svg>`,
-        // CBRN — circle with cardinal ticks inside rect
+        // CBRN
         cbrn: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <circle cx="175" cy="175" r="80" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="175" y1="95" x2="175" y2="50" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="175" y1="255" x2="175" y2="300" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="95" y1="175" x2="50" y2="175" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="255" y1="175" x2="300" y2="175" stroke="${c}" stroke-width="${sw}"/>
+  <path d="M100,275 Q100,125 250,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M250,275 Q250,125 100,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="250" cy="140" r="16" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="100" cy="140" r="14" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
-        // Medical — cross/plus inside rect
+        // Medical
         medical: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="175" y1="75" x2="175" y2="275" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="75" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}"/>
-</svg>`,
-        // Armored Infantry — armor oval + infantry X (legacy, kept for compatibility)
-        armored_infantry: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <ellipse cx="175" cy="175" rx="130" ry="75" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="0" y1="50" x2="350" y2="300" stroke="${c}" stroke-width="${sw}"/>
-</svg>`,
-        // Recon — single diagonal (legacy alias for cavalry)
-        recon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="0" y1="300" x2="350" y2="50" stroke="${c}" stroke-width="${sw}"/>
-</svg>`,
-        // Electronic Warfare (legacy alias for ew_jamming)
-        electronic_warfare: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <text x="175" y="230" text-anchor="middle" fill="${c}" font-size="160" font-weight="bold" font-family="Arial,sans-serif">EW</text>
+  <polygon points="150,100 200,100 200,150 250,150 250,200 200,200 200,250 150,250 150,200 100,200 100,150 150,150 150,100" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
 </svg>`,
     };
     return svgs[key] || svgs.infantry;
@@ -447,15 +471,14 @@ export const EQUIPMENT_LIST = [
 ];
 
 export const UNIT_LIST = [
+    { key: 'aviation', name: 'Aviation' },
     { key: 'infantry', name: 'Infantry' },
     { key: 'armor', name: 'Armor' },
     { key: 'combined_arms', name: 'Combined Arms' },
-    { key: 'armored_infantry', name: 'Armored Inf' },
     { key: 'artillery', name: 'Artillery' },
-    { key: 'aviation', name: 'Aviation' },
     { key: 'engineers', name: 'Engineers' },
-    { key: 'military_intel', name: 'Mil Intel' },
-    { key: 'military_police', name: 'Mil Police' },
+    { key: 'military_intel', name: 'MI' },
+    { key: 'military_police', name: 'MP' },
     { key: 'cavalry', name: 'Cavalry' },
     { key: 'signal', name: 'Signal' },
     { key: 'air_defense', name: 'Air Defense' },

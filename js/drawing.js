@@ -262,7 +262,7 @@ function placeSymbol(latLng, leftText, rightText) {
     if (!type || !key) return;
 
     const color = get('lineColor');
-    const strokeWidth = get('symbolStrokeWidth') || 8;
+    const strokeWidth = get('symbolStrokeWidth') || 2;
     const svgString = type === 'equipment' ? equipmentSVG(key, color, strokeWidth) : unitSVG(key, color, strokeWidth);
     const fullSVG = buildSymbolWithLabels(svgString, leftText, rightText, color);
 

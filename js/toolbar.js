@@ -52,12 +52,7 @@ export function setupToolbar() {
         toggleSubmenu('submenu-shapes', 'btn-shapes');
     });
 
-    document.getElementById('btn-lines').addEventListener('click', function (e) {
-        e.stopPropagation();
-        exitSymbolPlacement();
-        exitTextPlacement();
-        toggleSubmenu('submenu-lines', 'btn-lines');
-    });
+    // Lines button removed — line types now in right-side Style Panel
 
     document.getElementById('btn-equipment').addEventListener('click', function (e) {
         e.stopPropagation();
@@ -84,10 +79,7 @@ export function setupToolbar() {
 
     document.getElementById('btn-undo').addEventListener('click', function () { performUndo(); });
 
-    document.getElementById('btn-color').addEventListener('click', function (e) {
-        e.stopPropagation();
-        toggleSubmenu('submenu-color', 'btn-color');
-    });
+    // Color button removed — color picker now in right-side Style Panel
 
     document.getElementById('btn-redo').addEventListener('click', function () { performRedo(); });
 
@@ -108,12 +100,10 @@ export function setupToolbar() {
 function positionSubmenus() {
     const menuMap = {
         'btn-shapes': 'submenu-shapes',
-        'btn-lines': 'submenu-lines',
         'btn-equipment': 'submenu-equipment',
         'btn-units': 'submenu-units',
         'btn-text': 'submenu-text',
         'btn-map': 'submenu-map',
-        'btn-color': 'submenu-color',
     };
 
     for (const [btnId, menuId] of Object.entries(menuMap)) {
@@ -144,7 +134,7 @@ function closeAllSubmenus() {
 
 export function setActiveTool(tool) {
     document.querySelectorAll('.toolbar-btn').forEach(function (btn) { btn.classList.remove('active'); });
-    const btnMap = { select: 'btn-select', shapes: 'btn-shapes', lines: 'btn-lines', equipment: 'btn-equipment', units: 'btn-units', text: 'btn-text' };
+    const btnMap = { select: 'btn-select', shapes: 'btn-shapes', equipment: 'btn-equipment', units: 'btn-units', text: 'btn-text' };
     if (btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
     set('currentMode', tool);
 }

@@ -52,13 +52,7 @@
                     <circle cx="200" cy="200" r="79"/>
                 </svg>
             </button>
-            <button class="toolbar-btn" id="btn-lines" data-tooltip="Lines" aria-label="Line types">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                    <line x1="3" y1="6" x2="21" y2="6"/>
-                    <line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="4,3"/>
-                    <line x1="3" y1="18" x2="21" y2="18" stroke-dasharray="1,3"/>
-                </svg>
-            </button>
+            <!-- Lines button removed — now in right-side Style Panel -->
             <button class="toolbar-btn" id="btn-equipment" data-tooltip="Equipment" aria-label="Equipment symbols">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
                     <polygon points="12,3 22,21 2,21"/>
@@ -98,12 +92,7 @@
                     <path d="M125,225 Q175,275 225,225" fill="none"/>
                 </svg>
             </button>
-            <button class="toolbar-btn" id="btn-color" data-tooltip="Color" aria-label="Color picker">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                    <circle cx="12" cy="12" r="9"/>
-                    <circle cx="12" cy="12" r="4" fill="currentColor"/>
-                </svg>
-            </button>
+            <!-- Color button removed — now in right-side Style Panel -->
             <button class="toolbar-btn" id="btn-redo" data-tooltip="Redo" aria-label="Redo last action">
                 <svg viewBox="0 0 350 350" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <line x1="300" y1="300" x2="50" y2="300"/>
@@ -140,11 +129,7 @@
             <div class="submenu-grid" id="shape-grid"></div>
         </div>
 
-        <!-- Lines Sub-menu -->
-        <div class="submenu" id="submenu-lines">
-            <h3>Line Types</h3>
-            <div class="submenu-list" id="line-type-list"></div>
-        </div>
+        <!-- Lines Sub-menu (now inside Style Panel) -->
 
         <!-- Equipment Sub-menu -->
         <div class="submenu" id="submenu-equipment">
@@ -158,33 +143,40 @@
             <div class="submenu-grid" id="units-grid"></div>
         </div>
 
-        <!-- Color Picker Sub-menu -->
-        <div class="submenu" id="submenu-color">
-            <div id="color-selection-indicator" class="color-selection-indicator" style="display:none;">
-                <span id="color-selection-text">Editing: ---</span>
+        <!-- Style Panel (Right Side) — combined Line Types + Color -->
+        <div id="style-panel">
+            <div class="style-panel-section">
+                <h3>Line Types</h3>
+                <div class="submenu-list" id="line-type-list"></div>
             </div>
-            <div class="color-section">
-                <label>Line Color</label>
-                <div class="color-swatches" id="line-color-swatches"></div>
-            </div>
-            <div class="color-section">
-                <label>Fill Color</label>
-                <div class="color-swatches" id="fill-color-swatches"></div>
-            </div>
-            <div class="opacity-section">
-                <label>Opacity</label>
-                <input type="range" id="opacity-slider" min="0" max="100" value="60">
-                <div class="opacity-value" id="opacity-value">60%</div>
-            </div>
-            <div class="opacity-section">
-                <label>Symbol Stroke Width</label>
-                <input type="range" id="stroke-width-slider" min="1" max="10" value="5" step="1">
-                <div class="opacity-value" id="stroke-width-value">5</div>
-            </div>
-            <div class="opacity-section">
-                <label>Symbol Scale</label>
-                <input type="range" id="symbol-scale-slider" min="0.5" max="3" value="1" step="0.1">
-                <div class="opacity-value" id="symbol-scale-value">1.0x</div>
+            <div class="style-panel-section">
+                <h3>Colors</h3>
+                <div id="color-selection-indicator" class="color-selection-indicator" style="display:none;">
+                    <span id="color-selection-text">Editing: ---</span>
+                </div>
+                <div class="color-section">
+                    <label>Line Color</label>
+                    <div class="color-swatches" id="line-color-swatches"></div>
+                </div>
+                <div class="color-section">
+                    <label>Fill Color</label>
+                    <div class="color-swatches" id="fill-color-swatches"></div>
+                </div>
+                <div class="opacity-section">
+                    <label>Opacity</label>
+                    <input type="range" id="opacity-slider" min="0" max="100" value="60">
+                    <div class="opacity-value" id="opacity-value">60%</div>
+                </div>
+                <div class="opacity-section">
+                    <label>Symbol Stroke Width</label>
+                    <input type="range" id="stroke-width-slider" min="1" max="10" value="2" step="1">
+                    <div class="opacity-value" id="stroke-width-value">2</div>
+                </div>
+                <div class="opacity-section">
+                    <label>Symbol Scale</label>
+                    <input type="range" id="symbol-scale-slider" min="0.5" max="3" value="1" step="0.1">
+                    <div class="opacity-value" id="symbol-scale-value">1.0x</div>
+                </div>
             </div>
         </div>
 
