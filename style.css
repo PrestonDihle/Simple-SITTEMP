@@ -149,7 +149,7 @@ html, body {
 .toolbar-btn svg {
     width: 20px;
     height: 20px;
-    fill: currentColor;
+    fill: none;
     stroke: currentColor;
 }
 
