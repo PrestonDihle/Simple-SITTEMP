@@ -702,6 +702,7 @@ const LEGACY_LINE_TYPE_MAP = {
     'tankditch': 'atditch_a',
     'atditch_b': 'atditch_a',
     'flot_b': 'flot_a',
+    'triple_concertina': 'obstacle_belt',
 };
 
 function createLineOverlay(path, lineType, color, map, strokeWidth) {
@@ -780,36 +781,18 @@ function createLineOverlay(path, lineType, color, map, strokeWidth) {
                 map
             });
             break;
-        case 'triple_concertina':
-            // Triple Concertina — overlapping coil circles between two parallel lines
+        case 'obstacle_belt':
+            // Obstacle Belt — base line with upward triangular teeth
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
-                icons: [
-                    // Parallel line above
-                    {
-                        icon: {
-                            path: 'M 0,-8 L 0,-8',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: sw, scale: 1
-                        },
-                        offset: '0', repeat: '1px'
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: sw,
+                icons: [{
+                    icon: {
+                        path: 'M -4,0 L 0,-7 L 4,0',
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: sw,
+                        fillOpacity: 0, scale: 2
                     },
-                    // Parallel line below
-                    {
-                        icon: {
-                            path: 'M 0,8 L 0,8',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: sw, scale: 1
-                        },
-                        offset: '0', repeat: '1px'
-                    },
-                    // Overlapping coil circles
-                    {
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            fillOpacity: 0, strokeColor: color, strokeWeight: sw, scale: 6
-                        },
-                        offset: '0', repeat: '10px'
-                    }
-                ],
+                    offset: '0', repeat: '35px'
+                }],
                 map
             });
             break;
