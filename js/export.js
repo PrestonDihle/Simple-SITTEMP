@@ -27,7 +27,7 @@ export function setupExport() {
 
     document.getElementById('export-screenshot').addEventListener('click', function () {
         document.getElementById('export-dialog').classList.remove('visible');
-        exportScreenshot();
+        showInterstitial(function () { exportScreenshot(); });
     });
 
     document.querySelectorAll('.size-option').forEach(function (opt) {
