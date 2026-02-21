@@ -122,6 +122,32 @@ function featureToKML(feature, index) {
     return kml;
 }
 
+// ===== UI Hide/Show for Clean Export =====
+
+// Elements to hide during export (everything except map + classification banner)
+const EXPORT_HIDE_IDS = [
+    'toolbar', 'style-panel', 'mgrs-controls', 'coord-display', 'banner-ad',
+    'submenu-shapes', 'submenu-equipment', 'submenu-units', 'submenu-text', 'submenu-map'
+];
+
+function hideUIForExport() {
+    const saved = [];
+    EXPORT_HIDE_IDS.forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) {
+            saved.push({ el: el, display: el.style.display });
+            el.style.display = 'none';
+        }
+    });
+    return saved;
+}
+
+function restoreUI(saved) {
+    saved.forEach(function (item) {
+        item.el.style.display = item.display;
+    });
+}
+
 // ===== PDF Export =====
 
 function exportPDF(pageSize) {
@@ -135,8 +161,11 @@ function exportPDF(pageSize) {
 
     showToast('Generating PDF...');
 
+    const saved = hideUIForExport();
+
     html2canvas(container, { useCORS: true, allowTaint: true, scale: 2, logging: false })
         .then(function (canvas) {
+            restoreUI(saved);
             const { jsPDF } = window.jspdf;
             const orientation = width > height ? 'landscape' : 'portrait';
             const pdf = new jsPDF({ orientation, unit: 'pt', format: [width, height] });
@@ -146,6 +175,7 @@ function exportPDF(pageSize) {
             showToast('PDF exported');
         })
         .catch(function (err) {
+            restoreUI(saved);
             showToast('PDF export failed');
             console.error('PDF export error:', err);
         });
@@ -155,16 +185,14 @@ function exportPDF(pageSize) {
 
 function exportScreenshot() {
     const container = document.getElementById('map-container');
-    const banner = document.getElementById('banner-ad');
-    // Save the current display value so we can restore it exactly after capture
-    const originalDisplay = banner.style.display || '';
-    banner.style.display = 'none';
 
     showToast('Capturing screenshot...');
 
+    const saved = hideUIForExport();
+
     html2canvas(container, { useCORS: true, allowTaint: true, scale: 2, logging: false })
         .then(function (canvas) {
-            banner.style.display = originalDisplay;
+            restoreUI(saved);
             canvas.toBlob(function (blob) {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -176,7 +204,7 @@ function exportScreenshot() {
             });
         })
         .catch(function (err) {
-            banner.style.display = originalDisplay;
+            restoreUI(saved);
             showToast('Screenshot failed');
             console.error('Screenshot error:', err);
         });
