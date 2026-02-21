@@ -166,6 +166,16 @@ function buildShapesSubmenu() {
 
 // ===== Lines Sub-menu =====
 
+// Default colors per line type
+const LINE_TYPE_COLORS = {
+    solid: '#000000', dashed: '#000000', dotted: '#000000', dashdot: '#000000',
+    flot_a: '#0000FF',
+    low_wire: '#000000',
+    single_concertina: '#00AA00', atditch_a: '#00AA00', atditch_unfin: '#00AA00',
+    ap_mine: '#00AA00', at_mine: '#00AA00',
+    arrow: '#000000',
+};
+
 function buildLinesSubmenu() {
     const list = document.getElementById('line-type-list');
     LINE_TYPES.forEach(function (lt) {
@@ -177,6 +187,19 @@ function buildLinesSubmenu() {
         item.addEventListener('click', function () {
             set('lineType', lt.key);
             highlightSubmenuItem(list, item);
+
+            // Auto-set line color to the default for this line type
+            var defaultColor = LINE_TYPE_COLORS[lt.key];
+            if (defaultColor) {
+                set('lineColor', defaultColor);
+                // Update the active swatch in the color picker
+                var lineSwatches = document.getElementById('line-color-swatches');
+                if (lineSwatches) {
+                    lineSwatches.querySelectorAll('.color-swatch').forEach(function (s) {
+                        s.classList.toggle('active', s.style.background === defaultColor || s.style.backgroundColor === defaultColor);
+                    });
+                }
+            }
 
             // If a line is currently selected, change its type
             if (get('selectedFeatureId')) {
