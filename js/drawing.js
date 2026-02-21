@@ -829,7 +829,7 @@ function createLineOverlay(path, lineType, color, map, strokeWidth) {
         case 'ap_mine':
             // Antipersonnel Mine — filled circle + chevron diagonals from right
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: sw,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
                 icons: [
                     // Filled circle
                     {
