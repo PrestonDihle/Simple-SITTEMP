@@ -33,7 +33,7 @@ const initialState = {
     currentMode: 'select',
 
     // Style settings
-    lineColor: '#FF0000',
+    lineColor: '#000000',
     fillColor: '#FF0000',
     fillOpacity: 0.6,
     lineType: 'solid',
