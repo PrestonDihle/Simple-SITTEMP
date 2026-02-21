@@ -504,7 +504,7 @@ export const LINE_TYPES = [
     { key: 'flot_a', name: 'FLOT' },
     { key: 'low_wire', name: 'Low Wire' },
     { key: 'single_concertina', name: '1x Conc.' },
-    { key: 'obstacle_belt', name: 'Obs. Belt' },
+    { key: 'arrow', name: 'Arrow' },
     { key: 'atditch_a', name: 'AT Ditch' },
     { key: 'atditch_unfin', name: 'AT Unfin.' },
     { key: 'ap_mine', name: 'AP Mine' },
@@ -586,8 +586,8 @@ export function getLinePreviewSVG(type) {
             return `<svg width="${w}" height="8" viewBox="${vb} 12"><line x1="0" y1="8" x2="40" y2="8" stroke="${c}" stroke-width="2"/><line x1="5" y1="8" x2="12" y2="2" stroke="${c}" stroke-width="2"/><line x1="5" y1="2" x2="12" y2="8" stroke="${c}" stroke-width="2"/><line x1="25" y1="8" x2="32" y2="2" stroke="${c}" stroke-width="2"/><line x1="25" y1="2" x2="32" y2="8" stroke="${c}" stroke-width="2"/></svg>`;
         case 'single_concertina':
             return `<svg width="${w}" height="8" viewBox="${vb} 14"><line x1="0" y1="10" x2="40" y2="10" stroke="${c}" stroke-width="2"/><circle cx="5" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="13" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="21" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="29" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="37" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
-        case 'obstacle_belt':
-            return `<svg width="${w}" height="8" viewBox="${vb} 14"><polyline points="0,11 7,11 10,3 13,11 27,11 30,3 33,11 40,11" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        case 'arrow':
+            return `<svg width="${w}" height="8" viewBox="${vb} 14"><line x1="0" y1="7" x2="34" y2="7" stroke="${c}" stroke-width="2"/><polygon points="34,3 40,7 34,11" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
         case 'atditch_a':
             return `<svg width="${w}" height="8" viewBox="${vb} 14"><polygon points="5,1 5,13 15,7" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,1 25,13 35,7" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
         case 'atditch_unfin':

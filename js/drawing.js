@@ -746,7 +746,8 @@ const LEGACY_LINE_TYPE_MAP = {
     'tankditch': 'atditch_a',
     'atditch_b': 'atditch_a',
     'flot_b': 'flot_a',
-    'triple_concertina': 'obstacle_belt',
+    'triple_concertina': 'arrow',
+    'obstacle_belt': 'arrow',
 };
 
 function createLineOverlay(path, lineType, color, map, strokeWidth) {
@@ -825,18 +826,17 @@ function createLineOverlay(path, lineType, color, map, strokeWidth) {
                 map
             });
             break;
-        case 'obstacle_belt':
-            // Obstacle Belt — base line with symmetric triangular teeth perpendicular to the line
-            // In Google Maps icon coords: x = along line direction, y = perpendicular (negative = left of travel)
+        case 'arrow':
+            // Arrow — solid line with arrowhead at the end
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 1, strokeWeight: sw,
                 icons: [{
                     icon: {
-                        path: 'M -5,0 L 0,-10 L 5,0',
-                        strokeOpacity: 1, strokeColor: color, strokeWeight: sw,
-                        fillOpacity: 0, scale: 1.5
+                        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                        fillOpacity: 1, fillColor: color,
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: 1, scale: Math.max(3, sw * 1.5)
                     },
-                    offset: '20px', repeat: '40px'
+                    offset: '100%'
                 }],
                 map
             });
