@@ -767,13 +767,13 @@ function createLineOverlay(path, lineType, color, map, strokeWidth) {
             });
             break;
         case 'single_concertina':
-            // Single Concertina — overlapping coil circles, no base line
+            // Single Concertina — overlapping coil circles, no visible base line
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: 0,
                 icons: [{
                     icon: {
                         path: google.maps.SymbolPath.CIRCLE,
-                        fillOpacity: 0, strokeColor: color, strokeWeight: sw, scale: 6,
+                        fillOpacity: 0, strokeOpacity: 1, strokeColor: color, strokeWeight: sw, scale: 6,
                         anchor: new google.maps.Point(0, 3)
                     },
                     offset: '0', repeat: '10px'
