@@ -672,7 +672,7 @@ export function escapeXml(str) {
  * Handles both legacy 40x40 viewBox (units) and new 350x350 viewBox (equipment).
  */
 export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rotation) {
-    const totalWidth = 120;
+    const totalWidth = 150;
     const totalHeight = 50;
     rotation = rotation || 0;
 
@@ -684,19 +684,19 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rota
     // Symbol display area: 40x40 centered in the middle of the output SVG
     const symW = 40;
     const symH = 40;
-    const symX = 40; // left edge of symbol area
+    const symX = 55; // left edge of symbol area
     const symY = 5;  // top edge of symbol area
     const scaleX = symW / vbW;
     const scaleY = symH / vbH;
 
     // Center of the symbol area (for rotation pivot)
-    const symCX = symX + symW / 2; // 60
+    const symCX = symX + symW / 2; // 75
     const symCY = symY + symH / 2; // 25
 
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}">`;
 
     if (leftText) {
-        svg += `<text x="38" y="30" text-anchor="end" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(leftText)}</text>`;
+        svg += `<text x="53" y="30" text-anchor="end" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(leftText)}</text>`;
     }
 
     // Scale the inner SVG content to fit the 40x40 display area, with optional rotation
@@ -707,7 +707,7 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rota
     }
 
     if (rightText) {
-        svg += `<text x="82" y="30" text-anchor="start" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(rightText)}</text>`;
+        svg += `<text x="97" y="30" text-anchor="start" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(rightText)}</text>`;
     }
 
     svg += '</svg>';

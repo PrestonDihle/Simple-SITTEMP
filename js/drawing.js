@@ -282,7 +282,7 @@ function placeSymbol(latLng, leftText, rightText) {
 
     const scale = get('symbolScale') || 1.0;
     const sittemp = { type, key, leftText, rightText, color, strokeWidth, symbolScale: scale, rotation: 0 };
-    createMapMarker(latLng, fullSVG, new google.maps.Size(120 * scale, 50 * scale), new google.maps.Point(60 * scale, 25 * scale), sittemp);
+    createMapMarker(latLng, fullSVG, new google.maps.Size(150 * scale, 50 * scale), new google.maps.Point(75 * scale, 25 * scale), sittemp);
     pushUndoState();
 }
 
@@ -569,8 +569,8 @@ export function rotateSelectedMarker(degrees) {
 
     selected.setIcon({
         url: iconUrl,
-        scaledSize: new google.maps.Size(120 * scale, 50 * scale),
-        anchor: new google.maps.Point(60 * scale, 25 * scale)
+        scaledSize: new google.maps.Size(150 * scale, 50 * scale),
+        anchor: new google.maps.Point(75 * scale, 25 * scale)
     });
 
     showToast('Rotated to ' + info.rotation + '°');
@@ -709,20 +709,20 @@ function recreateMarker(data) {
         const sw = info.strokeWidth || 2;
         const rot = info.rotation || 0;
         svgString = buildSymbolWithLabels(equipmentSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot);
-        size = new google.maps.Size(120 * scale, 50 * scale);
-        anchor = new google.maps.Point(60 * scale, 25 * scale);
+        size = new google.maps.Size(150 * scale, 50 * scale);
+        anchor = new google.maps.Point(75 * scale, 25 * scale);
     } else if (info.type === 'unit') {
         const sw = info.strokeWidth || 2;
         const rot = info.rotation || 0;
         svgString = buildSymbolWithLabels(unitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot);
-        size = new google.maps.Size(120 * scale, 50 * scale);
-        anchor = new google.maps.Point(60 * scale, 25 * scale);
+        size = new google.maps.Size(150 * scale, 50 * scale);
+        anchor = new google.maps.Point(75 * scale, 25 * scale);
     } else if (info.type === 'enemy_unit') {
         const sw = info.strokeWidth || 2;
         const rot = info.rotation || 0;
         svgString = buildSymbolWithLabels(enemyUnitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot);
-        size = new google.maps.Size(120 * scale, 50 * scale);
-        anchor = new google.maps.Point(60 * scale, 25 * scale);
+        size = new google.maps.Size(150 * scale, 50 * scale);
+        anchor = new google.maps.Point(75 * scale, 25 * scale);
     } else if (info.type === 'star') {
         const fill = info.fill || info.color;
         const opacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
