@@ -290,6 +290,27 @@ export function equipmentSVG(key, color, strokeWidth) {
   <line x1="225" y1="275" x2="225" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="125" y1="300" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
+        // Fix — arrow pointing right with short vertical bar at tip
+        fix: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="300" y1="75" x2="300" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Disrupt — arrow pointing right with Z-cut through shaft
+        disrupt: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="125" y1="75" x2="175" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="175" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Block — arrow pointing right meeting a T-bar (blocked)
+        block: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="25" y1="175" x2="250" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="250,175 200,125 200,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="275" y1="50" x2="275" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="50" x2="325" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="300" x2="325" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
     };
     return svgs[key] || svgs.rifle;
 }
@@ -572,6 +593,10 @@ export const EQUIPMENT_LIST = [
     { key: 'forward_observer', name: 'Fwd Observer' },
     { key: 'sensor_op', name: 'Sensor OP' },
     { key: 'combat_outpost', name: 'Combat OP' },
+    // Row 7: Tactical Mission Graphics
+    { key: 'fix', name: 'Fix' },
+    { key: 'disrupt', name: 'Disrupt' },
+    { key: 'block', name: 'Block' },
 ];
 
 export const UNIT_LIST = [
