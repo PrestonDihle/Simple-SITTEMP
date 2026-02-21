@@ -7,7 +7,7 @@
 
 import { get, set, subscribe, MAX_UNDO_STATES } from './state.js';
 import {
-    equipmentSVG, unitSVG, EQUIPMENT_LIST, UNIT_LIST,
+    equipmentSVG, unitSVG, enemyUnitSVG, EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST,
     buildSymbolWithLabels, escapeXml
 } from './symbols.js';
 import { showToast } from './toolbar.js';
@@ -211,9 +211,14 @@ export function enterSymbolPlacement(type, key) {
     const draw = get('draw');
     if (get('ready')) draw.setMode('select');
 
-    const found = type === 'equipment'
-        ? EQUIPMENT_LIST.find(function (e) { return e.key === key; })
-        : UNIT_LIST.find(function (u) { return u.key === key; });
+    var found;
+    if (type === 'equipment') {
+        found = EQUIPMENT_LIST.find(function (e) { return e.key === key; });
+    } else if (type === 'enemy_unit') {
+        found = ENEMY_UNIT_LIST.find(function (u) { return u.key === key; });
+    } else {
+        found = UNIT_LIST.find(function (u) { return u.key === key; });
+    }
     const name = found ? found.name : key;
     showToast('Click on map to place ' + name);
 
@@ -265,7 +270,14 @@ function placeSymbol(latLng, leftText, rightText) {
 
     const color = get('lineColor');
     const strokeWidth = get('symbolStrokeWidth') || 2;
-    const svgString = type === 'equipment' ? equipmentSVG(key, color, strokeWidth) : unitSVG(key, color, strokeWidth);
+    var svgString;
+    if (type === 'equipment') {
+        svgString = equipmentSVG(key, color, strokeWidth);
+    } else if (type === 'enemy_unit') {
+        svgString = enemyUnitSVG(key, color, strokeWidth);
+    } else {
+        svgString = unitSVG(key, color, strokeWidth);
+    }
     const fullSVG = buildSymbolWithLabels(svgString, leftText, rightText, color, 0);
 
     const scale = get('symbolScale') || 1.0;
@@ -468,7 +480,7 @@ function createMapMarker(latLng, svgString, size, anchor, sittempData) {
             set('fontStrikethrough', info.fontStrikethrough !== undefined ? info.fontStrikethrough : false);
         }
 
-        if (marker._sittemp && (marker._sittemp.type === 'equipment' || marker._sittemp.type === 'unit')) {
+        if (marker._sittemp && (marker._sittemp.type === 'equipment' || marker._sittemp.type === 'unit' || marker._sittemp.type === 'enemy_unit')) {
             showToast('Selected. R / Shift+R to rotate.');
         } else {
             showToast('Selected. Press Clear Selected to delete.');
@@ -531,8 +543,8 @@ export function rotateSelectedMarker(degrees) {
     }
 
     const info = selected._sittemp;
-    // Only rotate equipment and unit symbols
-    if (info.type !== 'equipment' && info.type !== 'unit') {
+    // Only rotate equipment, unit, and enemy_unit symbols
+    if (info.type !== 'equipment' && info.type !== 'unit' && info.type !== 'enemy_unit') {
         showToast('Rotation applies to equipment and unit symbols');
         return;
     }
@@ -543,7 +555,14 @@ export function rotateSelectedMarker(degrees) {
 
     // Rebuild the SVG icon with the new rotation
     const sw = info.strokeWidth || 2;
-    const svgBase = info.type === 'equipment' ? equipmentSVG(info.key, info.color, sw) : unitSVG(info.key, info.color, sw);
+    var svgBase;
+    if (info.type === 'equipment') {
+        svgBase = equipmentSVG(info.key, info.color, sw);
+    } else if (info.type === 'enemy_unit') {
+        svgBase = enemyUnitSVG(info.key, info.color, sw);
+    } else {
+        svgBase = unitSVG(info.key, info.color, sw);
+    }
     const fullSVG = buildSymbolWithLabels(svgBase, info.leftText, info.rightText, info.color, info.rotation);
     const scale = info.symbolScale || 1.0;
     const iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(fullSVG);
@@ -696,6 +715,12 @@ function recreateMarker(data) {
         const sw = info.strokeWidth || 2;
         const rot = info.rotation || 0;
         svgString = buildSymbolWithLabels(unitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot);
+        size = new google.maps.Size(120 * scale, 50 * scale);
+        anchor = new google.maps.Point(60 * scale, 25 * scale);
+    } else if (info.type === 'enemy_unit') {
+        const sw = info.strokeWidth || 2;
+        const rot = info.rotation || 0;
+        svgString = buildSymbolWithLabels(enemyUnitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot);
         size = new google.maps.Size(120 * scale, 50 * scale);
         anchor = new google.maps.Point(60 * scale, 25 * scale);
     } else if (info.type === 'star') {

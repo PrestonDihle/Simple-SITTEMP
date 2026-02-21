@@ -6,7 +6,7 @@
 
 import { get, set, subscribe, COLORS } from './state.js';
 import {
-    equipmentSVG, unitSVG, EQUIPMENT_LIST, UNIT_LIST,
+    equipmentSVG, unitSVG, enemyUnitSVG, EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST,
     SHAPE_LIST, LINE_TYPES, getLinePreviewSVG
 } from './symbols.js';
 import {
@@ -33,6 +33,7 @@ export function setupToolbar() {
     buildLinesSubmenu();
     buildEquipmentSubmenu();
     buildUnitsSubmenu();
+    buildEnemyUnitsSubmenu();
     buildColorSubmenu();
     buildTextSubmenu();
     buildMapSubmenu();
@@ -64,6 +65,12 @@ export function setupToolbar() {
         e.stopPropagation();
         exitTextPlacement();
         toggleSubmenu('submenu-units', 'btn-units');
+    });
+
+    document.getElementById('btn-enemy-units').addEventListener('click', function (e) {
+        e.stopPropagation();
+        exitTextPlacement();
+        toggleSubmenu('submenu-enemy-units', 'btn-enemy-units');
     });
 
     document.getElementById('btn-text').addEventListener('click', function (e) {
@@ -102,6 +109,7 @@ function positionSubmenus() {
         'btn-shapes': 'submenu-shapes',
         'btn-equipment': 'submenu-equipment',
         'btn-units': 'submenu-units',
+        'btn-enemy-units': 'submenu-enemy-units',
         'btn-text': 'submenu-text',
         'btn-map': 'submenu-map',
     };
@@ -134,7 +142,7 @@ function closeAllSubmenus() {
 
 export function setActiveTool(tool) {
     document.querySelectorAll('.toolbar-btn').forEach(function (btn) { btn.classList.remove('active'); });
-    const btnMap = { select: 'btn-select', shapes: 'btn-shapes', equipment: 'btn-equipment', units: 'btn-units', text: 'btn-text' };
+    const btnMap = { select: 'btn-select', shapes: 'btn-shapes', equipment: 'btn-equipment', units: 'btn-units', 'enemy-units': 'btn-enemy-units', text: 'btn-text' };
     if (btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
     set('currentMode', tool);
 }
@@ -276,6 +284,39 @@ function buildUnitsSubmenu() {
         grid.querySelectorAll('.submenu-item[data-unit-key]').forEach(function (item) {
             const key = item.dataset.unitKey;
             item.querySelector('div').innerHTML = unitSVG(key, color, sw);
+        });
+    });
+}
+
+// ===== Enemy Units Sub-menu =====
+
+function buildEnemyUnitsSubmenu() {
+    const grid = document.getElementById('enemy-units-grid');
+    ENEMY_UNIT_LIST.forEach(function (unit) {
+        const item = document.createElement('div');
+        item.className = 'submenu-item';
+        item.dataset.enemyUnitKey = unit.key;
+        const iconDiv = document.createElement('div');
+        iconDiv.style.cssText = 'width:28px;height:28px;';
+        iconDiv.innerHTML = enemyUnitSVG(unit.key, get('lineColor'), get('symbolStrokeWidth'));
+        item.appendChild(iconDiv);
+        const label = document.createElement('span');
+        label.textContent = unit.name;
+        item.appendChild(label);
+        item.addEventListener('click', function () {
+            enterSymbolPlacement('enemy_unit', unit.key);
+            closeAllSubmenus();
+        });
+        grid.appendChild(item);
+    });
+
+    // Update icons when line color or stroke width changes
+    subscribe(['lineColor', 'symbolStrokeWidth'], function () {
+        const color = get('lineColor');
+        const sw = get('symbolStrokeWidth');
+        grid.querySelectorAll('.submenu-item[data-enemy-unit-key]').forEach(function (item) {
+            const key = item.dataset.enemyUnitKey;
+            item.querySelector('div').innerHTML = enemyUnitSVG(key, color, sw);
         });
     });
 }

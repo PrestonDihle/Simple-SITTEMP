@@ -426,6 +426,110 @@ export function unitSVG(key, color, strokeWidth) {
     return svgs[key] || svgs.infantry;
 }
 
+// ===== Enemy Unit Symbol SVGs =====
+// NATO enemy diamond frame with unit type modifier inside
+// All symbols use a 350x350 viewBox matching the equipment/unit symbol format
+export function enemyUnitSVG(key, color, strokeWidth) {
+    color = color || '#FF0000';
+    strokeWidth = strokeWidth || 2;
+    const c = color;
+    const sw = strokeWidth * (350 / 40);
+    // Diamond frame: points at top-center, right-center, bottom-center, left-center
+    const diamond = `<polygon points="175,10 340,175 175,340 10,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+    const svgs = {
+        aviation: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <polygon points="80,130 80,220 270,130 270,220 80,130" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+</svg>`,
+        infantry: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <line x1="80" y1="270" x2="270" y2="80" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="80" y1="80" x2="270" y2="270" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        armor: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <path d="M230,135 Q290,175 230,215" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M120,135 Q60,175 120,215" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="120" y1="135" x2="230" y2="135" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="120" y1="215" x2="230" y2="215" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        combined_arms: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <path d="M230,135 Q290,175 230,215" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M120,135 Q60,175 120,215" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="120" y1="135" x2="230" y2="135" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="120" y1="215" x2="230" y2="215" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="120" y1="135" x2="230" y2="215" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="230" y1="135" x2="120" y2="215" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        artillery: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <circle cx="175" cy="175" r="45" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+</svg>`,
+        engineers: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <line x1="110" y1="140" x2="110" y2="210" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="140" x2="175" y2="210" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="240" y1="140" x2="240" y2="210" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="240" y1="140" x2="110" y2="140" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        military_intel: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <line x1="155" y1="210" x2="155" y2="140" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="155" y1="140" x2="120" y2="210" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="120" y1="210" x2="85" y2="140" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="85" y1="140" x2="85" y2="210" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="210" y1="210" x2="265" y2="210" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="210" y1="140" x2="265" y2="140" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="238" y1="210" x2="238" y2="145" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        military_police: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <line x1="155" y1="210" x2="155" y2="140" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="155" y1="140" x2="120" y2="210" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="120" y1="210" x2="85" y2="140" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="85" y1="140" x2="85" y2="210" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="210" y1="140" x2="210" y2="210" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="235" cy="160" r="20" fill="none" stroke="${c}" stroke-width="${sw}"/>
+</svg>`,
+        cavalry: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <line x1="80" y1="270" x2="270" y2="80" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        signal: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <line x1="175" y1="195" x2="175" y2="155" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="155" x2="270" y2="270" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="195" x2="80" y2="80" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        air_defense: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <path d="M80,260 Q175,175 270,260" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        ew_jamming: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <path d="M80,120 Q95,90 110,120" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M110,120 Q125,150 140,120" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M140,120 Q155,90 170,120" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M170,120 Q185,150 200,120" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M200,120 Q215,90 230,120" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M230,120 Q245,150 260,120" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        cbrn: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <path d="M120,240 Q120,130 220,130" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M220,240 Q220,130 120,130" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="220" cy="140" r="12" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="120" cy="140" r="12" fill="${c}" stroke="${c}" stroke-width="${sw}"/>
+</svg>`,
+        medical: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <polygon points="160,120 190,120 190,150 220,150 220,200 190,200 190,230 160,230 160,200 130,200 130,150 160,150 160,120" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+</svg>`,
+    };
+    return svgs[key] || svgs.infantry;
+}
+
 // ===== Definition Lists =====
 
 export const EQUIPMENT_LIST = [
@@ -471,6 +575,23 @@ export const EQUIPMENT_LIST = [
 ];
 
 export const UNIT_LIST = [
+    { key: 'aviation', name: 'Aviation' },
+    { key: 'infantry', name: 'Infantry' },
+    { key: 'armor', name: 'Armor' },
+    { key: 'combined_arms', name: 'Combined Arms' },
+    { key: 'artillery', name: 'Artillery' },
+    { key: 'engineers', name: 'Engineers' },
+    { key: 'military_intel', name: 'MI' },
+    { key: 'military_police', name: 'MP' },
+    { key: 'cavalry', name: 'Cavalry' },
+    { key: 'signal', name: 'Signal' },
+    { key: 'air_defense', name: 'Air Defense' },
+    { key: 'ew_jamming', name: 'EW Jamming' },
+    { key: 'cbrn', name: 'CBRN' },
+    { key: 'medical', name: 'Medical' },
+];
+
+export const ENEMY_UNIT_LIST = [
     { key: 'aviation', name: 'Aviation' },
     { key: 'infantry', name: 'Infantry' },
     { key: 'armor', name: 'Armor' },
