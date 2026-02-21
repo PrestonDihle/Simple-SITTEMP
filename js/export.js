@@ -152,12 +152,13 @@ function restoreUI(saved) {
 
 function exportPDF(pageSize) {
     const container = document.getElementById('map-container');
+    // All sizes in landscape orientation (width > height)
     const sizes = {
-        letter: [612, 792],
-        tabloid: [792, 1224],
-        arch: [1296, 1728],
+        letter: [792, 612],
+        tabloid: [1224, 792],
+        arch: [1728, 1296],
     };
-    const [width, height] = sizes[pageSize] || sizes.letter;
+    const [pageW, pageH] = sizes[pageSize] || sizes.letter;
 
     showToast('Generating PDF...');
 
@@ -167,10 +168,29 @@ function exportPDF(pageSize) {
         .then(function (canvas) {
             restoreUI(saved);
             const { jsPDF } = window.jspdf;
-            const orientation = width > height ? 'landscape' : 'portrait';
-            const pdf = new jsPDF({ orientation, unit: 'pt', format: [width, height] });
+            const pdf = new jsPDF({ orientation: 'landscape', unit: 'pt', format: [pageW, pageH] });
+
+            // Fit the captured image into the page without distortion
+            const canvasAspect = canvas.width / canvas.height;
+            const pageAspect = pageW / pageH;
+            var imgW, imgH, offsetX, offsetY;
+
+            if (canvasAspect > pageAspect) {
+                // Canvas is wider than page — fit to width
+                imgW = pageW;
+                imgH = pageW / canvasAspect;
+                offsetX = 0;
+                offsetY = (pageH - imgH) / 2;
+            } else {
+                // Canvas is taller than page — fit to height
+                imgH = pageH;
+                imgW = pageH * canvasAspect;
+                offsetX = (pageW - imgW) / 2;
+                offsetY = 0;
+            }
+
             const imgData = canvas.toDataURL('image/jpeg', 0.95);
-            pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
+            pdf.addImage(imgData, 'JPEG', offsetX, offsetY, imgW, imgH);
             pdf.save('sittemp_export.pdf');
             showToast('PDF exported');
         })
