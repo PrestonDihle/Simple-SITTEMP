@@ -301,7 +301,7 @@ export function unitSVG(key, color, strokeWidth) {
     color = color || '#0000FF';
     strokeWidth = strokeWidth || 2;
     const c = color;
-    const sw = strokeWidth;
+    const sw = strokeWidth * (350 / 40);
     const svgs = {
         // Aviation
         aviation: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -340,31 +340,31 @@ export function unitSVG(key, color, strokeWidth) {
         // Engineer
         engineers: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="75" y1="125" x2="75" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="175" y1="125" x2="175" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="275" y1="125" x2="275" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="275" y1="125" x2="75" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="75" y1="125" x2="75" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="125" x2="175" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="125" x2="275" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="125" x2="75" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // MI
         military_intel: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="150" y1="225" x2="150" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="150" y1="125" x2="100" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="100" y1="225" x2="50" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="50" y1="125" x2="50" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="225" y1="225" x2="300" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="225" y1="125" x2="300" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="265" y1="225" x2="265" y2="130" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="150" y1="225" x2="150" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="125" x2="100" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="225" x2="50" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="50" y1="125" x2="50" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="225" x2="300" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="125" x2="300" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="265" y1="225" x2="265" y2="130" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // MP
         military_police: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="150" y1="225" x2="150" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="150" y1="125" x2="100" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="100" y1="225" x2="50" y2="125" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="50" y1="125" x2="50" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="225" y1="125" x2="225" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <circle cx="250" cy="150" r="25" fill="none" stroke="${c}" stroke-width="10"/>
+  <line x1="150" y1="225" x2="150" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="125" x2="100" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="225" x2="50" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="50" y1="125" x2="50" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="125" x2="225" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="250" cy="150" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
         // Cavalry
         cavalry: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -400,14 +400,14 @@ export function unitSVG(key, color, strokeWidth) {
   <path d="M200,125 Q225,75 250,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <path d="M250,125 Q275,175 300,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <path d="M300,125 Q325,75 350,125" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="125" y1="175" x2="75" y2="175" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="75" y1="175" x2="75" y2="275" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="75" y1="275" x2="125" y2="275" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="125" y1="225" x2="75" y2="225" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="175" y1="175" x2="200" y2="275" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="200" y1="275" x2="225" y2="175" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="225" y1="175" x2="250" y2="275" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-  <line x1="250" y1="275" x2="275" y2="175" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
+  <line x1="125" y1="175" x2="75" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="175" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="125" y1="225" x2="75" y2="225" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="175" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="200" y1="275" x2="225" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="175" x2="250" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="250" y1="275" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // CBRN
         cbrn: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
