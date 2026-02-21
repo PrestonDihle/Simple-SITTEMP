@@ -323,6 +323,17 @@
             <input type="text" id="symbol-left-text" maxlength="20" placeholder="e.g., 1/2 INF">
             <label for="symbol-right-text">Right Text (max 20 chars):</label>
             <input type="text" id="symbol-right-text" maxlength="20" placeholder="e.g., OBJ ALPHA">
+            <label for="symbol-echelon">Echelon:</label>
+            <select id="symbol-echelon">
+                <option value="none">None</option>
+                <option value="platoon">Platoon (●●●)</option>
+                <option value="company">Company ( | )</option>
+                <option value="battalion">Battalion ( || )</option>
+                <option value="regiment">Regiment ( ||| )</option>
+                <option value="brigade">Brigade ( X )</option>
+                <option value="division">Division ( XX )</option>
+                <option value="corps">Corps ( XXX )</option>
+            </select>
             <div class="dialog-btns">
                 <button class="btn-cancel" id="symbol-text-cancel">Cancel</button>
                 <button class="btn-ok" id="symbol-text-ok">Place</button>

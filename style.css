@@ -984,7 +984,8 @@ html, body {
     margin-top: 10px;
 }
 
-#symbol-text-dialog .dialog-content input {
+#symbol-text-dialog .dialog-content input,
+#symbol-text-dialog .dialog-content select {
     width: 100%;
     padding: 8px;
     background: #444;

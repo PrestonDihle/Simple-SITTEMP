@@ -244,6 +244,7 @@ function showSymbolTextDialog(latLng) {
     dialog.classList.add('visible');
     document.getElementById('symbol-left-text').value = '';
     document.getElementById('symbol-right-text').value = '';
+    document.getElementById('symbol-echelon').value = 'none';
     document.getElementById('symbol-left-text').focus();
 
     function cleanup() {
@@ -254,8 +255,9 @@ function showSymbolTextDialog(latLng) {
     function onOk() {
         const leftText = document.getElementById('symbol-left-text').value.substring(0, 20);
         const rightText = document.getElementById('symbol-right-text').value.substring(0, 20);
+        const echelon = document.getElementById('symbol-echelon').value;
         cleanup();
-        placeSymbol(latLng, leftText, rightText);
+        placeSymbol(latLng, leftText, rightText, echelon);
     }
     function onCancel() { cleanup(); }
 
@@ -263,11 +265,12 @@ function showSymbolTextDialog(latLng) {
     document.getElementById('symbol-text-cancel').addEventListener('click', onCancel);
 }
 
-function placeSymbol(latLng, leftText, rightText) {
+function placeSymbol(latLng, leftText, rightText, echelon) {
     const type = get('pendingSymbolType');
     const key = get('pendingSymbolKey');
     if (!type || !key) return;
 
+    echelon = echelon || 'none';
     const color = get('lineColor');
     const strokeWidth = get('symbolStrokeWidth') || 2;
     var svgString;
@@ -278,11 +281,13 @@ function placeSymbol(latLng, leftText, rightText) {
     } else {
         svgString = unitSVG(key, color, strokeWidth);
     }
-    const fullSVG = buildSymbolWithLabels(svgString, leftText, rightText, color, 0);
+    const fullSVG = buildSymbolWithLabels(svgString, leftText, rightText, color, 0, echelon);
 
     const scale = get('symbolScale') || 1.0;
-    const sittemp = { type, key, leftText, rightText, color, strokeWidth, symbolScale: scale, rotation: 0 };
-    createMapMarker(latLng, fullSVG, new google.maps.Size(150 * scale, 50 * scale), new google.maps.Point(75 * scale, 25 * scale), sittemp);
+    const echelonH = (echelon && echelon !== 'none') ? 14 : 0;
+    const h = 50 + echelonH;
+    const sittemp = { type, key, leftText, rightText, color, strokeWidth, symbolScale: scale, rotation: 0, echelon: echelon };
+    createMapMarker(latLng, fullSVG, new google.maps.Size(150 * scale, h * scale), new google.maps.Point(75 * scale, (h / 2) * scale), sittemp);
     pushUndoState();
 }
 
@@ -563,14 +568,17 @@ export function rotateSelectedMarker(degrees) {
     } else {
         svgBase = unitSVG(info.key, info.color, sw);
     }
-    const fullSVG = buildSymbolWithLabels(svgBase, info.leftText, info.rightText, info.color, info.rotation);
+    const ech = info.echelon || 'none';
+    const fullSVG = buildSymbolWithLabels(svgBase, info.leftText, info.rightText, info.color, info.rotation, ech);
     const scale = info.symbolScale || 1.0;
+    const echelonH = (ech !== 'none') ? 14 : 0;
+    const h = 50 + echelonH;
     const iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(fullSVG);
 
     selected.setIcon({
         url: iconUrl,
-        scaledSize: new google.maps.Size(150 * scale, 50 * scale),
-        anchor: new google.maps.Point(75 * scale, 25 * scale)
+        scaledSize: new google.maps.Size(150 * scale, h * scale),
+        anchor: new google.maps.Point(75 * scale, (h / 2) * scale)
     });
 
     showToast('Rotated to ' + info.rotation + '°');
@@ -708,21 +716,30 @@ function recreateMarker(data) {
     if (info.type === 'equipment') {
         const sw = info.strokeWidth || 2;
         const rot = info.rotation || 0;
-        svgString = buildSymbolWithLabels(equipmentSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot);
-        size = new google.maps.Size(150 * scale, 50 * scale);
-        anchor = new google.maps.Point(75 * scale, 25 * scale);
+        const ech = info.echelon || 'none';
+        const echelonH = (ech !== 'none') ? 14 : 0;
+        const h = 50 + echelonH;
+        svgString = buildSymbolWithLabels(equipmentSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot, ech);
+        size = new google.maps.Size(150 * scale, h * scale);
+        anchor = new google.maps.Point(75 * scale, (h / 2) * scale);
     } else if (info.type === 'unit') {
         const sw = info.strokeWidth || 2;
         const rot = info.rotation || 0;
-        svgString = buildSymbolWithLabels(unitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot);
-        size = new google.maps.Size(150 * scale, 50 * scale);
-        anchor = new google.maps.Point(75 * scale, 25 * scale);
+        const ech = info.echelon || 'none';
+        const echelonH = (ech !== 'none') ? 14 : 0;
+        const h = 50 + echelonH;
+        svgString = buildSymbolWithLabels(unitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot, ech);
+        size = new google.maps.Size(150 * scale, h * scale);
+        anchor = new google.maps.Point(75 * scale, (h / 2) * scale);
     } else if (info.type === 'enemy_unit') {
         const sw = info.strokeWidth || 2;
         const rot = info.rotation || 0;
-        svgString = buildSymbolWithLabels(enemyUnitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot);
-        size = new google.maps.Size(150 * scale, 50 * scale);
-        anchor = new google.maps.Point(75 * scale, 25 * scale);
+        const ech = info.echelon || 'none';
+        const echelonH = (ech !== 'none') ? 14 : 0;
+        const h = 50 + echelonH;
+        svgString = buildSymbolWithLabels(enemyUnitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot, ech);
+        size = new google.maps.Size(150 * scale, h * scale);
+        anchor = new google.maps.Point(75 * scale, (h / 2) * scale);
     } else if (info.type === 'star') {
         const fill = info.fill || info.color;
         const opacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;

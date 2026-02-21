@@ -667,13 +667,26 @@ export function escapeXml(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+// NATO echelon definitions: marks drawn above the unit frame
+export const ECHELON_LIST = [
+    { key: 'none', name: 'None' },
+    { key: 'platoon', name: 'Platoon (●●●)' },
+    { key: 'company', name: 'Company (|)' },
+    { key: 'battalion', name: 'Battalion (||)' },
+    { key: 'regiment', name: 'Regiment (|||)' },
+    { key: 'brigade', name: 'Brigade (X)' },
+    { key: 'division', name: 'Division (XX)' },
+    { key: 'corps', name: 'Corps (XXX)' },
+];
+
 /**
- * Build an SVG that includes the symbol + optional left/right text labels.
+ * Build an SVG that includes the symbol + optional left/right text labels + echelon marks.
  * Handles both legacy 40x40 viewBox (units) and new 350x350 viewBox (equipment).
  */
-export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rotation) {
+export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rotation, echelon) {
     const totalWidth = 150;
-    const totalHeight = 50;
+    const echelonH = (echelon && echelon !== 'none') ? 14 : 0;
+    const totalHeight = 50 + echelonH;
     rotation = rotation || 0;
 
     // Detect viewBox to determine how to scale the inner symbol
@@ -685,18 +698,23 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rota
     const symW = 40;
     const symH = 40;
     const symX = 55; // left edge of symbol area
-    const symY = 5;  // top edge of symbol area
+    const symY = 5 + echelonH;  // top edge of symbol area (shifted down if echelon present)
     const scaleX = symW / vbW;
     const scaleY = symH / vbH;
 
     // Center of the symbol area (for rotation pivot)
     const symCX = symX + symW / 2; // 75
-    const symCY = symY + symH / 2; // 25
+    const symCY = symY + symH / 2;
 
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}">`;
 
+    // Draw echelon marks above the symbol
+    if (echelon && echelon !== 'none') {
+        svg += buildEchelonMarks(echelon, symCX, symY - 2, color);
+    }
+
     if (leftText) {
-        svg += `<text x="53" y="30" text-anchor="end" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(leftText)}</text>`;
+        svg += `<text x="53" y="${symY + 25}" text-anchor="end" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(leftText)}</text>`;
     }
 
     // Scale the inner SVG content to fit the 40x40 display area, with optional rotation
@@ -707,11 +725,54 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rota
     }
 
     if (rightText) {
-        svg += `<text x="97" y="30" text-anchor="start" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(rightText)}</text>`;
+        svg += `<text x="97" y="${symY + 25}" text-anchor="start" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(rightText)}</text>`;
     }
 
     svg += '</svg>';
     return svg;
+}
+
+function buildEchelonMarks(echelon, cx, baseY, color) {
+    let marks = '';
+    const sw = 1.5;
+    switch (echelon) {
+        case 'platoon': // three dots
+            marks += `<circle cx="${cx - 8}" cy="${baseY - 5}" r="2" fill="${color}"/>`;
+            marks += `<circle cx="${cx}" cy="${baseY - 5}" r="2" fill="${color}"/>`;
+            marks += `<circle cx="${cx + 8}" cy="${baseY - 5}" r="2" fill="${color}"/>`;
+            break;
+        case 'company': // one vertical line
+            marks += `<line x1="${cx}" y1="${baseY - 1}" x2="${cx}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            break;
+        case 'battalion': // two vertical lines
+            marks += `<line x1="${cx - 4}" y1="${baseY - 1}" x2="${cx - 4}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx + 4}" y1="${baseY - 1}" x2="${cx + 4}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            break;
+        case 'regiment': // three vertical lines
+            marks += `<line x1="${cx - 6}" y1="${baseY - 1}" x2="${cx - 6}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx}" y1="${baseY - 1}" x2="${cx}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx + 6}" y1="${baseY - 1}" x2="${cx + 6}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            break;
+        case 'brigade': // one X
+            marks += `<line x1="${cx - 5}" y1="${baseY - 1}" x2="${cx + 5}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx + 5}" y1="${baseY - 1}" x2="${cx - 5}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            break;
+        case 'division': // two X's
+            marks += `<line x1="${cx - 10}" y1="${baseY - 1}" x2="${cx - 2}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx - 2}" y1="${baseY - 1}" x2="${cx - 10}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx + 2}" y1="${baseY - 1}" x2="${cx + 10}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx + 10}" y1="${baseY - 1}" x2="${cx + 2}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            break;
+        case 'corps': // three X's
+            marks += `<line x1="${cx - 15}" y1="${baseY - 1}" x2="${cx - 7}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx - 7}" y1="${baseY - 1}" x2="${cx - 15}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx - 4}" y1="${baseY - 1}" x2="${cx + 4}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx + 4}" y1="${baseY - 1}" x2="${cx - 4}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx + 7}" y1="${baseY - 1}" x2="${cx + 15}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx + 15}" y1="${baseY - 1}" x2="${cx + 7}" y2="${baseY - 11}" stroke="${color}" stroke-width="${sw}"/>`;
+            break;
+    }
+    return marks;
 }
 
 export function getLinePreviewSVG(type) {
