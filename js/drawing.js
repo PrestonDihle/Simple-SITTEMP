@@ -266,10 +266,10 @@ function placeSymbol(latLng, leftText, rightText) {
     const color = get('lineColor');
     const strokeWidth = get('symbolStrokeWidth') || 2;
     const svgString = type === 'equipment' ? equipmentSVG(key, color, strokeWidth) : unitSVG(key, color, strokeWidth);
-    const fullSVG = buildSymbolWithLabels(svgString, leftText, rightText, color);
+    const fullSVG = buildSymbolWithLabels(svgString, leftText, rightText, color, 0);
 
     const scale = get('symbolScale') || 1.0;
-    const sittemp = { type, key, leftText, rightText, color, strokeWidth, symbolScale: scale };
+    const sittemp = { type, key, leftText, rightText, color, strokeWidth, symbolScale: scale, rotation: 0 };
     createMapMarker(latLng, fullSVG, new google.maps.Size(120 * scale, 50 * scale), new google.maps.Point(60 * scale, 25 * scale), sittemp);
     pushUndoState();
 }
@@ -468,7 +468,11 @@ function createMapMarker(latLng, svgString, size, anchor, sittempData) {
             set('fontStrikethrough', info.fontStrikethrough !== undefined ? info.fontStrikethrough : false);
         }
 
-        showToast('Selected. Press Clear Selected to delete.');
+        if (marker._sittemp && (marker._sittemp.type === 'equipment' || marker._sittemp.type === 'unit')) {
+            showToast('Selected. R / Shift+R to rotate.');
+        } else {
+            showToast('Selected. Press Clear Selected to delete.');
+        }
     });
 
     markers.push(marker);
@@ -514,6 +518,44 @@ export function clearSelected() {
     } else {
         showToast('Nothing selected');
     }
+}
+
+// ===== Rotate Selected Marker =====
+
+export function rotateSelectedMarker(degrees) {
+    const markers = get('markers');
+    const selected = markers.find(function (m) { return m._selected; });
+    if (!selected) {
+        showToast('No symbol selected');
+        return;
+    }
+
+    const info = selected._sittemp;
+    // Only rotate equipment and unit symbols
+    if (info.type !== 'equipment' && info.type !== 'unit') {
+        showToast('Rotation applies to equipment and unit symbols');
+        return;
+    }
+
+    // Update rotation (wrap around 360)
+    const currentRotation = info.rotation || 0;
+    info.rotation = (currentRotation + degrees + 360) % 360;
+
+    // Rebuild the SVG icon with the new rotation
+    const sw = info.strokeWidth || 2;
+    const svgBase = info.type === 'equipment' ? equipmentSVG(info.key, info.color, sw) : unitSVG(info.key, info.color, sw);
+    const fullSVG = buildSymbolWithLabels(svgBase, info.leftText, info.rightText, info.color, info.rotation);
+    const scale = info.symbolScale || 1.0;
+    const iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(fullSVG);
+
+    selected.setIcon({
+        url: iconUrl,
+        scaledSize: new google.maps.Size(120 * scale, 50 * scale),
+        anchor: new google.maps.Point(60 * scale, 25 * scale)
+    });
+
+    showToast('Rotated to ' + info.rotation + '°');
+    pushUndoState();
 }
 
 // ===== Undo / Redo =====
@@ -646,12 +688,14 @@ function recreateMarker(data) {
 
     if (info.type === 'equipment') {
         const sw = info.strokeWidth || 2;
-        svgString = buildSymbolWithLabels(equipmentSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color);
+        const rot = info.rotation || 0;
+        svgString = buildSymbolWithLabels(equipmentSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot);
         size = new google.maps.Size(120 * scale, 50 * scale);
         anchor = new google.maps.Point(60 * scale, 25 * scale);
     } else if (info.type === 'unit') {
         const sw = info.strokeWidth || 2;
-        svgString = buildSymbolWithLabels(unitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color);
+        const rot = info.rotation || 0;
+        svgString = buildSymbolWithLabels(unitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot);
         size = new google.maps.Size(120 * scale, 50 * scale);
         anchor = new google.maps.Point(60 * scale, 25 * scale);
     } else if (info.type === 'star') {

@@ -526,9 +526,10 @@ export function escapeXml(str) {
  * Build an SVG that includes the symbol + optional left/right text labels.
  * Handles both legacy 40x40 viewBox (units) and new 350x350 viewBox (equipment).
  */
-export function buildSymbolWithLabels(svgInner, leftText, rightText, color) {
+export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rotation) {
     const totalWidth = 120;
     const totalHeight = 50;
+    rotation = rotation || 0;
 
     // Detect viewBox to determine how to scale the inner symbol
     const vbMatch = svgInner.match(/viewBox="0 0 (\d+) (\d+)"/);
@@ -543,14 +544,22 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color) {
     const scaleX = symW / vbW;
     const scaleY = symH / vbH;
 
+    // Center of the symbol area (for rotation pivot)
+    const symCX = symX + symW / 2; // 60
+    const symCY = symY + symH / 2; // 25
+
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}">`;
 
     if (leftText) {
         svg += `<text x="38" y="30" text-anchor="end" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(leftText)}</text>`;
     }
 
-    // Scale the inner SVG content to fit the 40x40 display area
-    svg += `<g transform="translate(${symX}, ${symY}) scale(${scaleX}, ${scaleY})">${stripSvgWrapper(svgInner)}</g>`;
+    // Scale the inner SVG content to fit the 40x40 display area, with optional rotation
+    if (rotation !== 0) {
+        svg += `<g transform="rotate(${rotation}, ${symCX}, ${symCY}) translate(${symX}, ${symY}) scale(${scaleX}, ${scaleY})">${stripSvgWrapper(svgInner)}</g>`;
+    } else {
+        svg += `<g transform="translate(${symX}, ${symY}) scale(${scaleX}, ${scaleY})">${stripSvgWrapper(svgInner)}</g>`;
+    }
 
     if (rightText) {
         svg += `<text x="82" y="30" text-anchor="start" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(rightText)}</text>`;

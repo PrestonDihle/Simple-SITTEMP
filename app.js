@@ -6,7 +6,7 @@
  */
 
 import { get, set, DEFAULT_CENTER, DEFAULT_ZOOM } from './js/state.js';
-import { initTerraDraw } from './js/drawing.js';
+import { initTerraDraw, rotateSelectedMarker } from './js/drawing.js';
 import { setupToolbar, setActiveTool } from './js/toolbar.js';
 import { setupCoordinateDisplay, setupRightClickMGRS, setupMGRSGrid } from './js/grid.js';
 import { setupExport } from './js/export.js';
@@ -87,6 +87,17 @@ function initMap() {
     setupToolbar();
     setupMGRSGrid();
     setupExport();
+
+    // Keyboard shortcut: R to rotate selected equipment/unit symbol
+    document.addEventListener('keydown', function (e) {
+        // Don't intercept if user is typing in an input or textarea
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === 'r' || e.key === 'R') {
+            e.preventDefault();
+            // Shift+R = counter-clockwise 15°, R = clockwise 15°
+            rotateSelectedMarker(e.shiftKey ? -15 : 15);
+        }
+    });
 }
 
 // ===== Boot =====
