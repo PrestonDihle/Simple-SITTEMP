@@ -782,14 +782,15 @@ function createLineOverlay(path, lineType, color, map, strokeWidth) {
             });
             break;
         case 'obstacle_belt':
-            // Obstacle Belt — base line with triangular teeth rising from the line
+            // Obstacle Belt — base line with symmetric triangular teeth perpendicular to the line
+            // In Google Maps icon coords: x = along line direction, y = perpendicular (negative = left of travel)
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 1, strokeWeight: sw,
                 icons: [{
                     icon: {
-                        path: 'M -6,0 L -3,-8 L 0,0',
+                        path: 'M -5,0 L 0,-10 L 5,0',
                         strokeOpacity: 1, strokeColor: color, strokeWeight: sw,
-                        fillOpacity: 0, scale: 1.8
+                        fillOpacity: 0, scale: 1.5
                     },
                     offset: '20px', repeat: '40px'
                 }],
