@@ -767,9 +767,9 @@ function createLineOverlay(path, lineType, color, map, strokeWidth) {
             });
             break;
         case 'single_concertina':
-            // Single Concertina — overlapping coil circles on a base line
+            // Single Concertina — overlapping coil circles, no base line
             polyline = new google.maps.Polyline({
-                path, strokeColor: color, strokeOpacity: 1, strokeWeight: sw,
+                path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
                 icons: [{
                     icon: {
                         path: google.maps.SymbolPath.CIRCLE,
@@ -861,26 +861,10 @@ function createLineOverlay(path, lineType, color, map, strokeWidth) {
             });
             break;
         case 'at_mine':
-            // Anti-tank Mine — filled circle between two parallel lines above/below
+            // Anti-tank Mine — filled circle only, no base line
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 0, strokeWeight: sw,
                 icons: [
-                    // Parallel line above (dense dots simulate continuous line)
-                    {
-                        icon: {
-                            path: 'M 0,-8 L 0,-8',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: sw, scale: 1
-                        },
-                        offset: '0', repeat: '1px'
-                    },
-                    // Parallel line below
-                    {
-                        icon: {
-                            path: 'M 0,8 L 0,8',
-                            strokeOpacity: 1, strokeColor: color, strokeWeight: sw, scale: 1
-                        },
-                        offset: '0', repeat: '1px'
-                    },
                     // Filled circle
                     {
                         icon: {
