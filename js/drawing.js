@@ -782,16 +782,16 @@ function createLineOverlay(path, lineType, color, map, strokeWidth) {
             });
             break;
         case 'obstacle_belt':
-            // Obstacle Belt — base line with upward triangular teeth
+            // Obstacle Belt — base line with triangular teeth rising from the line
             polyline = new google.maps.Polyline({
                 path, strokeColor: color, strokeOpacity: 1, strokeWeight: sw,
                 icons: [{
                     icon: {
-                        path: 'M -4,0 L 0,-7 L 4,0',
+                        path: 'M -6,0 L -3,-8 L 0,0',
                         strokeOpacity: 1, strokeColor: color, strokeWeight: sw,
-                        fillOpacity: 0, scale: 2
+                        fillOpacity: 0, scale: 1.8
                     },
-                    offset: '0', repeat: '35px'
+                    offset: '20px', repeat: '40px'
                 }],
                 map
             });

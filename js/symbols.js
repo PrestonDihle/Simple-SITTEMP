@@ -579,7 +579,7 @@ export function getLinePreviewSVG(type) {
         case 'single_concertina':
             return `<svg width="${w}" height="8" viewBox="${vb} 14"><line x1="0" y1="10" x2="40" y2="10" stroke="${c}" stroke-width="2"/><circle cx="5" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="13" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="21" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="29" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/><circle cx="37" cy="6" r="5" fill="none" stroke="${c}" stroke-width="1.5"/></svg>`;
         case 'obstacle_belt':
-            return `<svg width="${w}" height="8" viewBox="${vb} 14"><line x1="0" y1="10" x2="40" y2="10" stroke="${c}" stroke-width="2"/><polyline points="6,10 10,2 14,10" fill="none" stroke="${c}" stroke-width="2"/><polyline points="26,10 30,2 34,10" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
+            return `<svg width="${w}" height="8" viewBox="${vb} 14"><polyline points="0,10 8,10 12,2 16,10 28,10 32,2 36,10 40,10" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
         case 'atditch_a':
             return `<svg width="${w}" height="8" viewBox="${vb} 14"><polygon points="5,1 5,13 15,7" fill="${c}" stroke="${c}" stroke-width="1"/><polygon points="25,1 25,13 35,7" fill="${c}" stroke="${c}" stroke-width="1"/></svg>`;
         case 'atditch_unfin':
