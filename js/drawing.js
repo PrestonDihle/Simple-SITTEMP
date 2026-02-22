@@ -1048,3 +1048,162 @@ export function changeLineType(newLineType) {
     pushUndoState();
     return true;
 }
+
+// ===== Measurement Tool =====
+
+var measureState = {
+    active: false,
+    points: [],
+    polyline: null,
+    markers: [],
+    infoWindow: null,
+    clickListener: null,
+    dblClickListener: null,
+    keyListener: null,
+};
+
+export function enterMeasureMode() {
+    exitMeasureMode();
+    exitTextPlacement();
+    exitSymbolPlacement();
+    if (get('ready')) get('draw').setMode('select');
+
+    measureState.active = true;
+    measureState.points = [];
+    showToast('Click to add points. Double-click or Esc to finish.');
+
+    const map = get('map');
+
+    measureState.clickListener = map.addListener('click', function (e) {
+        if (!measureState.active) return;
+        addMeasurePoint(e.latLng);
+    });
+
+    measureState.dblClickListener = map.addListener('dblclick', function () {
+        finishMeasurement();
+    });
+
+    measureState.keyListener = function (e) {
+        if (e.key === 'Escape') finishMeasurement();
+    };
+    document.addEventListener('keydown', measureState.keyListener);
+}
+
+export function exitMeasureMode() {
+    measureState.active = false;
+    if (measureState.clickListener) {
+        google.maps.event.removeListener(measureState.clickListener);
+        measureState.clickListener = null;
+    }
+    if (measureState.dblClickListener) {
+        google.maps.event.removeListener(measureState.dblClickListener);
+        measureState.dblClickListener = null;
+    }
+    if (measureState.keyListener) {
+        document.removeEventListener('keydown', measureState.keyListener);
+        measureState.keyListener = null;
+    }
+}
+
+export function clearMeasurement() {
+    exitMeasureMode();
+    if (measureState.polyline) {
+        measureState.polyline.setMap(null);
+        measureState.polyline = null;
+    }
+    measureState.markers.forEach(function (m) { m.setMap(null); });
+    measureState.markers = [];
+    if (measureState.infoWindow) {
+        measureState.infoWindow.close();
+        measureState.infoWindow = null;
+    }
+    measureState.points = [];
+}
+
+function addMeasurePoint(latLng) {
+    const map = get('map');
+    measureState.points.push(latLng);
+
+    // Add small dot marker at the point
+    var dot = new google.maps.Marker({
+        position: latLng,
+        map: map,
+        icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: '#FF4444',
+            fillOpacity: 1,
+            strokeColor: '#FFFFFF',
+            strokeWeight: 2,
+            scale: 5,
+        },
+        clickable: false,
+        zIndex: 200,
+    });
+    measureState.markers.push(dot);
+
+    // Update or create the polyline
+    if (measureState.polyline) {
+        measureState.polyline.setPath(measureState.points);
+    } else if (measureState.points.length > 1) {
+        measureState.polyline = new google.maps.Polyline({
+            path: measureState.points,
+            strokeColor: '#FF4444',
+            strokeOpacity: 1,
+            strokeWeight: 3,
+            geodesic: true,
+            map: map,
+        });
+    }
+
+    // Show running distance
+    if (measureState.points.length > 1) {
+        var totalM = computeTotalDistance(measureState.points);
+        showMeasureInfo(totalM, measureState.points[measureState.points.length - 1]);
+    }
+}
+
+function finishMeasurement() {
+    if (!measureState.active) return;
+    exitMeasureMode();
+
+    if (measureState.points.length < 2) {
+        showToast('Need at least 2 points to measure');
+        clearMeasurement();
+        return;
+    }
+
+    var totalM = computeTotalDistance(measureState.points);
+    showMeasureInfo(totalM, measureState.points[measureState.points.length - 1]);
+    showToast('Measurement complete. Click Measure again to start new.');
+}
+
+function computeTotalDistance(points) {
+    var total = 0;
+    for (var i = 1; i < points.length; i++) {
+        total += google.maps.geometry.spherical.computeDistanceBetween(points[i - 1], points[i]);
+    }
+    return total;
+}
+
+function showMeasureInfo(meters, position) {
+    var map = get('map');
+    var km = meters / 1000;
+    var miles = meters * 0.000621371;
+
+    var content = '<div style="font-family:Arial,sans-serif;font-size:13px;line-height:1.5;color:#333;">'
+        + '<b>' + Math.round(meters).toLocaleString() + ' m</b><br>'
+        + km.toFixed(2) + ' km<br>'
+        + miles.toFixed(2) + ' mi'
+        + '</div>';
+
+    if (measureState.infoWindow) {
+        measureState.infoWindow.setContent(content);
+        measureState.infoWindow.setPosition(position);
+    } else {
+        measureState.infoWindow = new google.maps.InfoWindow({
+            content: content,
+            position: position,
+        });
+        measureState.infoWindow.open(map);
+    }
+}

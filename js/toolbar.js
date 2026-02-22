@@ -13,7 +13,7 @@ import {
     activateShape, enterSymbolPlacement, exitSymbolPlacement,
     enterTextPlacement, exitTextPlacement, clearSelected,
     performUndo, performRedo, buildTextSVG, pushUndoState,
-    changeLineType
+    changeLineType, enterMeasureMode, exitMeasureMode, clearMeasurement
 } from './drawing.js';
 
 // ===== Toast =====
@@ -43,6 +43,7 @@ export function setupToolbar() {
         setActiveTool('select');
         exitSymbolPlacement();
         exitTextPlacement();
+        exitMeasureMode();
         if (get('ready')) get('draw').setMode('select');
     });
 
@@ -50,6 +51,7 @@ export function setupToolbar() {
         e.stopPropagation();
         exitSymbolPlacement();
         exitTextPlacement();
+        exitMeasureMode();
         toggleSubmenu('submenu-shapes', 'btn-shapes');
     });
 
@@ -58,30 +60,45 @@ export function setupToolbar() {
     document.getElementById('btn-equipment').addEventListener('click', function (e) {
         e.stopPropagation();
         exitTextPlacement();
+        exitMeasureMode();
         toggleSubmenu('submenu-equipment', 'btn-equipment');
     });
 
     document.getElementById('btn-units').addEventListener('click', function (e) {
         e.stopPropagation();
         exitTextPlacement();
+        exitMeasureMode();
         toggleSubmenu('submenu-units', 'btn-units');
     });
 
     document.getElementById('btn-enemy-units').addEventListener('click', function (e) {
         e.stopPropagation();
         exitTextPlacement();
+        exitMeasureMode();
         toggleSubmenu('submenu-enemy-units', 'btn-enemy-units');
     });
 
     document.getElementById('btn-text').addEventListener('click', function (e) {
         e.stopPropagation();
         exitSymbolPlacement();
+        exitMeasureMode();
         toggleSubmenu('submenu-text', 'btn-text');
     });
 
     document.getElementById('btn-map').addEventListener('click', function (e) {
         e.stopPropagation();
+        exitMeasureMode();
         toggleSubmenu('submenu-map', 'btn-map');
+    });
+
+    document.getElementById('btn-measure').addEventListener('click', function () {
+        closeAllSubmenus();
+        exitSymbolPlacement();
+        exitTextPlacement();
+        // If already measuring, clear and restart; otherwise start fresh
+        clearMeasurement();
+        setActiveTool('measure');
+        enterMeasureMode();
     });
 
     document.getElementById('btn-undo').addEventListener('click', function () { performUndo(); });
@@ -142,7 +159,7 @@ function closeAllSubmenus() {
 
 export function setActiveTool(tool) {
     document.querySelectorAll('.toolbar-btn').forEach(function (btn) { btn.classList.remove('active'); });
-    const btnMap = { select: 'btn-select', shapes: 'btn-shapes', equipment: 'btn-equipment', units: 'btn-units', 'enemy-units': 'btn-enemy-units', text: 'btn-text' };
+    const btnMap = { select: 'btn-select', shapes: 'btn-shapes', equipment: 'btn-equipment', units: 'btn-units', 'enemy-units': 'btn-enemy-units', text: 'btn-text', measure: 'btn-measure' };
     if (btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
     set('currentMode', tool);
 }

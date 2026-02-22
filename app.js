@@ -52,7 +52,7 @@ function loadGoogleMaps(apiKey) {
     // initMap must be on window for the JSONP callback
     window.initMap = initMap;
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=geometry&callback=initMap`;
     script.async = true;
     script.defer = true;
     document.body.appendChild(script);
