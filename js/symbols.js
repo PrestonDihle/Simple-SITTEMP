@@ -616,6 +616,19 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
   <line x1="275" y1="50" x2="325" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="275" y1="300" x2="325" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
+        // Attack by Fire (ABF) — diagonal arrow pointing down-right with vertical bar at tip
+        attack_by_fire: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="50" y1="50" x2="250" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="250,250 250,190 190,250" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="280" y1="200" x2="280" y2="310" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Breach — arrow breaking through a vertical line
+        breach: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="175" y1="50" x2="175" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="225" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
     };
     return svgs[key] || svgs.delay;
 }
@@ -710,6 +723,8 @@ export const TACTICAL_TASK_LIST = [
     { key: 'withdraw', name: 'Withdraw' },
     { key: 'contain', name: 'Contain' },
     { key: 'seize', name: 'Seize' },
+    { key: 'attack_by_fire', name: 'ABF' },
+    { key: 'breach', name: 'Breach' },
 ];
 
 export const SHAPE_LIST = [
