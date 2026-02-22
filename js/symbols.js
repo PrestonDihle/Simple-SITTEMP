@@ -311,6 +311,29 @@ export function equipmentSVG(key, color, strokeWidth) {
   <line x1="275" y1="50" x2="325" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="275" y1="300" x2="325" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
+        // Tracked Radar — radar dish on tracked vehicle chassis
+        tracked_radar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="75" y1="0" x2="75" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="0" x2="275" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="275" y1="75" x2="75" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M115,110 Q90,275 255,250" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="145" y1="210" x2="195" y2="160" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="195" y1="195" x2="195" y2="160" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="195" y1="195" x2="235" y2="140" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Wheeled Radar — radar dish on wheeled vehicle chassis
+        wheeled_radar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <circle cx="100" cy="325" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="250" cy="325" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="100" y1="300" x2="100" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="250" y1="300" x2="250" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="100" y1="50" x2="250" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M125,100 Q105,225 240,210" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="145" y1="185" x2="185" y2="145" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="185" y1="175" x2="185" y2="145" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="185" y1="175" x2="220" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
     };
     return svgs[key] || svgs.rifle;
 }
@@ -575,6 +598,8 @@ export const EQUIPMENT_LIST = [
     { key: 'at_missile_launcher', name: 'AT Missile Lnchr' },
     { key: 'sensor', name: 'Sensor' },
     { key: 'radar', name: 'Radar' },
+    { key: 'tracked_radar', name: 'Tracked Radar' },
+    { key: 'wheeled_radar', name: 'Wheeled Radar' },
     // Row 4: Vehicles
     { key: 'afv', name: 'AFV' },
     { key: 'apc', name: 'APC' },
