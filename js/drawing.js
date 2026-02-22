@@ -188,6 +188,8 @@ subscribe(['lineColor', 'fillColor', 'fillOpacity', 'symbolStrokeWidth'], update
 
 export function activateShape(key) {
     if (!get('ready')) return;
+    exitTextPlacement();
+    exitSymbolPlacement();
     const draw = get('draw');
 
     if (key === 'triangle') {
@@ -241,6 +243,7 @@ export function exitSymbolPlacement() {
 
 function showSymbolTextDialog(latLng) {
     const dialog = document.getElementById('symbol-text-dialog');
+    if (dialog.classList.contains('visible')) return; // Prevent re-entrant calls
     dialog.classList.add('visible');
     document.getElementById('symbol-left-text').value = '';
     document.getElementById('symbol-right-text').value = '';
@@ -348,6 +351,7 @@ function placeTriangleMarker(latLng) {
 // ===== Text Placement =====
 
 export function enterTextPlacement() {
+    exitTextPlacement(); // Clean up any existing listener first
     if (get('ready')) get('draw').setMode('select');
     set('textPlacementMode', true);
     showToast('Click on map to place text');
@@ -367,7 +371,10 @@ export function exitTextPlacement() {
 }
 
 function showTextInputDialog(latLng) {
+    // Prevent re-entrant calls — if dialog already visible, ignore
     const dialog = document.getElementById('text-input-dialog');
+    if (dialog.classList.contains('visible')) return;
+
     dialog.classList.add('visible');
     const input = document.getElementById('text-label-input');
     input.value = '';
