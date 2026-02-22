@@ -6,7 +6,8 @@
 
 import { get, set, subscribe, COLORS } from './state.js';
 import {
-    equipmentSVG, unitSVG, enemyUnitSVG, EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST,
+    equipmentSVG, unitSVG, enemyUnitSVG, tacticalTaskSVG,
+    EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
     SHAPE_LIST, LINE_TYPES, getLinePreviewSVG
 } from './symbols.js';
 import {
@@ -34,6 +35,7 @@ export function setupToolbar() {
     buildEquipmentSubmenu();
     buildUnitsSubmenu();
     buildEnemyUnitsSubmenu();
+    buildTacticalTasksSubmenu();
     buildColorSubmenu();
     buildTextSubmenu();
     buildMapSubmenu();
@@ -76,6 +78,13 @@ export function setupToolbar() {
         exitTextPlacement();
         exitMeasureMode();
         toggleSubmenu('submenu-enemy-units', 'btn-enemy-units');
+    });
+
+    document.getElementById('btn-tactical-tasks').addEventListener('click', function (e) {
+        e.stopPropagation();
+        exitTextPlacement();
+        exitMeasureMode();
+        toggleSubmenu('submenu-tactical-tasks', 'btn-tactical-tasks');
     });
 
     document.getElementById('btn-text').addEventListener('click', function (e) {
@@ -127,6 +136,7 @@ function positionSubmenus() {
         'btn-equipment': 'submenu-equipment',
         'btn-units': 'submenu-units',
         'btn-enemy-units': 'submenu-enemy-units',
+        'btn-tactical-tasks': 'submenu-tactical-tasks',
         'btn-text': 'submenu-text',
         'btn-map': 'submenu-map',
     };
@@ -159,7 +169,7 @@ function closeAllSubmenus() {
 
 export function setActiveTool(tool) {
     document.querySelectorAll('.toolbar-btn').forEach(function (btn) { btn.classList.remove('active'); });
-    const btnMap = { select: 'btn-select', shapes: 'btn-shapes', equipment: 'btn-equipment', units: 'btn-units', 'enemy-units': 'btn-enemy-units', text: 'btn-text', measure: 'btn-measure' };
+    const btnMap = { select: 'btn-select', shapes: 'btn-shapes', equipment: 'btn-equipment', units: 'btn-units', 'enemy-units': 'btn-enemy-units', 'tactical-tasks': 'btn-tactical-tasks', text: 'btn-text', measure: 'btn-measure' };
     if (btnMap[tool]) document.getElementById(btnMap[tool]).classList.add('active');
     set('currentMode', tool);
 }
@@ -334,6 +344,39 @@ function buildEnemyUnitsSubmenu() {
         grid.querySelectorAll('.submenu-item[data-enemy-unit-key]').forEach(function (item) {
             const key = item.dataset.enemyUnitKey;
             item.querySelector('div').innerHTML = enemyUnitSVG(key, color, sw);
+        });
+    });
+}
+
+// ===== Tactical Tasks Sub-menu =====
+
+function buildTacticalTasksSubmenu() {
+    const grid = document.getElementById('tactical-tasks-grid');
+    TACTICAL_TASK_LIST.forEach(function (task) {
+        const item = document.createElement('div');
+        item.className = 'submenu-item';
+        item.dataset.taskKey = task.key;
+        const iconDiv = document.createElement('div');
+        iconDiv.style.cssText = 'width:28px;height:28px;';
+        iconDiv.innerHTML = tacticalTaskSVG(task.key, get('lineColor'), get('symbolStrokeWidth'));
+        item.appendChild(iconDiv);
+        const label = document.createElement('span');
+        label.textContent = task.name;
+        item.appendChild(label);
+        item.addEventListener('click', function () {
+            enterSymbolPlacement('tactical_task', task.key);
+            closeAllSubmenus();
+        });
+        grid.appendChild(item);
+    });
+
+    // Update icons when line color or stroke width changes
+    subscribe(['lineColor', 'symbolStrokeWidth'], function () {
+        const color = get('lineColor');
+        const sw = get('symbolStrokeWidth');
+        grid.querySelectorAll('.submenu-item[data-task-key]').forEach(function (item) {
+            const key = item.dataset.taskKey;
+            item.querySelector('div').innerHTML = tacticalTaskSVG(key, color, sw);
         });
     });
 }

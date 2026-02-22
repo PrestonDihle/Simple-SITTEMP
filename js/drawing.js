@@ -7,7 +7,8 @@
 
 import { get, set, subscribe, MAX_UNDO_STATES } from './state.js';
 import {
-    equipmentSVG, unitSVG, enemyUnitSVG, EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST,
+    equipmentSVG, unitSVG, enemyUnitSVG, tacticalTaskSVG,
+    EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
     buildSymbolWithLabels, escapeXml
 } from './symbols.js';
 import { showToast } from './toolbar.js';
@@ -218,6 +219,8 @@ export function enterSymbolPlacement(type, key) {
         found = EQUIPMENT_LIST.find(function (e) { return e.key === key; });
     } else if (type === 'enemy_unit') {
         found = ENEMY_UNIT_LIST.find(function (u) { return u.key === key; });
+    } else if (type === 'tactical_task') {
+        found = TACTICAL_TASK_LIST.find(function (t) { return t.key === key; });
     } else {
         found = UNIT_LIST.find(function (u) { return u.key === key; });
     }
@@ -281,6 +284,8 @@ function placeSymbol(latLng, leftText, rightText, echelon) {
         svgString = equipmentSVG(key, color, strokeWidth);
     } else if (type === 'enemy_unit') {
         svgString = enemyUnitSVG(key, color, strokeWidth);
+    } else if (type === 'tactical_task') {
+        svgString = tacticalTaskSVG(key, color, strokeWidth);
     } else {
         svgString = unitSVG(key, color, strokeWidth);
     }
@@ -492,7 +497,7 @@ function createMapMarker(latLng, svgString, size, anchor, sittempData) {
             set('fontStrikethrough', info.fontStrikethrough !== undefined ? info.fontStrikethrough : false);
         }
 
-        if (marker._sittemp && (marker._sittemp.type === 'equipment' || marker._sittemp.type === 'unit' || marker._sittemp.type === 'enemy_unit')) {
+        if (marker._sittemp && (marker._sittemp.type === 'equipment' || marker._sittemp.type === 'unit' || marker._sittemp.type === 'enemy_unit' || marker._sittemp.type === 'tactical_task')) {
             showToast('Selected. R / Shift+R to rotate.');
         } else {
             showToast('Selected. Press Clear Selected to delete.');
@@ -572,6 +577,8 @@ export function rotateSelectedMarker(degrees) {
         svgBase = equipmentSVG(info.key, info.color, sw);
     } else if (info.type === 'enemy_unit') {
         svgBase = enemyUnitSVG(info.key, info.color, sw);
+    } else if (info.type === 'tactical_task') {
+        svgBase = tacticalTaskSVG(info.key, info.color, sw);
     } else {
         svgBase = unitSVG(info.key, info.color, sw);
     }
@@ -745,6 +752,15 @@ function recreateMarker(data) {
         const echelonH = (ech !== 'none') ? 14 : 0;
         const h = 50 + echelonH;
         svgString = buildSymbolWithLabels(enemyUnitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot, ech);
+        size = new google.maps.Size(150 * scale, h * scale);
+        anchor = new google.maps.Point(75 * scale, (h / 2) * scale);
+    } else if (info.type === 'tactical_task') {
+        const sw = info.strokeWidth || 2;
+        const rot = info.rotation || 0;
+        const ech = info.echelon || 'none';
+        const echelonH = (ech !== 'none') ? 14 : 0;
+        const h = 50 + echelonH;
+        svgString = buildSymbolWithLabels(tacticalTaskSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot, ech);
         size = new google.maps.Size(150 * scale, h * scale);
         anchor = new google.maps.Point(75 * scale, (h / 2) * scale);
     } else if (info.type === 'star') {

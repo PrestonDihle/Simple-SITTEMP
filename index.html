@@ -75,6 +75,13 @@
                     <line x1="7" y1="8" x2="17" y2="16"/>
                 </svg>
             </button>
+            <button class="toolbar-btn" id="btn-tactical-tasks" data-tooltip="Tactical Tasks" aria-label="Tactical mission tasks">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="2" y1="12" x2="18" y2="12"/>
+                    <polygon points="18,12 14,8 14,16" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+                    <line x1="20" y1="6" x2="20" y2="18"/>
+                </svg>
+            </button>
             <button class="toolbar-btn" id="btn-text" data-tooltip="Text" aria-label="Place text label">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M5 7V5h14v2"/>
@@ -152,6 +159,12 @@
         <div class="submenu" id="submenu-enemy-units">
             <h3>Enemy Units</h3>
             <div class="submenu-grid" id="enemy-units-grid"></div>
+        </div>
+
+        <!-- Tactical Tasks Sub-menu -->
+        <div class="submenu" id="submenu-tactical-tasks">
+            <h3>Tactical Tasks</h3>
+            <div class="submenu-grid" id="tactical-tasks-grid"></div>
         </div>
 
         <!-- Style Panel (Right Side) — combined Line Types + Color -->

@@ -575,6 +575,51 @@ export function enemyUnitSVG(key, color, strokeWidth) {
     return svgs[key] || svgs.infantry;
 }
 
+// ===== Tactical Task Symbol SVGs =====
+// NATO APP-6 tactical mission task graphics
+// All symbols use a 350x350 viewBox with parameterized color and stroke width
+export function tacticalTaskSVG(key, color, strokeWidth) {
+    color = color || '#000000';
+    strokeWidth = strokeWidth || 2;
+    const sw = strokeWidth * (350 / 40);
+    const c = color;
+    const svgs = {
+        // Delay — arrow pointing right with inverted V at tip and vertical bar
+        delay: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="25" y1="175" x2="225" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="225,175 175,125 175,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="260" y1="75" x2="260" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="260" y1="75" x2="310" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="260" y1="275" x2="310" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Retire — arrow pointing left
+        retire: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="325" y1="175" x2="75" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="75,175 125,125 125,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+</svg>`,
+        // Withdraw — arrow pointing left with zigzag through shaft
+        withdraw: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="325" y1="175" x2="75" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="75,175 125,125 125,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="200" y1="75" x2="250" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="250" y1="175" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Contain — arc with inward-pointing arrowheads at both ends
+        contain: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <path d="M100,50 Q325,175 100,300" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="100,50 140,70 120,90" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <polygon points="100,300 120,260 140,280" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+</svg>`,
+        // Seize — right-pointing arrow with S on shaft
+        seize: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <text x="125" y="165" font-family="Arial,sans-serif" font-size="100" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
+</svg>`,
+    };
+    return svgs[key] || svgs.delay;
+}
+
 // ===== Definition Lists =====
 
 export const EQUIPMENT_LIST = [
@@ -658,6 +703,14 @@ export const ENEMY_UNIT_LIST = [
     { key: 'cbrn', name: 'CBRN' },
     { key: 'medical', name: 'Medical' },
     { key: 'anti_tank', name: 'Anti-Tank' },
+];
+
+export const TACTICAL_TASK_LIST = [
+    { key: 'delay', name: 'Delay' },
+    { key: 'retire', name: 'Retire' },
+    { key: 'withdraw', name: 'Withdraw' },
+    { key: 'contain', name: 'Contain' },
+    { key: 'seize', name: 'Seize' },
 ];
 
 export const SHAPE_LIST = [
