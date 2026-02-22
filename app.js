@@ -26,9 +26,24 @@ function initApp() {
         document.getElementById('classification-modal').style.display = 'none';
     });
 
-    // Load Google Maps directly with the supplied API key
-    const API_KEY = 'AIzaSyBmRTGBlVJF5GVbYqra1nRicPEjJBXWKKY';
-    loadGoogleMaps(API_KEY);
+    // Check for API key
+    const storedKey = localStorage.getItem('sittemp_gmaps_key');
+    if (storedKey) {
+        loadGoogleMaps(storedKey);
+    } else {
+        document.getElementById('api-key-dialog').style.display = 'flex';
+        document.getElementById('api-key-submit').addEventListener('click', function () {
+            const key = document.getElementById('api-key-input').value.trim();
+            if (key) {
+                localStorage.setItem('sittemp_gmaps_key', key);
+                document.getElementById('api-key-dialog').style.display = 'none';
+                loadGoogleMaps(key);
+            }
+        });
+        document.getElementById('api-key-input').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') document.getElementById('api-key-submit').click();
+        });
+    }
 }
 
 // ===== Google Maps Loading =====
