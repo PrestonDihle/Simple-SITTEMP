@@ -324,15 +324,13 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Wheeled Radar — radar dish on wheeled vehicle chassis
         wheeled_radar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <circle cx="100" cy="325" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <circle cx="250" cy="325" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="100" y1="300" x2="100" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="250" y1="300" x2="250" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="100" y1="50" x2="250" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M125,100 Q105,225 240,210" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="145" y1="185" x2="185" y2="145" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="185" y1="175" x2="185" y2="145" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="185" y1="175" x2="220" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <circle cx="75" cy="300" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="175" cy="300" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <circle cx="275" cy="300" r="25" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <path d="M50,25 Q0,300 275,250" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="200" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="175" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="175" x2="250" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
     };
     return svgs[key] || svgs.rifle;
