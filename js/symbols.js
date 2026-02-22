@@ -595,18 +595,20 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
   <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
   <text x="125" y="165" font-family="Arial,sans-serif" font-size="100" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
 </svg>`,
-        // Fix — arrow pointing right with short vertical bar at tip
+        // Fix — arrow with F on shaft and vertical bar at tip
         fix: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
   <line x1="300" y1="75" x2="300" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <text x="110" y="165" font-family="Arial,sans-serif" font-size="90" font-weight="bold" fill="${c}" text-anchor="middle">F</text>
 </svg>`,
-        // Disrupt — arrow pointing right with Z-cut through shaft
+        // Disrupt — arrow with D on shaft and Z-cut through shaft
         disrupt: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <line x1="125" y1="75" x2="175" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="175" y1="175" x2="125" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="75" x2="225" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="175" x2="175" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <text x="90" y="165" font-family="Arial,sans-serif" font-size="90" font-weight="bold" fill="${c}" text-anchor="middle">D</text>
 </svg>`,
         // Block — arrow pointing right meeting a T-bar (blocked)
         block: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -673,6 +675,28 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
   <polygon points="250,75 210,65 220,105" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
   <line x1="75" y1="175" x2="250" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <polygon points="250,275 220,245 210,285" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+</svg>`,
+        // Exfiltrate — arrow pointing left with zigzag cut
+        exfiltrate: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="325" y1="175" x2="75" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="75,175 125,125 125,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="200" y1="75" x2="250" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="250" y1="175" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <text x="275" y="165" font-family="Arial,sans-serif" font-size="70" font-weight="bold" fill="${c}" text-anchor="middle">EX</text>
+</svg>`,
+        // Follow and Assume — dashed arrow through a box with A
+        follow_and_assume: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${sw * 2.5} ${sw * 2}"/>
+  <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <rect x="75" y="125" width="100" height="100" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <text x="125" y="195" font-family="Arial,sans-serif" font-size="80" font-weight="bold" fill="${c}" text-anchor="middle">A</text>
+</svg>`,
+        // Follow and Support — dashed arrow through a box with S
+        follow_and_support: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${sw * 2.5} ${sw * 2}"/>
+  <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <rect x="75" y="125" width="100" height="100" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <text x="125" y="195" font-family="Arial,sans-serif" font-size="80" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
 </svg>`,
     };
     return svgs[key] || svgs.delay;
@@ -776,6 +800,9 @@ export const TACTICAL_TASK_LIST = [
     { key: 'control', name: 'Control' },
     { key: 'destroy', name: 'Destroy' },
     { key: 'disengage', name: 'Disengage' },
+    { key: 'exfiltrate', name: 'Exfiltrate' },
+    { key: 'follow_and_assume', name: 'Follow & Assume' },
+    { key: 'follow_and_support', name: 'Follow & Support' },
 ];
 
 export const SHAPE_LIST = [
