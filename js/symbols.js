@@ -466,6 +466,12 @@ export function unitSVG(key, color, strokeWidth) {
   <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
   <polygon points="150,100 200,100 200,150 250,150 250,200 200,200 200,250 150,250 150,200 100,200 100,150 150,150 150,100" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
 </svg>`,
+        // Anti-Tank
+        anti_tank: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <rect x="0" y="50" width="350" height="250" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="50" x2="0" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="50" x2="350" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
     };
     return svgs[key] || svgs.infantry;
 }
@@ -570,6 +576,12 @@ export function enemyUnitSVG(key, color, strokeWidth) {
   ${diamond}
   <polygon points="160,120 190,120 190,150 220,150 220,200 190,200 190,230 160,230 160,200 130,200 130,150 160,150 160,120" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
 </svg>`,
+        // Anti-Tank
+        anti_tank: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  ${diamond}
+  <line x1="175" y1="80" x2="80" y2="270" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="80" x2="270" y2="270" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
     };
     return svgs[key] || svgs.infantry;
 }
@@ -639,6 +651,7 @@ export const UNIT_LIST = [
     { key: 'ew_jamming', name: 'EW Jamming' },
     { key: 'cbrn', name: 'CBRN' },
     { key: 'medical', name: 'Medical' },
+    { key: 'anti_tank', name: 'Anti-Tank' },
 ];
 
 export const ENEMY_UNIT_LIST = [
@@ -656,6 +669,7 @@ export const ENEMY_UNIT_LIST = [
     { key: 'ew_jamming', name: 'EW Jamming' },
     { key: 'cbrn', name: 'CBRN' },
     { key: 'medical', name: 'Medical' },
+    { key: 'anti_tank', name: 'Anti-Tank' },
 ];
 
 export const SHAPE_LIST = [
