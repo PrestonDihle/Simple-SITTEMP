@@ -589,11 +589,13 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
   <polygon points="100,50 140,70 120,90" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
   <polygon points="100,300 120,260 140,280" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
 </svg>`,
-        // Seize — right-pointing arrow with S on shaft
+        // Seize — arrow with S on shaft and boxed A objective per FM 3-90
         seize: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <text x="125" y="165" font-family="Arial,sans-serif" font-size="100" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
+  <line x1="25" y1="175" x2="220" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="220,175 180,140 180,210" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <text x="100" y="165" font-family="Arial,sans-serif" font-size="85" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
+  <rect x="245" y="120" width="90" height="110" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <text x="290" y="200" font-family="Arial,sans-serif" font-size="80" font-weight="bold" fill="${c}" text-anchor="middle">A</text>
 </svg>`,
         // Fix — arrow with F on shaft and vertical bar at tip
         fix: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -698,6 +700,38 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
   <rect x="75" y="125" width="100" height="100" fill="none" stroke="${c}" stroke-width="${sw}"/>
   <text x="125" y="195" font-family="Arial,sans-serif" font-size="80" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
 </svg>`,
+        // Isolate — saw-tooth / starburst circle per FM 3-90 Fig 11-1
+        isolate: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <polygon points="175,20 190,65 220,30 225,80 265,55 255,105 300,95 278,140 325,145 290,175 325,205 278,210 300,255 255,245 265,295 225,270 220,320 190,285 175,330 160,285 130,320 125,270 85,295 95,245 50,255 72,210 25,205 60,175 25,145 72,140 50,95 95,105 85,55 125,80 130,30 160,65" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linejoin="miter"/>
+</svg>`,
+        // Neutralize — arrow with N on shaft and diagonal Z-slash per FM 3-90
+        neutralize: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="185" y1="75" x2="225" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="175" x2="185" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <text x="95" y="165" font-family="Arial,sans-serif" font-size="90" font-weight="bold" fill="${c}" text-anchor="middle">N</text>
+</svg>`,
+        // Occupy — circle with vertical tick at top per FM 3-90
+        occupy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <circle cx="175" cy="200" r="110" fill="none" stroke="${c}" stroke-width="${sw}"/>
+  <line x1="175" y1="90" x2="175" y2="30" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+</svg>`,
+        // Retain — two inward arrows into vertical bars with R per FM 3-90
+        retain: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <line x1="15" y1="175" x2="115" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="115,175 90,150 90,200" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="335" y1="175" x2="235" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <polygon points="235,175 260,150 260,200" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
+  <line x1="120" y1="70" x2="120" y2="280" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="230" y1="70" x2="230" y2="280" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <text x="175" y="200" font-family="Arial,sans-serif" font-size="100" font-weight="bold" fill="${c}" text-anchor="middle">R</text>
+</svg>`,
+        // Secure — arc bow opening right with S per FM 3-90
+        secure: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
+  <path d="M230,40 Q40,175 230,310" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <text x="200" y="200" font-family="Arial,sans-serif" font-size="100" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
+</svg>`,
     };
     return svgs[key] || svgs.delay;
 }
@@ -791,6 +825,11 @@ export const TACTICAL_TASK_LIST = [
     { key: 'retire', name: 'Retire' },
     { key: 'withdraw', name: 'Withdraw' },
     { key: 'contain', name: 'Contain' },
+    { key: 'isolate', name: 'Isolate' },
+    { key: 'neutralize', name: 'Neutralize' },
+    { key: 'occupy', name: 'Occupy' },
+    { key: 'retain', name: 'Retain' },
+    { key: 'secure', name: 'Secure' },
     { key: 'seize', name: 'Seize' },
     { key: 'attack_by_fire', name: 'ABF' },
     { key: 'breach', name: 'Breach' },

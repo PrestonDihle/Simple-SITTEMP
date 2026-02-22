@@ -123,6 +123,19 @@ export function setupToolbar() {
         document.getElementById('export-dialog').classList.add('visible');
     });
 
+    document.getElementById('btn-help').addEventListener('click', function () {
+        closeAllSubmenus();
+        document.getElementById('help-dialog').classList.add('visible');
+    });
+
+    document.getElementById('help-close').addEventListener('click', function () {
+        document.getElementById('help-dialog').classList.remove('visible');
+    });
+
+    document.getElementById('help-dialog').addEventListener('click', function (e) {
+        if (e.target === this) this.classList.remove('visible');
+    });
+
     document.getElementById('map').addEventListener('click', function () { closeAllSubmenus(); });
 
     positionSubmenus();

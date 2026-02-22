@@ -133,6 +133,14 @@
                     <path d="M12 15V3"/>
                 </svg>
             </button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" id="btn-help" data-tooltip="Help" aria-label="Help">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+            </button>
         </div>
 
         <!-- Shapes Sub-menu -->
@@ -373,6 +381,61 @@
                 <button class="dialog-close" id="text-cancel">Cancel</button>
                 <button class="btn-ok" id="text-ok" style="background:#4a7;color:#fff;">Place</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ===== Help Dialog ===== -->
+    <div id="help-dialog">
+        <div class="dialog-content">
+            <h3>Simple SITTEMP Help</h3>
+            <div class="help-body">
+                <section>
+                    <h4>Overview</h4>
+                    <p>Simple SITTEMP is a situational template tool for building military overlays on a Google Maps base. Place NATO APP-6 unit and equipment symbols, draw shapes and tactical graphics, and export your work.</p>
+                </section>
+                <section>
+                    <h4>Toolbar</h4>
+                    <ul>
+                        <li><strong>Select</strong> &mdash; Click to select, drag to move placed items.</li>
+                        <li><strong>Shapes</strong> &mdash; Draw circles, rectangles, polygons, lines, freehand, and stars.</li>
+                        <li><strong>Equipment</strong> &mdash; Place NATO equipment modifier icons (rifles, mortars, vehicles, etc.).</li>
+                        <li><strong>Units</strong> &mdash; Place friendly unit symbols with echelon and labels.</li>
+                        <li><strong>Enemy Units</strong> &mdash; Place enemy (diamond-framed) unit symbols.</li>
+                        <li><strong>Tactical Tasks</strong> &mdash; Place FM 3-90 tactical mission task graphics (block, seize, isolate, etc.).</li>
+                        <li><strong>Text</strong> &mdash; Place text labels on the map with font styling options.</li>
+                        <li><strong>Map Type</strong> &mdash; Switch between terrain and satellite; toggle roads, labels, and city-only overlays.</li>
+                        <li><strong>Measure</strong> &mdash; Click two points to measure distance.</li>
+                        <li><strong>Export</strong> &mdash; Save your overlay as KML, PDF, or PNG screenshot.</li>
+                    </ul>
+                </section>
+                <section>
+                    <h4>Style Panel (Right Side)</h4>
+                    <p>Change line types (solid, dashed, FLOT, wire, mines, etc.), line and fill colors, opacity, stroke width, and symbol scale for selected or newly placed items.</p>
+                </section>
+                <section>
+                    <h4>Keyboard Shortcuts</h4>
+                    <table class="help-shortcuts">
+                        <tr><td><kbd>R</kbd></td><td>Rotate selected symbol clockwise 15&deg;</td></tr>
+                        <tr><td><kbd>Shift</kbd>+<kbd>R</kbd></td><td>Rotate selected symbol counter-clockwise 15&deg;</td></tr>
+                        <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Undo</td></tr>
+                        <tr><td><kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>Redo</td></tr>
+                        <tr><td><kbd>Delete</kbd></td><td>Clear selected item</td></tr>
+                    </table>
+                </section>
+                <section>
+                    <h4>MGRS Grid</h4>
+                    <p>Toggle the MGRS grid overlay with the Grid button (top-left). Adjust grid color and weight. Right-click the map to copy MGRS coordinates.</p>
+                </section>
+                <section>
+                    <h4>Tips</h4>
+                    <ul>
+                        <li>When placing a unit or equipment symbol you will be prompted for left/right labels and echelon.</li>
+                        <li>Use the Scale slider to resize symbols after placement.</li>
+                        <li>Coordinates (Lat/Lon and MGRS) are shown in the top-right corner as you move the cursor.</li>
+                    </ul>
+                </section>
+            </div>
+            <button class="dialog-close" id="help-close">Close</button>
         </div>
     </div>
 
