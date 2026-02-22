@@ -242,15 +242,6 @@ export function equipmentSVG(key, color, strokeWidth) {
   <line x1="250" y1="50" x2="250" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="250" y1="300" x2="300" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Bridge (Horizontal)
-        bridge_h: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="50" y1="100" x2="0" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="50" y1="100" x2="300" y2="100" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="300" y1="100" x2="350" y2="50" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="50" y1="250" x2="0" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="50" y1="250" x2="300" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="300" y1="250" x2="350" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-</svg>`,
         // Observation Post
         observation_post: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <line x1="175" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
@@ -313,14 +304,14 @@ export function equipmentSVG(key, color, strokeWidth) {
 </svg>`,
         // Tracked Radar — radar dish on tracked vehicle chassis
         tracked_radar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="75" y1="0" x2="75" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="275" y1="0" x2="275" y2="350" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="275" y1="75" x2="75" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="75" y1="275" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M115,110 Q90,275 255,250" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="145" y1="210" x2="195" y2="160" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="195" y1="195" x2="195" y2="160" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="195" y1="195" x2="235" y2="140" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M50,25 Q0,300 275,250" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="75" y1="200" x2="150" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="150" y1="150" x2="175" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="175" y1="175" x2="250" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M75,275 Q25,300 75,325" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <path d="M225,275 Q275,300 225,325" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="275" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <line x1="225" y1="325" x2="75" y2="325" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
         // Wheeled Radar — radar dish on wheeled vehicle chassis
         wheeled_radar: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -620,8 +611,7 @@ export const EQUIPMENT_LIST = [
     // Row 5: Special
     { key: 'autonomous_robot', name: 'Auton Robot' },
     { key: 'isolated_person', name: 'Isolated Person' },
-    { key: 'bridge_v', name: 'Bridge (V)' },
-    { key: 'bridge_h', name: 'Bridge (H)' },
+    { key: 'bridge_v', name: 'Bridge' },
     { key: 'observation_post', name: 'Obs Post' },
     { key: 'recon_op', name: 'Recon OP' },
     // Row 6: Observation Posts
