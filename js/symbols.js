@@ -571,13 +571,12 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
   <line x1="260" y1="75" x2="310" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="260" y1="275" x2="310" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Seize — arrow with S on shaft and boxed A objective per FM 3-90
+        // Seize — arrow with S on shaft pointing into a circle objective per FM 3-90
         seize: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <line x1="25" y1="175" x2="220" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <polygon points="220,175 180,140 180,210" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
   <text x="100" y="165" font-family="Arial,sans-serif" font-size="85" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
-  <rect x="245" y="120" width="90" height="110" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <text x="290" y="200" font-family="Arial,sans-serif" font-size="80" font-weight="bold" fill="${c}" text-anchor="middle">A</text>
+  <circle cx="280" cy="175" r="60" fill="none" stroke="${c}" stroke-width="${sw}"/>
 </svg>`,
         // Fix — arrow with F on shaft and vertical bar at tip
         fix: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
