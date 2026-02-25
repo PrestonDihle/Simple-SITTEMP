@@ -571,24 +571,6 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
   <line x1="260" y1="75" x2="310" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="260" y1="275" x2="310" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Retire — arrow pointing left
-        retire: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="325" y1="175" x2="75" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="75,175 125,125 125,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-</svg>`,
-        // Withdraw — arrow pointing left with zigzag through shaft
-        withdraw: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="325" y1="175" x2="75" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="75,175 125,125 125,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <line x1="200" y1="75" x2="250" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="250" y1="175" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-</svg>`,
-        // Contain — arc with inward-pointing arrowheads at both ends
-        contain: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M100,50 Q325,175 100,300" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="100,50 140,70 120,90" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <polygon points="100,300 120,260 140,280" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-</svg>`,
         // Seize — arrow with S on shaft and boxed A objective per FM 3-90
         seize: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <line x1="25" y1="175" x2="220" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
@@ -633,20 +615,6 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
   <line x1="175" y1="50" x2="175" y2="125" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="175" y1="225" x2="175" y2="300" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Bypass — arrow curving around an obstacle
-        bypass: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="25" y1="175" x2="100" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M100,175 Q175,25 250,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <circle cx="175" cy="225" r="30" fill="none" stroke="${c}" stroke-width="${sw}"/>
-</svg>`,
-        // Canalize — arrow with converging lines funneling the shaft
-        canalize: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <line x1="50" y1="75" x2="175" y2="150" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="50" y1="275" x2="175" y2="200" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-</svg>`,
         // Clear — arrow with diagonal sweep lines
         clear: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
@@ -655,36 +623,12 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
   <line x1="150" y1="100" x2="200" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="50" y1="100" x2="100" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
 </svg>`,
-        // Control — arrow with a flat bar at the tip
-        control: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="25" y1="175" x2="250" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="250,175 200,125 200,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <line x1="275" y1="75" x2="275" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="275" y1="75" x2="325" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="275" y1="175" x2="325" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="275" y1="275" x2="325" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-</svg>`,
         // Destroy — X overlaid on an arrow
         destroy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <line x1="25" y1="175" x2="275" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <polygon points="275,175 225,125 225,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
   <line x1="75" y1="75" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <line x1="200" y1="75" x2="75" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-</svg>`,
-        // Disengage — two arrows diverging apart
-        disengage: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="75" y1="175" x2="250" y2="75" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="250,75 210,65 220,105" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <line x1="75" y1="175" x2="250" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="250,275 220,245 210,285" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-</svg>`,
-        // Exfiltrate — arrow pointing left with zigzag cut
-        exfiltrate: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="325" y1="175" x2="75" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="75,175 125,125 125,225" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <line x1="200" y1="75" x2="250" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="250" y1="175" x2="200" y2="275" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <text x="275" y="165" font-family="Arial,sans-serif" font-size="70" font-weight="bold" fill="${c}" text-anchor="middle">EX</text>
 </svg>`,
         // Follow and Assume — dashed arrow through a box with A
         follow_and_assume: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -716,16 +660,6 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
         occupy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <circle cx="175" cy="200" r="110" fill="none" stroke="${c}" stroke-width="${sw}"/>
   <line x1="175" y1="90" x2="175" y2="30" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-</svg>`,
-        // Retain — two inward arrows into vertical bars with R per FM 3-90
-        retain: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="15" y1="175" x2="115" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="115,175 90,150 90,200" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <line x1="335" y1="175" x2="235" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="235,175 260,150 260,200" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <line x1="120" y1="70" x2="120" y2="280" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="230" y1="70" x2="230" y2="280" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <text x="175" y="200" font-family="Arial,sans-serif" font-size="100" font-weight="bold" fill="${c}" text-anchor="middle">R</text>
 </svg>`,
         // Secure — arc bow opening right with S per FM 3-90
         secure: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
@@ -822,24 +756,15 @@ export const TACTICAL_TASK_LIST = [
     { key: 'disrupt', name: 'Disrupt' },
     { key: 'block', name: 'Block' },
     { key: 'delay', name: 'Delay' },
-    { key: 'retire', name: 'Retire' },
-    { key: 'withdraw', name: 'Withdraw' },
-    { key: 'contain', name: 'Contain' },
     { key: 'isolate', name: 'Isolate' },
     { key: 'neutralize', name: 'Neutralize' },
     { key: 'occupy', name: 'Occupy' },
-    { key: 'retain', name: 'Retain' },
     { key: 'secure', name: 'Secure' },
     { key: 'seize', name: 'Seize' },
     { key: 'attack_by_fire', name: 'ABF' },
     { key: 'breach', name: 'Breach' },
-    { key: 'bypass', name: 'Bypass' },
-    { key: 'canalize', name: 'Canalize' },
     { key: 'clear', name: 'Clear' },
-    { key: 'control', name: 'Control' },
     { key: 'destroy', name: 'Destroy' },
-    { key: 'disengage', name: 'Disengage' },
-    { key: 'exfiltrate', name: 'Exfiltrate' },
     { key: 'follow_and_assume', name: 'Follow & Assume' },
     { key: 'follow_and_support', name: 'Follow & Support' },
 ];
