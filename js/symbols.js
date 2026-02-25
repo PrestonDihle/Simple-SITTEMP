@@ -659,6 +659,7 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
         occupy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
   <circle cx="175" cy="200" r="110" fill="none" stroke="${c}" stroke-width="${sw}"/>
   <line x1="175" y1="90" x2="175" y2="30" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
+  <text x="175" y="230" font-family="Arial,sans-serif" font-size="120" font-weight="bold" fill="${c}" text-anchor="middle">O</text>
 </svg>`,
         // Secure — arc bow opening right with S per FM 3-90
         secure: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
