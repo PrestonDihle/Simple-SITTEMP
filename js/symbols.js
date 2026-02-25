@@ -661,11 +661,14 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
   <line x1="175" y1="90" x2="175" y2="30" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
   <text x="175" y="230" font-family="Arial,sans-serif" font-size="120" font-weight="bold" fill="${c}" text-anchor="middle">O</text>
 </svg>`,
-        // Secure — circle with vertical tick and S per FM 3-90
+        // Secure — open circular arc with arrowhead and S per FM 3-90
         secure: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <circle cx="175" cy="200" r="110" fill="none" stroke="${c}" stroke-width="${sw}"/>
-  <line x1="175" y1="90" x2="175" y2="30" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <text x="175" y="230" font-family="Arial,sans-serif" font-size="120" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
+  <g fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 96,105 A 126,126 0 0,1 266,122"/>
+    <path d="M 266,253 A 126,126 0 0,1 61,259"/>
+    <path d="M 61,259 l -26,-9 m 26,9 l 17,-31"/>
+  </g>
+  <text x="266" y="210" font-family="Arial,sans-serif" font-size="77" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
 </svg>`,
     };
     return svgs[key] || svgs.delay;
