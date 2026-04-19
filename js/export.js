@@ -126,7 +126,7 @@ function featureToKML(feature, index) {
 
 // Elements to hide during export (everything except map + classification banner)
 const EXPORT_HIDE_IDS = [
-    'toolbar', 'style-panel', 'mgrs-controls', 'coord-display', 'banner-ad',
+    'toolbar', 'style-panel', 'mgrs-controls', 'coord-display',
     'submenu-shapes', 'submenu-equipment', 'submenu-units', 'submenu-enemy-units', 'submenu-tactical-tasks', 'submenu-text', 'submenu-map'
 ];
 

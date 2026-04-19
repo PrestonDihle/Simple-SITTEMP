@@ -26,24 +26,7 @@ function initApp() {
         document.getElementById('classification-modal').style.display = 'none';
     });
 
-    // Check for API key
-    const storedKey = localStorage.getItem('sittemp_gmaps_key');
-    if (storedKey) {
-        loadGoogleMaps(storedKey);
-    } else {
-        document.getElementById('api-key-dialog').style.display = 'flex';
-        document.getElementById('api-key-submit').addEventListener('click', function () {
-            const key = document.getElementById('api-key-input').value.trim();
-            if (key) {
-                localStorage.setItem('sittemp_gmaps_key', key);
-                document.getElementById('api-key-dialog').style.display = 'none';
-                loadGoogleMaps(key);
-            }
-        });
-        document.getElementById('api-key-input').addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') document.getElementById('api-key-submit').click();
-        });
-    }
+    loadGoogleMaps('AIzaSyC3HTaEVwiNyPUcFCs2IkJMFLMFLnOrHEY');
 }
 
 // ===== Google Maps Loading =====
