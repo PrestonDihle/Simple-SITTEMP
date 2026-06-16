@@ -21,13 +21,29 @@ cannot resolve from the code itself.
   Co-Authored-By: Claude <noreply@anthropic.com>
   ```
   Run the push after each commit (`git push origin main`). Do not use `--no-verify`.
-- **Verification (the app can't be fully run here — no Google Maps API key/browser):**
-  After editing JS, run `node --check <file>` on every `.js` file you touched to catch
-  syntax errors. Do a careful self-review of each change against the acceptance
-  criteria. Do not claim a behavior works that you could not verify; if you could only
-  static-check it, say so in your final summary.
+- **Verification (you cannot fully run the app here — no browser environment):**
+  The Google Maps API key is now hardcoded in `app.js`, so the map would load in a real
+  browser, but you still have no browser to run or click through the app. After editing
+  JS, run `node --check <file>` on every `.js` file you touched to catch syntax errors.
+  Do a careful self-review of each change against the acceptance criteria. Do not claim a
+  behavior works that you could not verify; if you could only static-check it, say so in
+  your final summary.
 - Match the existing code style (the codebase mixes `function`/`var` in older spots and
   `const`/arrow functions elsewhere — follow the conventions of the file you're editing).
+
+## Recent repo change (context — don't redo it)
+
+A merged PR ("Hardcode API key and remove advertisement banner") already changed the live
+code, so the code differs from what older docs describe:
+- The API-key dialog + `localStorage` flow is **gone**. `app.js` now calls
+  `loadGoogleMaps(...)` with a **hardcoded key**, and the `#api-key-dialog` markup was
+  removed from `index.html`. Do not reintroduce the key prompt.
+- The ad banner is **gone**: `#banner-ad` was removed from `index.html`, its styles removed
+  from `style.css`, and the screenshot-export ad-hiding reference in `js/export.js` adjusted.
+- **`README.md` and `AI.md` are stale on both points** (they still mention the localStorage
+  API-key prompt and the ad-banner / monetization placeholders). None of the 7 tasks below
+  touch the API key or ads — just don't be confused by those stale docs, and fix them in the
+  final docs step.
 
 ## Architecture facts you must know
 
@@ -210,11 +226,13 @@ without overlapping or gapping.
 ---
 
 ## Final steps (do these after the 7 commits)
-1. **Update `AI.md`** to reflect reality: that post-creation live editing, the click
-   popover, the selection highlight, the No-Fill option, bottom-aligned labels, the MGRS
-   go-to box, and the toolbar shift now exist — and remove/correct the stale Phase 7/8
-   claims about features that didn't actually exist before this work. Commit + push this as
-   a final commit.
+1. **Update `AI.md` and `README.md`** to reflect reality. For `AI.md`: document that
+   post-creation live editing, the click popover, the selection highlight, the No-Fill
+   option, bottom-aligned labels, the MGRS go-to box, and the toolbar shift now exist, and
+   remove/correct the stale Phase 7/8 claims about features that didn't actually exist
+   before this work. For **both** files: correct the now-stale references to the removed
+   API-key `localStorage` prompt (the key is hardcoded) and the removed ad banner /
+   monetization placeholders. Commit + push this as a final commit.
 2. **Final report:** summarize what you changed per requirement, which behaviors you
    verified vs. only static-checked (remember you cannot run the app here), and any
    follow-ups or risks (especially around undo/redo persistence of the new per-object style
