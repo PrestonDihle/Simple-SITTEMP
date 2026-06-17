@@ -835,13 +835,248 @@ function _typeLabel(type) {
     return labels[type] || type || 'Object';
 }
 
-// ===== Popover Stubs (implemented in Req 4) =====
+// ===== Object Popover (Req 4) =====
 
-function _showPopoverForMarker(marker) { /* implemented in Req 4 */ }
-function _showPopoverForFeature(featureId) { /* implemented in Req 4 */ }
+var _overlayView = null;
+var _overlayProjection = null;
+var _popoverMapClickListener = null;
+var _popoverEscHandler = null;
+
+function _ensureOverlay() {
+    if (_overlayProjection) return _overlayProjection;
+    if (!_overlayView) {
+        var map = get('map');
+        if (!map) return null;
+        _overlayView = new google.maps.OverlayView();
+        _overlayView.draw = function () {
+            if (!_overlayProjection) {
+                _overlayProjection = _overlayView.getProjection();
+            }
+        };
+        _overlayView.setMap(map);
+    }
+    return _overlayProjection;
+}
+
+function _latLngToPixel(latLng) {
+    var proj = _ensureOverlay();
+    if (proj) {
+        var px = proj.fromLatLngToContainerPixel(latLng);
+        if (px) return { x: px.x, y: px.y };
+    }
+    // Fallback: use map.getProjection() + fromLatLngToPoint math
+    var map = get('map');
+    var mproj = map.getProjection();
+    if (!mproj) return null;
+    var bounds = map.getBounds();
+    if (!bounds) return null;
+    var scale = Math.pow(2, map.getZoom());
+    var nw = mproj.fromLatLngToPoint(new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getSouthWest().lng()));
+    var pt = mproj.fromLatLngToPoint(latLng);
+    return { x: Math.floor((pt.x - nw.x) * scale), y: Math.floor((pt.y - nw.y) * scale) };
+}
+
+function _getFeatureCentroid(featureId) {
+    var draw = get('draw');
+    if (!draw) return null;
+    var features = draw.getSnapshot();
+    var feat = null;
+    for (var i = 0; i < features.length; i++) {
+        if (features[i].id === featureId) { feat = features[i]; break; }
+    }
+    if (!feat) return null;
+    var coords = feat.geometry.coordinates;
+    var geomType = feat.geometry.type;
+    if (geomType === 'Point') {
+        return new google.maps.LatLng(coords[1], coords[0]);
+    }
+    if (geomType === 'LineString') {
+        var mid = Math.floor(coords.length / 2);
+        return new google.maps.LatLng(coords[mid][1], coords[mid][0]);
+    }
+    var ring = (geomType === 'Polygon') ? coords[0] : coords;
+    if (!ring || !ring.length) return null;
+    var sumLat = 0, sumLng = 0;
+    for (var j = 0; j < ring.length; j++) { sumLng += ring[j][0]; sumLat += ring[j][1]; }
+    return new google.maps.LatLng(sumLat / ring.length, sumLng / ring.length);
+}
+
+var _POPOVER_COLORS = ['#000000', '#FF0000', '#0000FF', '#00AA00', '#FFFFFF', '#808080', '#FF8C00', '#800080'];
+
+function _buildPopoverContent(popover, type, info) {
+    popover.innerHTML = '';
+
+    var delBtn = document.createElement('button');
+    delBtn.className = 'popover-delete-btn';
+    delBtn.textContent = 'Delete';
+    delBtn.addEventListener('click', function () {
+        _hidePopover();
+        clearSelected();
+    });
+    popover.appendChild(delBtn);
+
+    var isShape = ['polygon', 'rectangle', 'circle', 'freehand', 'linestring'].indexOf(type) !== -1;
+    var hasFill = ['polygon', 'rectangle', 'circle', 'freehand'].indexOf(type) !== -1;
+    var isMarker = !isShape;
+
+    var lineColor = info.lineColor || get('lineColor');
+    var fillColor = (info.fillColor !== null && info.fillColor !== undefined) ? info.fillColor : get('fillColor');
+    var fillOpacity = (info.fillOpacity !== null && info.fillOpacity !== undefined) ? info.fillOpacity : get('fillOpacity');
+    var strokeWidth = info.strokeWidth || get('symbolStrokeWidth');
+    var symbolScale = (info.symbolScale !== null && info.symbolScale !== undefined) ? info.symbolScale : get('symbolScale');
+
+    function makeColorRow(label, propName, currentVal) {
+        var row = document.createElement('div');
+        row.className = 'popover-row';
+        var lbl = document.createElement('span');
+        lbl.className = 'popover-label';
+        lbl.textContent = label;
+        row.appendChild(lbl);
+        var swatches = document.createElement('div');
+        swatches.className = 'popover-swatches';
+
+        if (propName === 'fillColor') {
+            var noFillSw = document.createElement('div');
+            noFillSw.className = 'popover-swatch no-fill' + (currentVal === 'none' ? ' active' : '');
+            noFillSw.title = 'No Fill';
+            noFillSw.addEventListener('click', function () {
+                swatches.querySelectorAll('.popover-swatch').forEach(function (s) { s.classList.remove('active'); });
+                noFillSw.classList.add('active');
+                set('fillColor', 'none');
+                applyStyleToSelected('fillColor', 'none');
+            });
+            swatches.appendChild(noFillSw);
+        }
+
+        _POPOVER_COLORS.forEach(function (c) {
+            var sw = document.createElement('div');
+            var isActive = (currentVal !== 'none' && c === currentVal);
+            sw.className = 'popover-swatch' + (isActive ? ' active' : '');
+            sw.style.backgroundColor = c;
+            sw.addEventListener('click', function () {
+                swatches.querySelectorAll('.popover-swatch').forEach(function (s) { s.classList.remove('active'); });
+                sw.classList.add('active');
+                set(propName === 'fillColor' ? 'fillColor' : 'lineColor', c);
+                applyStyleToSelected(propName, c);
+            });
+            swatches.appendChild(sw);
+        });
+        row.appendChild(swatches);
+        return row;
+    }
+
+    function makeSliderRow(label, propName, min, max, step, currentVal, format) {
+        var row = document.createElement('div');
+        row.className = 'popover-row';
+        var lbl = document.createElement('span');
+        lbl.className = 'popover-label';
+        lbl.textContent = label;
+        row.appendChild(lbl);
+        var sl = document.createElement('input');
+        sl.type = 'range'; sl.className = 'popover-slider';
+        sl.min = min; sl.max = max; sl.step = step; sl.value = currentVal;
+        var valSpan = document.createElement('span');
+        valSpan.className = 'popover-val';
+        valSpan.textContent = format(currentVal);
+        sl.addEventListener('input', function () {
+            var v = parseFloat(sl.value);
+            valSpan.textContent = format(v);
+            applyStyleToSelected(propName, v);
+        });
+        row.appendChild(sl);
+        row.appendChild(valSpan);
+        return row;
+    }
+
+    popover.appendChild(makeColorRow('Line', 'lineColor', lineColor));
+    if (hasFill) {
+        popover.appendChild(makeColorRow('Fill', 'fillColor', fillColor));
+        popover.appendChild(makeSliderRow('Opacity', 'fillOpacity', 0, 1, 0.01, fillOpacity,
+            function (v) { return Math.round(v * 100) + '%'; }));
+    }
+    popover.appendChild(makeSliderRow('Stroke', 'strokeWidth', 1, 10, 1, strokeWidth,
+        function (v) { return Math.round(v); }));
+    if (isMarker) {
+        popover.appendChild(makeSliderRow('Scale', 'symbolScale', 0.5, 3, 0.1, symbolScale,
+            function (v) { return parseFloat(v).toFixed(1) + 'x'; }));
+    }
+}
+
+function _showPopoverAtLatLng(latLng, type, info) {
+    var popover = document.getElementById('object-popover');
+    if (!popover) return;
+    _buildPopoverContent(popover, type, info || {});
+    var px = _latLngToPixel(latLng);
+    if (px) {
+        popover.style.left = Math.round(px.x) + 'px';
+        popover.style.top = Math.round(px.y) + 'px';
+    }
+    popover.style.display = 'block';
+
+    // Close on map pan/zoom
+    var map = get('map');
+    if (!_popoverMapClickListener) {
+        _popoverMapClickListener = map.addListener('click', function () {
+            get('markers').forEach(function (m) {
+                if (m._selected) { m._selected = false; rebuildMarkerIcon(m); }
+            });
+            set('selectionInfo', null);
+            _hidePopover();
+        });
+    }
+
+    // Close on Esc key
+    if (_popoverEscHandler) {
+        document.removeEventListener('keydown', _popoverEscHandler);
+    }
+    _popoverEscHandler = function (e) {
+        if (e.key === 'Escape') {
+            document.removeEventListener('keydown', _popoverEscHandler);
+            _popoverEscHandler = null;
+            get('markers').forEach(function (m) {
+                if (m._selected) { m._selected = false; rebuildMarkerIcon(m); }
+            });
+            set('selectionInfo', null);
+            _hidePopover();
+        }
+    };
+    document.addEventListener('keydown', _popoverEscHandler);
+}
+
+function _showPopoverForMarker(marker) {
+    var info = get('selectionInfo') || {};
+    var type = (marker._sittemp && marker._sittemp.type) || 'marker';
+    _showPopoverAtLatLng(marker.getPosition(), type, info);
+}
+
+function _showPopoverForFeature(featureId) {
+    var info = get('selectionInfo') || {};
+    var centroid = _getFeatureCentroid(featureId);
+    if (!centroid) return;
+    var draw = get('draw');
+    var features = draw ? draw.getSnapshot() : [];
+    var type = 'polygon';
+    for (var i = 0; i < features.length; i++) {
+        if (features[i].id === featureId) {
+            var mode = features[i].properties && features[i].properties.mode;
+            type = mode || features[i].geometry.type.toLowerCase();
+            break;
+        }
+    }
+    _showPopoverAtLatLng(centroid, type, info);
+}
+
 function _hidePopover() {
     var popover = document.getElementById('object-popover');
     if (popover) popover.style.display = 'none';
+    if (_popoverMapClickListener) {
+        google.maps.event.removeListener(_popoverMapClickListener);
+        _popoverMapClickListener = null;
+    }
+    if (_popoverEscHandler) {
+        document.removeEventListener('keydown', _popoverEscHandler);
+        _popoverEscHandler = null;
+    }
 }
 
 // ===== Undo / Redo =====
