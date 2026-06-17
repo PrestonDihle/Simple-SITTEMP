@@ -735,6 +735,44 @@ html, body {
     font-size: 11px;
 }
 
+.mgrs-goto-row {
+    display: flex;
+    gap: 4px;
+    margin-top: 5px;
+}
+
+#mgrs-goto-input {
+    flex: 1;
+    font-family: 'SF Mono', 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+    padding: 3px 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    background: #fff;
+    color: #333;
+    min-width: 0;
+}
+
+#mgrs-goto-input:focus {
+    border-color: #4a90d9;
+}
+
+#mgrs-goto-btn {
+    padding: 3px 8px;
+    font-size: 11px;
+    background: #4a4a4a;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+#mgrs-goto-btn:hover {
+    background: #2a2a2a;
+}
+
 /* ===== Toast Notification ===== */
 #toast {
     position: fixed;

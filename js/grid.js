@@ -43,6 +43,30 @@ function formatMGRS(mgrsStr) {
 
 // ===== Coordinate Display =====
 
+export function setupMGRSGoto() {
+    var input = document.getElementById('mgrs-goto-input');
+    var btn = document.getElementById('mgrs-goto-btn');
+
+    function doGoto() {
+        var raw = input.value.trim();
+        if (!raw) return;
+        var clean = raw.replace(/\s+/g, '');
+        try {
+            var pt = mgrs.toPoint(clean); // returns [lng, lat]
+            var map = get('map');
+            map.setCenter({ lat: pt[1], lng: pt[0] });
+            showToast('Centered on ' + raw.toUpperCase());
+        } catch (err) {
+            showToast('Invalid MGRS: ' + raw);
+        }
+    }
+
+    btn.addEventListener('click', doGoto);
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') doGoto();
+    });
+}
+
 export function setupCoordinateDisplay() {
     const map = get('map');
     let throttleTimer = null;

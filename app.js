@@ -8,7 +8,7 @@
 import { get, set, DEFAULT_CENTER, DEFAULT_ZOOM } from './js/state.js';
 import { initTerraDraw, rotateSelectedMarker } from './js/drawing.js';
 import { setupToolbar, setActiveTool } from './js/toolbar.js';
-import { setupCoordinateDisplay, setupRightClickMGRS, setupMGRSGrid } from './js/grid.js';
+import { setupCoordinateDisplay, setupRightClickMGRS, setupMGRSGrid, setupMGRSGoto } from './js/grid.js';
 import { setupExport } from './js/export.js';
 
 // ===== Initialization =====
@@ -67,6 +67,7 @@ function initMap() {
     // Wire up all modules
     setupCoordinateDisplay();
     setupRightClickMGRS();
+    setupMGRSGoto();
     setupToolbar();
     setupMGRSGrid();
     setupExport();
