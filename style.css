@@ -104,7 +104,7 @@ html, body {
 /* ===== Toolbar (Left Side) ===== */
 #toolbar {
     position: absolute;
-    left: 16px;
+    left: calc(16px + 1vw);
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -190,7 +190,7 @@ html, body {
 /* ===== Sub-menus / Flyouts ===== */
 .submenu {
     position: absolute;
-    left: 58px;
+    left: calc(58px + 1vw);
     background: rgba(255, 255, 255, 0.96);
     border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 12px;
