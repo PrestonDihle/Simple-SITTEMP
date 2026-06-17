@@ -364,6 +364,12 @@ html, body {
     box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
 }
 
+/* No Fill swatch: white with red diagonal slash */
+.color-swatch.no-fill-swatch {
+    background: linear-gradient(to bottom right, #ffffff 43%, #ee3333 44%, #ee3333 56%, #ffffff 57%);
+    border-color: #bbb;
+}
+
 .opacity-section {
     margin-top: 12px;
 }

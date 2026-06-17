@@ -163,11 +163,15 @@ function updateDrawStyles() {
     const fillOpacity = get('fillOpacity');
     const sw = get('symbolStrokeWidth') || 2;
 
+    // 'none' fillColor sentinel = transparent fill (outline still visible)
+    const effectiveFillColor = (fillColor === 'none') ? '#000000' : fillColor;
+    const effectiveFillOpacity = (fillColor === 'none') ? 0 : fillOpacity;
+
     try {
-        draw.updateModeOptions('polygon', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: sw } });
-        draw.updateModeOptions('rectangle', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: sw } });
-        draw.updateModeOptions('circle', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: sw } });
-        draw.updateModeOptions('freehand', { styles: { fillColor, fillOpacity, outlineColor: lineColor, outlineWidth: sw } });
+        draw.updateModeOptions('polygon', { styles: { fillColor: effectiveFillColor, fillOpacity: effectiveFillOpacity, outlineColor: lineColor, outlineWidth: sw } });
+        draw.updateModeOptions('rectangle', { styles: { fillColor: effectiveFillColor, fillOpacity: effectiveFillOpacity, outlineColor: lineColor, outlineWidth: sw } });
+        draw.updateModeOptions('circle', { styles: { fillColor: effectiveFillColor, fillOpacity: effectiveFillOpacity, outlineColor: lineColor, outlineWidth: sw } });
+        draw.updateModeOptions('freehand', { styles: { fillColor: effectiveFillColor, fillOpacity: effectiveFillOpacity, outlineColor: lineColor, outlineWidth: sw } });
         draw.updateModeOptions('linestring', { styles: {
             lineStringColor: lineColor, lineStringWidth: sw,
             lineStringOpacity: function (feature) {

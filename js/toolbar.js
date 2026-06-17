@@ -428,6 +428,17 @@ function buildColorSubmenu() {
         fillSwatches.appendChild(fillSwatch);
     }
 
+    // No Fill swatch — sentinel value 'none' = transparent fill
+    var noFillSwatch = document.createElement('div');
+    noFillSwatch.className = 'color-swatch no-fill-swatch' + (get('fillColor') === 'none' ? ' active' : '');
+    noFillSwatch.title = 'No Fill';
+    noFillSwatch.addEventListener('click', function () {
+        set('fillColor', 'none');
+        fillSwatches.querySelectorAll('.color-swatch').forEach(function (s) { s.classList.remove('active'); });
+        noFillSwatch.classList.add('active');
+    });
+    fillSwatches.appendChild(noFillSwatch);
+
     const slider = document.getElementById('opacity-slider');
     const valueLabel = document.getElementById('opacity-value');
     slider.addEventListener('input', function () {
