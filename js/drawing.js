@@ -13,6 +13,42 @@ import {
 } from './symbols.js';
 import { showToast } from './toolbar.js';
 
+// ===== Per-Feature Style Helper Functions =====
+// These are passed as function-based styles to Terra Draw so each feature
+// can have its own color/opacity/stroke overrides (stored in featureStyles).
+
+function _featureFillColor(feature) {
+    var fs = get('featureStyles'); var s = fs && fs[feature.id];
+    var fc = (s && s.fillColor !== undefined) ? s.fillColor : get('fillColor');
+    return (fc === 'none') ? '#000000' : (fc || '#000000');
+}
+function _featureFillOpacity(feature) {
+    var fs = get('featureStyles'); var s = fs && fs[feature.id];
+    var fc = (s && s.fillColor !== undefined) ? s.fillColor : get('fillColor');
+    if (fc === 'none') return 0;
+    return (s && s.fillOpacity !== undefined) ? s.fillOpacity : get('fillOpacity');
+}
+function _featureOutlineColor(feature) {
+    var fs = get('featureStyles'); var s = fs && fs[feature.id];
+    return (s && s.lineColor) ? s.lineColor : get('lineColor');
+}
+function _featureOutlineWidth(feature) {
+    var fs = get('featureStyles'); var s = fs && fs[feature.id];
+    return (s && s.strokeWidth) ? s.strokeWidth : (get('symbolStrokeWidth') || 2);
+}
+function _featureLineColor(feature) {
+    var fs = get('featureStyles'); var s = fs && fs[feature.id];
+    return (s && s.lineColor) ? s.lineColor : get('lineColor');
+}
+function _featureLineWidth(feature) {
+    var fs = get('featureStyles'); var s = fs && fs[feature.id];
+    return (s && s.strokeWidth) ? s.strokeWidth : (get('symbolStrokeWidth') || 2);
+}
+function _featureLineOpacity(feature) {
+    var flt = get('featureLineTypes'); var lt = flt[feature.id];
+    return (lt && lt !== 'solid') ? 0 : 1;
+}
+
 // ===== Terra Draw Init =====
 
 export function initTerraDraw() {
@@ -41,26 +77,22 @@ export function initTerraDraw() {
             }),
             new TerraDrawLineStringMode({
                 styles: {
-                    lineStringColor: lineColor,
-                    lineStringWidth: sw,
-                    lineStringOpacity: function (feature) {
-                        var flt = get('featureLineTypes');
-                        var lt = flt[feature.id];
-                        return (lt && lt !== 'solid') ? 0 : 1;
-                    }
+                    lineStringColor: _featureLineColor,
+                    lineStringWidth: _featureLineWidth,
+                    lineStringOpacity: _featureLineOpacity
                 }
             }),
             new TerraDrawPolygonMode({
-                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: sw }
+                styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth }
             }),
             new TerraDrawRectangleMode({
-                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: sw }
+                styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth }
             }),
             new TerraDrawCircleMode({
-                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: sw }
+                styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth }
             }),
             new TerraDrawFreehandMode({
-                styles: { fillColor: fillColor, fillOpacity: fillOpacity, outlineColor: lineColor, outlineWidth: sw }
+                styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth }
             }),
             new TerraDrawSelectMode({
                 flags: {
@@ -118,8 +150,24 @@ export function initTerraDraw() {
         pushUndoState();
     });
 
-    draw.on('select', function (id) { set('selectedFeatureId', id); });
-    draw.on('deselect', function () { set('selectedFeatureId', null); });
+    draw.on('select', function (id) {
+        // Mutual exclusion: deselect any selected marker
+        get('markers').forEach(function (m) {
+            if (m._selected) {
+                m._selected = false;
+                rebuildMarkerIcon(m);
+            }
+        });
+        set('selectedFeatureId', id);
+        _syncPanelToFeature(id);
+        _showPopoverForFeature(id);
+    });
+
+    draw.on('deselect', function () {
+        set('selectedFeatureId', null);
+        set('selectionInfo', null);
+        _hidePopover();
+    });
 
     draw.on('finish', function (id, context) {
         if (context.action === 'draw') {
@@ -158,29 +206,17 @@ function updateDrawStyles() {
     const draw = get('draw');
     if (!draw || !get('ready')) return;
 
-    const lineColor = get('lineColor');
-    const fillColor = get('fillColor');
-    const fillOpacity = get('fillOpacity');
-    const sw = get('symbolStrokeWidth') || 2;
-
-    // 'none' fillColor sentinel = transparent fill (outline still visible)
-    const effectiveFillColor = (fillColor === 'none') ? '#000000' : fillColor;
-    const effectiveFillOpacity = (fillColor === 'none') ? 0 : fillOpacity;
-
     try {
-        draw.updateModeOptions('polygon', { styles: { fillColor: effectiveFillColor, fillOpacity: effectiveFillOpacity, outlineColor: lineColor, outlineWidth: sw } });
-        draw.updateModeOptions('rectangle', { styles: { fillColor: effectiveFillColor, fillOpacity: effectiveFillOpacity, outlineColor: lineColor, outlineWidth: sw } });
-        draw.updateModeOptions('circle', { styles: { fillColor: effectiveFillColor, fillOpacity: effectiveFillOpacity, outlineColor: lineColor, outlineWidth: sw } });
-        draw.updateModeOptions('freehand', { styles: { fillColor: effectiveFillColor, fillOpacity: effectiveFillOpacity, outlineColor: lineColor, outlineWidth: sw } });
+        // Use per-feature style functions so individual feature colors persist
+        draw.updateModeOptions('polygon', { styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth } });
+        draw.updateModeOptions('rectangle', { styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth } });
+        draw.updateModeOptions('circle', { styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth } });
+        draw.updateModeOptions('freehand', { styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth } });
         draw.updateModeOptions('linestring', { styles: {
-            lineStringColor: lineColor, lineStringWidth: sw,
-            lineStringOpacity: function (feature) {
-                var flt = get('featureLineTypes');
-                var lt = flt[feature.id];
-                return (lt && lt !== 'solid') ? 0 : 1;
-            }
+            lineStringColor: _featureLineColor, lineStringWidth: _featureLineWidth,
+            lineStringOpacity: _featureLineOpacity
         } });
-        draw.updateModeOptions('point', { styles: { pointColor: lineColor, pointWidth: 6, pointOutlineColor: '#000000', pointOutlineWidth: 2 } });
+        draw.updateModeOptions('point', { styles: { pointColor: get('lineColor'), pointWidth: 6, pointOutlineColor: '#000000', pointOutlineWidth: 2 } });
     } catch (e) {
         // Styles may fail if mode not yet ready
     }
@@ -488,8 +524,26 @@ function createMapMarker(latLng, svgString, size, anchor, sittempData) {
 
     marker._sittemp = sittempData;
     marker.addListener('click', function () {
-        get('markers').forEach(function (m) { m._selected = false; });
+        // Mutual exclusion: clear any active Terra Draw selection
+        if (get('selectedFeatureId')) {
+            var draw = get('draw');
+            if (draw && get('ready')) {
+                try { draw.setMode('select'); } catch (e) { /* ignore */ }
+            }
+            set('selectedFeatureId', null);
+        }
+
+        // Deselect all other markers and remove their highlights
+        get('markers').forEach(function (m) {
+            if (m._selected) {
+                m._selected = false;
+                rebuildMarkerIcon(m);
+            }
+        });
+
+        // Select this marker with highlight
         marker._selected = true;
+        rebuildMarkerIcon(marker);
 
         // Sync font state when selecting a text marker
         if (marker._sittemp && marker._sittemp.type === 'text') {
@@ -501,10 +555,16 @@ function createMapMarker(latLng, svgString, size, anchor, sittempData) {
             set('fontStrikethrough', info.fontStrikethrough !== undefined ? info.fontStrikethrough : false);
         }
 
+        // Sync style panel to this marker's current values
+        _syncPanelToMarker(marker);
+
+        // Show action popover
+        _showPopoverForMarker(marker);
+
         if (marker._sittemp && (marker._sittemp.type === 'equipment' || marker._sittemp.type === 'unit' || marker._sittemp.type === 'enemy_unit' || marker._sittemp.type === 'tactical_task')) {
             showToast('Selected. R / Shift+R to rotate.');
         } else {
-            showToast('Selected. Press Clear Selected to delete.');
+            showToast('Selected.');
         }
     });
 
@@ -527,7 +587,10 @@ export function clearSelected() {
                 lineOverlays[selectedId].setMap(null);
                 delete lineOverlays[selectedId];
             }
+            const featureStyles = get('featureStyles');
+            if (featureStyles[selectedId]) delete featureStyles[selectedId];
             set('selectedFeatureId', null);
+            set('selectionInfo', null);
             deleted = true;
         } catch (e) { /* ignore */ }
     }
@@ -546,6 +609,8 @@ export function clearSelected() {
     markers.push.apply(markers, remaining);
 
     if (deleted) {
+        set('selectionInfo', null);
+        _hidePopover();
         pushUndoState();
         showToast('Deleted');
     } else {
@@ -603,6 +668,182 @@ export function rotateSelectedMarker(degrees) {
     pushUndoState();
 }
 
+// ===== Live Style Editing =====
+
+/**
+ * Rebuild a marker's SVG icon from its _sittemp metadata.
+ * Adds a dashed selection border when marker._selected is true.
+ */
+export function rebuildMarkerIcon(marker) {
+    var info = marker._sittemp;
+    if (!info) return;
+    var scale = info.symbolScale || 1.0;
+    var svgString, size, anchor;
+
+    if (info.type === 'equipment' || info.type === 'unit' || info.type === 'enemy_unit' || info.type === 'tactical_task') {
+        var sw = info.strokeWidth || 2;
+        var rot = info.rotation || 0;
+        var ech = info.echelon || 'none';
+        var echelonH = (ech !== 'none') ? 14 : 0;
+        var h = 50 + echelonH;
+        var svgBase;
+        if (info.type === 'equipment') svgBase = equipmentSVG(info.key, info.color, sw);
+        else if (info.type === 'enemy_unit') svgBase = enemyUnitSVG(info.key, info.color, sw);
+        else if (info.type === 'tactical_task') svgBase = tacticalTaskSVG(info.key, info.color, sw);
+        else svgBase = unitSVG(info.key, info.color, sw);
+        svgString = buildSymbolWithLabels(svgBase, info.leftText, info.rightText, info.color, rot, ech);
+        if (marker._selected) svgString = _addSelectionHighlight(svgString, 150, h, info.color);
+        size = new google.maps.Size(150 * scale, h * scale);
+        anchor = new google.maps.Point(75 * scale, (h / 2) * scale);
+    } else if (info.type === 'star') {
+        var svgFill = info.fill || info.color;
+        var svgOpacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
+        svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">'
+            + '<polygon points="15,1 18.5,11 29,11 20.5,17.5 23.5,28 15,22 6.5,28 9.5,17.5 1,11 11.5,11"'
+            + ' fill="' + svgFill + '" fill-opacity="' + svgOpacity + '" stroke="' + info.color + '" stroke-width="2"/>'
+            + (marker._selected ? '<rect x="1" y="1" width="28" height="28" fill="none" stroke="' + info.color + '" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.75"/>' : '')
+            + '</svg>';
+        size = new google.maps.Size(30 * scale, 30 * scale);
+        anchor = new google.maps.Point(15 * scale, 15 * scale);
+    } else if (info.type === 'triangle') {
+        var triFill = info.fill || info.color;
+        var triOpacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
+        svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">'
+            + '<polygon points="15,2 28,28 2,28"'
+            + ' fill="' + triFill + '" fill-opacity="' + triOpacity + '" stroke="' + info.color + '" stroke-width="2"/>'
+            + (marker._selected ? '<rect x="1" y="1" width="28" height="28" fill="none" stroke="' + info.color + '" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.75"/>' : '')
+            + '</svg>';
+        size = new google.maps.Size(30 * scale, 30 * scale);
+        anchor = new google.maps.Point(15 * scale, 15 * scale);
+    } else if (info.type === 'text') {
+        var fs = info.fontSize !== undefined ? info.fontSize : 14;
+        var fb = info.fontBold !== undefined ? info.fontBold : true;
+        var fi = info.fontItalic !== undefined ? info.fontItalic : false;
+        var fu = info.fontUnderline !== undefined ? info.fontUnderline : false;
+        var fst = info.fontStrikethrough !== undefined ? info.fontStrikethrough : false;
+        var result = buildTextSVG(info.text, info.color, fs, fb, fi, fu, fst);
+        svgString = marker._selected ? _addSelectionHighlight(result.svg, result.width, result.height, info.color) : result.svg;
+        size = new google.maps.Size(result.width, result.height);
+        anchor = new google.maps.Point(result.width / 2, result.height / 2);
+    } else {
+        return;
+    }
+
+    var iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgString);
+    marker.setIcon({ url: iconUrl, scaledSize: size, anchor: anchor });
+}
+
+function _addSelectionHighlight(svgString, w, h, color) {
+    var rect = '<rect x="1" y="1" width="' + (w - 2) + '" height="' + (h - 2)
+        + '" fill="none" stroke="' + color + '" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.75"/>';
+    return svgString.replace('</svg>', rect + '</svg>');
+}
+
+/**
+ * Apply a style property to the currently selected object (Terra Draw feature or marker).
+ * Valid props: 'lineColor', 'fillColor', 'fillOpacity', 'strokeWidth', 'symbolScale'
+ */
+export function applyStyleToSelected(prop, value) {
+    var selectedId = get('selectedFeatureId');
+    if (selectedId) {
+        _applyStyleToFeature(selectedId, prop, value);
+        return;
+    }
+    var markers = get('markers');
+    for (var i = 0; i < markers.length; i++) {
+        if (markers[i]._selected) {
+            _applyStyleToMarker(markers[i], prop, value);
+            return;
+        }
+    }
+}
+
+function _applyStyleToFeature(featureId, prop, value) {
+    var featureStyles = get('featureStyles');
+    if (!featureStyles[featureId]) featureStyles[featureId] = {};
+    featureStyles[featureId][prop] = value;
+    updateDrawStyles(); // triggers re-render of all features using the updated function
+    _scheduleUndoPush();
+}
+
+function _applyStyleToMarker(marker, prop, value) {
+    var info = marker._sittemp;
+    if (prop === 'lineColor') { info.color = value; }
+    else if (prop === 'fillColor') { info.fill = value; }
+    else if (prop === 'fillOpacity') { info.fillOpacity = parseFloat(value); }
+    else if (prop === 'strokeWidth') { info.strokeWidth = parseInt(value, 10); }
+    else if (prop === 'symbolScale') { info.symbolScale = parseFloat(value); }
+    rebuildMarkerIcon(marker);
+    _scheduleUndoPush();
+}
+
+var _undoPushTimer = null;
+function _scheduleUndoPush() {
+    if (_undoPushTimer) clearTimeout(_undoPushTimer);
+    _undoPushTimer = setTimeout(function () {
+        _undoPushTimer = null;
+        pushUndoState();
+    }, 300);
+}
+
+// ===== Selection → Panel Sync =====
+
+function _syncPanelToMarker(marker) {
+    var info = marker._sittemp;
+    var fillColor = (info.fill !== undefined) ? info.fill : 'none';
+    // For stroke-only symbols (equipment/unit/enemy/tactical), there's no fill concept
+    var hasNoFill = (info.type === 'equipment' || info.type === 'unit' || info.type === 'enemy_unit' || info.type === 'tactical_task');
+    set('selectionInfo', {
+        type: info.type,
+        label: _typeLabel(info.type),
+        lineColor: info.color || get('lineColor'),
+        fillColor: hasNoFill ? null : fillColor,
+        fillOpacity: info.fillOpacity !== undefined ? info.fillOpacity : get('fillOpacity'),
+        strokeWidth: info.strokeWidth || get('symbolStrokeWidth'),
+        symbolScale: info.symbolScale || get('symbolScale')
+    });
+}
+
+function _syncPanelToFeature(featureId) {
+    var featureStyles = get('featureStyles');
+    var s = featureStyles[featureId] || {};
+    var draw = get('draw');
+    var featureType = 'shape';
+    try {
+        var feat = draw.getSnapshotFeature(featureId);
+        if (feat && feat.properties && feat.properties.mode) featureType = feat.properties.mode;
+        else if (feat) featureType = (feat.geometry.type || 'shape').toLowerCase();
+    } catch (e) { /* ignore */ }
+    set('selectionInfo', {
+        type: featureType,
+        label: _typeLabel(featureType),
+        lineColor: s.lineColor || get('lineColor'),
+        fillColor: (s.fillColor !== undefined) ? s.fillColor : get('fillColor'),
+        fillOpacity: (s.fillOpacity !== undefined) ? s.fillOpacity : get('fillOpacity'),
+        strokeWidth: s.strokeWidth || get('symbolStrokeWidth'),
+        symbolScale: null // not applicable for shapes
+    });
+}
+
+function _typeLabel(type) {
+    var labels = {
+        equipment: 'Equipment', unit: 'Unit', enemy_unit: 'Enemy Unit',
+        tactical_task: 'Tactical Task', star: 'Star', triangle: 'Triangle',
+        text: 'Text', polygon: 'Polygon', linestring: 'Line',
+        rectangle: 'Rectangle', circle: 'Circle', freehand: 'Freehand'
+    };
+    return labels[type] || type || 'Object';
+}
+
+// ===== Popover Stubs (implemented in Req 4) =====
+
+function _showPopoverForMarker(marker) { /* implemented in Req 4 */ }
+function _showPopoverForFeature(featureId) { /* implemented in Req 4 */ }
+function _hidePopover() {
+    var popover = document.getElementById('object-popover');
+    if (popover) popover.style.display = 'none';
+}
+
 // ===== Undo / Redo =====
 
 export function pushUndoState() {
@@ -633,7 +874,8 @@ export function pushUndoState() {
                 sittemp: m._sittemp,
             };
         }),
-        featureLineTypes: Object.assign({}, get('featureLineTypes'))
+        featureLineTypes: Object.assign({}, get('featureLineTypes')),
+        featureStyles: Object.assign({}, get('featureStyles'))
     };
 
     undoStack.push(JSON.stringify(snapshot));
@@ -688,6 +930,15 @@ function restoreState(stateJson) {
     }
     if (saved.featureLineTypes) {
         Object.assign(featureLineTypes, saved.featureLineTypes);
+    }
+
+    // Restore per-feature style overrides
+    const featureStyles = get('featureStyles');
+    for (const id of Object.keys(featureStyles)) {
+        delete featureStyles[id];
+    }
+    if (saved.featureStyles) {
+        Object.assign(featureStyles, saved.featureStyles);
     }
 
     // Restore Terra Draw features

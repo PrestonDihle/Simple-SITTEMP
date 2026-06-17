@@ -75,6 +75,12 @@ const initialState = {
     // Line type per feature ID (e.g., { 'abc123': 'dashed' })
     featureLineTypes: {},
 
+    // Per-feature style overrides keyed by feature ID
+    featureStyles: {},
+
+    // Selection info for panel sync (set by drawing.js, read by toolbar.js)
+    selectionInfo: null,
+
     // MGRS grid
     mgrsGridVisible: true,
     mgrsGridLines: [],
