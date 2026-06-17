@@ -854,7 +854,7 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rota
     }
 
     if (leftText) {
-        svg += `<text x="53" y="${symY + 25}" text-anchor="end" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(leftText)}</text>`;
+        svg += `<text x="53" y="${symY + 40}" text-anchor="end" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(leftText)}</text>`;
     }
 
     // Scale the inner SVG content to fit the 40x40 display area, with optional rotation
@@ -865,7 +865,7 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rota
     }
 
     if (rightText) {
-        svg += `<text x="97" y="${symY + 25}" text-anchor="start" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(rightText)}</text>`;
+        svg += `<text x="97" y="${symY + 40}" text-anchor="start" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(rightText)}</text>`;
     }
 
     svg += '</svg>';
