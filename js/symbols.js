@@ -748,23 +748,7 @@ export const UNIT_LIST = [
     { key: 'anti_tank', name: 'Anti-Tank' },
 ];
 
-export const ENEMY_UNIT_LIST = [
-    { key: 'aviation', name: 'Aviation' },
-    { key: 'infantry', name: 'Infantry' },
-    { key: 'armor', name: 'Armor' },
-    { key: 'combined_arms', name: 'Combined Arms' },
-    { key: 'artillery', name: 'Artillery' },
-    { key: 'engineers', name: 'Engineers' },
-    { key: 'military_intel', name: 'MI' },
-    { key: 'military_police', name: 'MP' },
-    { key: 'cavalry', name: 'Cavalry' },
-    { key: 'signal', name: 'Signal' },
-    { key: 'air_defense', name: 'Air Defense' },
-    { key: 'ew_jamming', name: 'EW Jamming' },
-    { key: 'cbrn', name: 'CBRN' },
-    { key: 'medical', name: 'Medical' },
-    { key: 'anti_tank', name: 'Anti-Tank' },
-];
+export const ENEMY_UNIT_LIST = UNIT_LIST;
 
 export const TACTICAL_TASK_LIST = [
     { key: 'fix', name: 'Fix' },

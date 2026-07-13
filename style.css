@@ -119,6 +119,8 @@ html, body {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(0, 0, 0, 0.06);
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
 }
 
 .toolbar-btn {
