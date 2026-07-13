@@ -162,46 +162,6 @@
             <div class="submenu-grid" id="tactical-tasks-grid"></div>
         </div>
 
-        <!-- Style Panel (Right Side) — combined Line Types + Color -->
-        <div id="style-panel">
-            <div class="style-panel-section">
-                <h3>Line Types</h3>
-                <div class="line-type-grid" id="line-type-list"></div>
-            </div>
-            <div class="style-panel-section">
-                <h3>Colors</h3>
-                <div id="color-selection-indicator" class="color-selection-indicator" style="display:none;">
-                    <span id="color-selection-text">Editing: ---</span>
-                </div>
-                <div class="color-row">
-                    <label>Line</label>
-                    <div class="color-swatches" id="line-color-swatches"></div>
-                </div>
-                <div class="color-row">
-                    <label>Fill</label>
-                    <div class="color-swatches" id="fill-color-swatches"></div>
-                </div>
-            </div>
-            <div class="style-panel-section">
-                <h3>Settings</h3>
-                <div class="slider-row">
-                    <label>Opacity</label>
-                    <input type="range" id="opacity-slider" min="0" max="100" value="60">
-                    <span class="slider-val" id="opacity-value">60%</span>
-                </div>
-                <div class="slider-row">
-                    <label>Stroke</label>
-                    <input type="range" id="stroke-width-slider" min="1" max="10" value="2" step="1">
-                    <span class="slider-val" id="stroke-width-value">2</span>
-                </div>
-                <div class="slider-row">
-                    <label>Scale</label>
-                    <input type="range" id="symbol-scale-slider" min="0.5" max="3" value="1" step="0.1">
-                    <span class="slider-val" id="symbol-scale-value">1.0x</span>
-                </div>
-            </div>
-        </div>
-
         <!-- Text Sub-menu -->
         <div class="submenu" id="submenu-text">
             <h3>Text</h3>
@@ -272,13 +232,56 @@
             </select>
         </div>
 
-        <!-- Coordinate Display (Top Right) -->
-        <div id="coord-display">
-            <div><span class="label">Lat/Lon:</span> <span id="coord-latlon">---, ---</span></div>
-            <div><span class="label">MGRS:</span> <span id="coord-mgrs">---</span></div>
-            <div class="mgrs-goto-row" style="pointer-events: auto;">
-                <input id="mgrs-goto-input" type="text" placeholder="Go to MGRS..." maxlength="20" autocomplete="off" spellcheck="false">
-                <button id="mgrs-goto-btn" title="Center map on MGRS">Go</button>
+        <!-- Right Rail: Coordinate Display + Style Panel stacked to avoid overlap -->
+        <div id="right-rail">
+            <!-- Coordinate Display -->
+            <div id="coord-display">
+                <div><span class="label">Lat/Lon:</span> <span id="coord-latlon">---, ---</span></div>
+                <div><span class="label">MGRS:</span> <span id="coord-mgrs">---</span></div>
+                <div class="mgrs-goto-row" style="pointer-events: auto;">
+                    <input id="mgrs-goto-input" type="text" placeholder="Go to MGRS..." maxlength="20" autocomplete="off" spellcheck="false">
+                    <button id="mgrs-goto-btn" title="Center map on MGRS">Go</button>
+                </div>
+            </div>
+
+            <!-- Style Panel — combined Line Types + Color -->
+            <div id="style-panel">
+                <div class="style-panel-section">
+                    <h3>Line Types</h3>
+                    <div class="line-type-grid" id="line-type-list"></div>
+                </div>
+                <div class="style-panel-section">
+                    <h3>Colors</h3>
+                    <div id="color-selection-indicator" class="color-selection-indicator" style="display:none;">
+                        <span id="color-selection-text">Editing: ---</span>
+                    </div>
+                    <div class="color-row">
+                        <label>Line</label>
+                        <div class="color-swatches" id="line-color-swatches"></div>
+                    </div>
+                    <div class="color-row">
+                        <label>Fill</label>
+                        <div class="color-swatches" id="fill-color-swatches"></div>
+                    </div>
+                </div>
+                <div class="style-panel-section">
+                    <h3>Settings</h3>
+                    <div class="slider-row">
+                        <label>Opacity</label>
+                        <input type="range" id="opacity-slider" min="0" max="100" value="60">
+                        <span class="slider-val" id="opacity-value">60%</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>Stroke</label>
+                        <input type="range" id="stroke-width-slider" min="1" max="10" value="2" step="1">
+                        <span class="slider-val" id="stroke-width-value">2</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>Scale</label>
+                        <input type="range" id="symbol-scale-slider" min="0.5" max="3" value="1" step="0.1">
+                        <span class="slider-val" id="symbol-scale-value">1.0x</span>
+                    </div>
+                </div>
             </div>
         </div>
 

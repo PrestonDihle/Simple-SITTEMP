@@ -584,21 +584,34 @@ html, body {
 }
 
 /* ===== Style Panel (Right Side) ===== */
-#style-panel {
+#right-rail {
     position: absolute;
+    top: 10px;
     right: 10px;
-    top: calc(60px + 2vh);
+    bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    z-index: 1001;
+    pointer-events: none;
+}
+
+#style-panel {
     width: 232px;
     background: rgba(255, 255, 255, 0.96);
     color: #333;
     border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 14px;
     padding: 8px;
-    z-index: 1001;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
                 0 4px 12px rgba(0, 0, 0, 0.12);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    pointer-events: auto;
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 .style-panel-section {
@@ -710,9 +723,6 @@ html, body {
 
 /* ===== Coordinate Display (Top Right) ===== */
 #coord-display {
-    position: absolute;
-    top: 10px;
-    right: 10px;
     background: rgba(255, 255, 255, 0.96);
     color: #333;
     padding: 8px 14px;
@@ -720,7 +730,6 @@ html, body {
     font-family: 'SF Mono', 'Consolas', 'Courier New', monospace;
     font-size: 13px;
     line-height: 1.5;
-    z-index: 1000;
     pointer-events: none;
     user-select: none;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
@@ -728,6 +737,7 @@ html, body {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(0, 0, 0, 0.06);
+    flex: 0 0 auto;
 }
 
 #coord-display .label {
