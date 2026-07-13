@@ -181,7 +181,8 @@ overlay.setMap(map);
 - [x] Right-click MGRS copy to clipboard
 - [x] Shapes (circle, rectangle, polygon, linestring, freehand, star, triangle)
 - [x] Line types (solid, dashed, dotted, dash-dot, mine belt, wire obstacle, tank ditch)
-- [x] 24+ equipment symbols, 11 unit symbols, enemy units, tactical tasks
+- [x] 24+ equipment symbols, 11 unit symbols, enemy units, 15 tactical tasks (geometry verified against FM 3-90 Appendix B / Table 8-2 figures, including task-designator letters)
+- [x] Coordinate display and Style Panel stacked in `#right-rail` (flex column) so they never overlap regardless of viewport height
 - [x] Symbol placement with left/right text labels (bottom of symbol area, `symY+40`)
 - [x] Symbol echelon markers
 - [x] Text labels (place anywhere, font styling)
