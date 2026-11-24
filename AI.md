@@ -35,6 +35,7 @@ Simple-SITTEMP/
     viewshed.js        # Range fans + terrain-masked viewsheds attached to symbols; shared fetchElevations()
     elevation.js       # Elevation band shading for drawn areas or the current view
     measures.js        # Control-measure tags (PZ/LZ/DZ/HA/FARP/BP, airspace zones) on drawn areas
+    routes.js          # Flight routes (SP/ACP/RP), air corridors, route card, CSV/PDF
   README.md            # Human-facing documentation
   AI.md                # This file - AI agent working memory
   LICENSE              # MIT License
@@ -91,6 +92,15 @@ Simple-SITTEMP/
 - Tags in `state.featureMeasures[featureId]` (in undo snapshots); labels are non-clickable markers that follow Terra Draw `change` update/delete events and the outline color
 - KML: tagged features export with the measure as the Placemark name and the label block as description
 - Not implemented: BP planned/prepared (dashed) variants — Terra Draw polygons can't dash; coordinating altitude (not in the extract)
+
+### Flight Routes (`js/routes.js`)
+- Shapes submenu → Flight Route: click SP, ACPs; double-click places RP and finishes (Enter also finishes, Esc cancels). Double-click zoom is disabled while placing
+- Checkpoint symbols per FM 1-02.2: SP/RP = Table 5-6 point template (box + V pointer), ACP = Table 5-23 circle; markers are draggable
+- Per leg (`data.legs[i]`, inbound to checkpoint i+1): ground speed (kt), altitude (ft) + AGL/MSL, defaulting from the last route (localStorage `sittemp_route_defaults`, which also stores declination)
+- Computed: magnetic heading = true course − declination (+E), no wind correction; grid azimuth = true course − UTM grid convergence (shown in mils or degrees per `angleUnit`); NM and km; ETE and cumulative time
+- Leg labels on the map ("034°M 4.4NM 2:54"); route card panel (`#route-card`, bottom center) with editable name, color, declination, GS/alt per leg, SP/RP names, remove-ACP, totals, CSV and PDF (jsPDF) export, delete
+- Air corridor option: type AC/LLTR/MRR/SL/SC/SAAFR/TC/UA, width (ft), min/max alt (AGL/MSL), DTG start/end → corridor edges between circles of radius width/2 at each checkpoint, rotated "SAAFR BLUE" label on the longest leg, and the NAME/WIDTH/MIN ALT/MAX ALT/DTG block
+- Route data is in undo snapshots (`routes`); KML export writes each route as a LineString plus checkpoint Points
 
 ### Elevation Shading (`js/elevation.js`)
 - Sources: "Shade elevation" button in the popover of polygon / rectangle / circle / freehand features, or Map submenu → Elevation → "Shade current view" (band interval input there sets the default)
