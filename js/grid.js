@@ -4,7 +4,7 @@
  * Handles the MGRS grid display, scale controls, and coordinate readout.
  */
 
-import { get, set } from './state.js';
+import { get, set, DEFAULT_CENTER, DEFAULT_ZOOM } from './state.js';
 import { showToast } from './toolbar.js';
 
 // ===== MGRS Formatting =====
@@ -64,6 +64,19 @@ export function setupMGRSGoto() {
     btn.addEventListener('click', doGoto);
     input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') doGoto();
+    });
+
+    // Training-area quick links: center at the app's default zoom
+    document.querySelectorAll('.quick-link').forEach(function (link) {
+        link.addEventListener('click', function () {
+            var target = link.dataset.home
+                ? DEFAULT_CENTER
+                : { lat: parseFloat(link.dataset.lat), lng: parseFloat(link.dataset.lng) };
+            var map = get('map');
+            map.setCenter(target);
+            map.setZoom(DEFAULT_ZOOM);
+            showToast('Centered on ' + link.textContent);
+        });
     });
 }
 
