@@ -12,6 +12,7 @@ import {
     buildSymbolWithLabels, escapeXml
 } from './symbols.js';
 import { showToast } from './toolbar.js';
+import { syncViewshed, clearViewshedOverlays, buildViewshedSection } from './viewshed.js';
 
 // ===== Per-Feature Style Helper Functions =====
 // These are passed as function-based styles to Terra Draw so each feature
@@ -570,6 +571,9 @@ function createMapMarker(latLng, svgString, size, anchor, sittempData) {
 
     markers.push(marker);
     // markers array is mutated in-place, no need to set() again
+
+    // Draw the attached viewshed, if any (e.g. when restored by undo/redo)
+    syncViewshed(marker);
 }
 
 // ===== Clear Selected =====
@@ -598,6 +602,7 @@ export function clearSelected() {
     const markers = get('markers');
     const remaining = markers.filter(function (m) {
         if (m._selected) {
+            clearViewshedOverlays(m);
             m.setMap(null);
             deleted = true;
             return false;
@@ -1000,6 +1005,12 @@ function _buildPopoverContent(popover, type, info) {
         popover.appendChild(makeSliderRow('Scale', 'symbolScale', 0.5, 3, 0.1, symbolScale,
             function (v) { return parseFloat(v).toFixed(1) + 'x'; }));
     }
+
+    // Viewshed controls for equipment / unit / enemy unit symbols
+    if (type === 'equipment' || type === 'unit' || type === 'enemy_unit') {
+        var selMarker = get('markers').find(function (m) { return m._selected; });
+        if (selMarker) buildViewshedSection(popover, selMarker, _scheduleUndoPush);
+    }
 }
 
 function _showPopoverAtLatLng(latLng, type, info) {
@@ -1204,7 +1215,7 @@ function restoreState(stateJson) {
     }
 
     // Restore markers
-    markers.forEach(function (m) { m.setMap(null); });
+    markers.forEach(function (m) { clearViewshedOverlays(m); m.setMap(null); });
     markers.length = 0;
 
     saved.markers.forEach(function (data) {

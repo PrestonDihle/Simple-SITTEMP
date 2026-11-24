@@ -555,134 +555,155 @@ export function enemyUnitSVG(key, color, strokeWidth) {
 }
 
 // ===== Tactical Task Symbol SVGs =====
-// NATO APP-6 tactical mission task graphics
-// All symbols use a 350x350 viewBox with parameterized color and stroke width
+// Geometry follows FM 1-02.2 (INCL C1, 23 Jan 2025), Chapter 6, Table 6-1
+// "Tactical mission task symbols". Delay is not in Table 6-1 and keeps its
+// FM 3-90 retrograde-task form. Tasks are drawn pointing right (this app's
+// rotation convention). All symbols use a 350x350 viewBox with parameterized
+// color and stroke width.
 export function tacticalTaskSVG(key, color, strokeWidth) {
     color = color || '#000000';
     strokeWidth = strokeWidth || 2;
     const sw = strokeWidth * (350 / 40);
     const c = color;
-    const svgs = {
-        // Delay — FM 3-90 Table 8-2 (Retrograde task symbols): arrow with D on shaft,
-        // hook curve at tail (mirrored to point right per this app's rotation convention)
-        delay: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M100,90 Q58,175 100,260" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="110" y1="175" x2="265" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <text x="150" y="155" font-family="Arial,sans-serif" font-size="80" font-weight="bold" fill="${c}" text-anchor="middle">D</text>
-  <polygon points="265,175 215,140 215,210" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-</svg>`,
-        // Seize — FM 3-90 Fig B-26: hooked/curved arrow with S on shaft, pointing at objective
-        seize: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M50,110 C130,90 210,105 250,165" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <text x="150" y="105" font-family="Arial,sans-serif" font-size="75" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
-  <polygon points="250,165 225,115 195,155" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-</svg>`,
-        // Fix — FM 3-90 Fig B-16: line, F, zigzag ("broken" part of arrow), arrowhead
-        fix: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="25" y1="175" x2="120" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <text x="140" y="200" font-family="Arial,sans-serif" font-size="80" font-weight="bold" fill="${c}" text-anchor="middle">F</text>
-  <path d="M160,175 L180,140 L200,210 L220,140 L240,175" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>
-  <line x1="240" y1="175" x2="270" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="270,175 235,150 235,200" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-</svg>`,
-        // Disrupt — FM 3-90 Fig B-13: vertical bar with three staggered arrows (D on center arrow)
-        disrupt: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="25" y1="175" x2="70" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="70" y1="105" x2="70" y2="245" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="70" y1="105" x2="280" y2="105" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="280,105 250,85 250,125" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <line x1="70" y1="175" x2="220" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="220,175 190,155 190,195" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <text x="130" y="160" font-family="Arial,sans-serif" font-size="70" font-weight="bold" fill="${c}" text-anchor="middle">D</text>
-  <line x1="70" y1="245" x2="190" y2="245" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="190,245 160,225 160,265" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-</svg>`,
-        // Block — FM 3-90 Fig B-2: line, B, perpendicular bar, arrowhead
-        block: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="25" y1="175" x2="110" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <text x="130" y="200" font-family="Arial,sans-serif" font-size="80" font-weight="bold" fill="${c}" text-anchor="middle">B</text>
-  <line x1="150" y1="175" x2="215" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="225" y1="95" x2="225" y2="255" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="225,150 290,175 225,200" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-</svg>`,
-        // Attack by Fire — FM 3-90 Fig B-1: bracket-hook tail, straight arrow, no letter, no bar
-        attack_by_fire: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M65,105 L105,150 L105,200 L65,245" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>
-  <line x1="105" y1="175" x2="265" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="265,175 215,140 215,210" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-</svg>`,
-        // Breach — FM 3-90 Fig B-4: two parallel arms flanking the breach, each ending in an
-        // outward arrowhead tick, joined by a vertical tail line, B near the tail
-        breach: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <text x="40" y="200" font-family="Arial,sans-serif" font-size="70" font-weight="bold" fill="${c}" text-anchor="middle">B</text>
-  <line x1="70" y1="110" x2="70" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="70" y1="110" x2="260" y2="110" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="260" y1="110" x2="295" y2="80" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="70" y1="250" x2="260" y2="250" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="260" y1="250" x2="295" y2="280" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-</svg>`,
-        // Clear — FM 3-90 Fig B-8: C on tail, three parallel arrows converging on a vertical bar
-        clear: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="25" y1="175" x2="60" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <text x="90" y="200" font-family="Arial,sans-serif" font-size="70" font-weight="bold" fill="${c}" text-anchor="middle">C</text>
-  <line x1="60" y1="110" x2="60" y2="240" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="60" y1="110" x2="270" y2="110" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="120" y1="175" x2="270" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="60" y1="240" x2="270" y2="240" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="280" y1="90" x2="280" y2="260" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="270,90 285,110 270,130" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <polygon points="270,155 285,175 270,195" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <polygon points="270,220 285,240 270,260" fill="${c}" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-</svg>`,
-        // Destroy — FM 3-90 Fig B-11: plain crossed X with D at center, no shaft
-        destroy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="90" y1="90" x2="260" y2="260" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="260" y1="90" x2="90" y2="260" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <text x="175" y="200" font-family="Arial,sans-serif" font-size="75" font-weight="bold" fill="${c}" text-anchor="middle">D</text>
-</svg>`,
-        // Follow and Assume — FM 3-90 Fig B-18: unit-box tail, dashed line, open double-chevron arrowhead
-        follow_and_assume: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M55,130 L160,130 L200,175 L160,220 L55,220 Z" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <line x1="200" y1="175" x2="245" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${sw * 2.2} ${sw * 1.8}"/>
-  <path d="M240,145 L275,175 L240,205" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M265,145 L300,175 L265,205" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`,
-        // Follow and Support — FM 3-90 Fig B-19: unit-box tail, solid line, open single-chevron arrowhead
-        follow_and_support: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M55,130 L160,130 L200,175 L160,220 L55,220 Z" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round"/>
-  <line x1="200" y1="175" x2="255" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M250,140 L295,175 L250,210" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`,
-        // Isolate — FM 3-90 Fig B-21: circle of tangential arrowhead barbs around the enemy, with a gap
-        isolate: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M175,65 A110,110 0 1,1 172,65.01" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="175,65 195,80 165,90" fill="${c}"/>
-  <polygon points="259,99 275,120 245,115" fill="${c}"/>
-  <polygon points="285,175 275,205 255,180" fill="${c}"/>
-  <polygon points="175,285 155,270 185,260" fill="${c}"/>
-  <polygon points="91,251 75,230 105,235" fill="${c}"/>
-</svg>`,
-        // Neutralize — FM 3-90 Fig B-22: horizontal line with N, one diagonal dashed line crossing
-        neutralize: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <line x1="60" y1="175" x2="160" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <text x="185" y="200" font-family="Arial,sans-serif" font-size="80" font-weight="bold" fill="${c}" text-anchor="middle">N</text>
-  <line x1="210" y1="175" x2="290" y2="175" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <line x1="115" y1="270" x2="235" y2="80" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${sw * 1.8} ${sw * 1.5}"/>
-</svg>`,
-        // Occupy — FM 3-90 Fig B-23: area corner bracket with a stylized cursive-O loop and arrowhead
-        occupy: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M60,60 L60,290 M60,60 L300,60" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <path d="M225,150 A65,65 0 1,0 130,225" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="130,225 100,222 122,198" fill="${c}"/>
-</svg>`,
-        // Secure — FM 3-90 Fig B-25: near-full circle with a small arrowhead break, S beside it
-        secure: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">
-  <path d="M120,90 A100,100 0 1,1 95,240" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>
-  <polygon points="95,240 65,232 90,208" fill="${c}"/>
-  <text x="255" y="185" font-family="Arial,sans-serif" font-size="75" font-weight="bold" fill="${c}" text-anchor="middle">S</text>
-</svg>`,
+    const RAD = Math.PI / 180;
+    const f1 = (n) => Math.round(n * 10) / 10;
+
+    // Stroked path (no fill)
+    const P = (d, extra) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"${extra ? ' ' + extra : ''}/>`;
+    // Letter centered on (x, y)
+    const T = (x, y, txt, size) => {
+        size = size || 75;
+        return `<text x="${x}" y="${f1(y + size * 0.36)}" font-family="Arial,sans-serif" font-size="${size}" font-weight="bold" fill="${c}" text-anchor="middle">${txt}</text>`;
     };
-    return svgs[key] || svgs.delay;
+    // Point at angle a (deg, screen coords: 0 = right, 90 = down) on circle (cx, cy, r)
+    const pt = (cx, cy, r, a) => [f1(cx + r * Math.cos(a * RAD)), f1(cy + r * Math.sin(a * RAD))];
+    // Open (line) arrowhead with tip at (x, y) pointing toward angle a
+    const openHead = (x, y, a, len) => {
+        len = len || 40;
+        const b1 = pt(x, y, -len, a - 30), b2 = pt(x, y, -len, a + 30);
+        return P(`M${b1[0]},${b1[1]} L${x},${y} L${b2[0]},${b2[1]}`);
+    };
+    // Filled arrowhead with tip at (x, y) pointing toward angle a
+    const fillHead = (x, y, a, len) => {
+        len = len || 45;
+        const b1 = pt(x, y, -len, a - 26), b2 = pt(x, y, -len, a + 26);
+        return `<polygon points="${x},${y} ${b1[0]},${b1[1]} ${b2[0]},${b2[1]}" fill="${c}" stroke="${c}" stroke-width="${f1(sw * 0.5)}" stroke-linejoin="round"/>`;
+    };
+    // Clockwise arc on circle (cx, cy, r) from angle a0 to a1 (degrees)
+    const arc = (cx, cy, r, a0, a1) => {
+        const s = pt(cx, cy, r, a0), e = pt(cx, cy, r, a1);
+        const sweep = ((a1 - a0) % 360 + 360) % 360;
+        return `M${s[0]},${s[1]} A${r},${r} 0 ${sweep > 180 ? 1 : 0},1 ${e[0]},${e[1]}`;
+    };
+    // Direction of travel at angle a on a clockwise arc
+    const tangentCW = (a) => a + 90;
+    const wrap = (inner) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350" width="350" height="350">${inner}</svg>`;
+
+    // Shared open-circle geometry for isolate / occupy / secure: gap on the left,
+    // drawn clockwise from ~10 o'clock to ~8 o'clock, letter outside on the right.
+    const CX = 160, CY = 175, CR = 105, A0 = 205, A1 = 150;
+    const arcEnd = pt(CX, CY, CR, A1);
+
+    const builders = {
+        // Delay — not in FM 1-02.2 Table 6-1; FM 3-90 retrograde form: hook tail, D on shaft
+        delay: () => P('M100,90 Q58,175 100,260') +
+            P('M110,175 L265,175') +
+            T(175, 130, 'D', 75) +
+            fillHead(295, 175, 0, 50),
+
+        // Attack by fire — bracket tail, arrow from its midpoint, open arrowhead, no letter
+        attack_by_fire: () => P('M85,85 L135,140 L135,210 L85,265') +
+            P('M135,175 L290,175') +
+            openHead(290, 175, 0, 45),
+
+        // Block — line, B, line ending at a perpendicular bar; no arrowhead
+        block: () => P('M30,175 L120,175') +
+            T(165, 175, 'B', 80) +
+            P('M210,175 L275,175') +
+            P('M275,80 L275,270'),
+
+        // Breach — B left of a bracket; arms end in ticks angled inward
+        breach: () => T(45, 210, 'B', 70) +
+            P('M90,95 L90,255') +
+            P('M90,95 L265,95 L305,135') +
+            P('M90,255 L265,255 L305,215'),
+
+        // Clear — three parallel arrows (C on the center one) ending at a bar
+        clear: () => P('M40,90 L280,90') + openHead(280, 90, 0, 38) +
+            P('M40,175 L125,175') + T(165, 175, 'C', 75) + P('M205,175 L280,175') + openHead(280, 175, 0, 38) +
+            P('M40,260 L280,260') + openHead(280, 260, 0, 38) +
+            P('M295,60 L295,290'),
+
+        // Destroy — X broken at the center around D
+        destroy: () => P('M70,70 L132,132 M218,218 L280,280 M280,70 L218,132 M132,218 L70,280') +
+            T(175, 175, 'D', 80),
+
+        // Disrupt — stem to a bar; three filled-head arrows, top longest, D on the center arrow
+        disrupt: () => P('M20,175 L85,175') +
+            P('M85,90 L85,260') +
+            P('M85,90 L275,90') + fillHead(315, 90, 0) +
+            P('M85,175 L130,175') + T(165, 175, 'D', 70) + P('M200,175 L245,175') + fillHead(285, 175, 0) +
+            P('M85,260 L230,260') + fillHead(270, 260, 0),
+
+        // Fix — line, F, zigzag, filled arrowhead
+        fix: () => P('M20,175 L60,175') +
+            T(92, 175, 'F', 75) +
+            P('M125,175 L148,175 L172,120 L198,230 L224,120 L248,175 L268,175') +
+            fillHead(318, 175, 0, 50),
+
+        // Follow and assume — unit (A) in a pointed frame, dashed line, outlined double chevron
+        follow_and_assume: () => P('M30,125 L145,125 L190,175 L145,225 L30,225 Z') +
+            T(88, 175, 'A', 70) +
+            P('M190,175 L262,175', `stroke-dasharray="${f1(sw * 1.4)} ${f1(sw * 1.2)}" stroke-linecap="butt"`) +
+            P('M250,128 L275,128 L322,175 L275,222 L250,222 L297,175 Z'),
+
+        // Follow and support — unit (A) in a notched pointed frame, solid line, open arrowhead
+        follow_and_support: () => P('M20,125 L145,125 L190,175 L145,225 L20,225 L55,175 Z') +
+            T(105, 175, 'A', 70) +
+            P('M190,175 L315,175') +
+            openHead(315, 175, 0, 48),
+
+        // Isolate — open circle ringed by outlined triangles pointing in at the enemy,
+        // arrowhead at the open end, I outside
+        isolate: () => {
+            const r = 95;
+            let s = P(arc(CX, CY, r, A0, A1));
+            [228, 258, 288, 318, 62, 92, 122].forEach((a) => {
+                const b1 = pt(CX, CY, r + 40, a - 9), b2 = pt(CX, CY, r + 40, a + 9), tip = pt(CX, CY, r, a);
+                s += P(`M${b1[0]},${b1[1]} L${tip[0]},${tip[1]} L${b2[0]},${b2[1]} Z`, `stroke-width="${f1(sw * 0.6)}"`);
+            });
+            const e = pt(CX, CY, r, A1);
+            return s + openHead(e[0], e[1], tangentCW(A1) + 15, 42) + T(318, 175, 'I', 70);
+        },
+
+        // Neutralize — line broken by N, crossed by a dashed diagonal (also broken at N)
+        neutralize: () => P('M25,175 L130,175 M220,175 L325,175') +
+            T(175, 175, 'N', 75) +
+            P('M45,275 L135,206 M215,144 L305,75', `stroke-dasharray="${f1(sw * 1.4)} ${f1(sw * 1.2)}" stroke-linecap="butt"`),
+
+        // Occupy — open circle ending in an X at the lower-left, O outside
+        occupy: () => {
+            const t = tangentCW(A1);
+            const x1a = pt(arcEnd[0], arcEnd[1], 38, t + 45), x1b = pt(arcEnd[0], arcEnd[1], -38, t + 45);
+            const x2a = pt(arcEnd[0], arcEnd[1], 38, t - 45), x2b = pt(arcEnd[0], arcEnd[1], -38, t - 45);
+            return P(arc(CX, CY, CR, A0, A1)) +
+                P(`M${x1a[0]},${x1a[1]} L${x1b[0]},${x1b[1]} M${x2a[0]},${x2a[1]} L${x2b[0]},${x2b[1]}`) +
+                T(310, 175, 'O', 60);
+        },
+
+        // Secure — open circle with an open arrowhead at the lower-left end, S outside
+        secure: () => P(arc(CX, CY, CR, A0, A1)) +
+            openHead(arcEnd[0], arcEnd[1], tangentCW(A1) + 15, 45) +
+            T(310, 175, 'S', 70),
+
+        // Seize — unit (A) in a circle, curved arrow with S, open arrowhead at the objective
+        seize: () => `<circle cx="85" cy="120" r="58" fill="none" stroke="${c}" stroke-width="${sw}"/>` +
+            T(85, 120, 'A', 60) +
+            P('M143,120 C215,115 262,165 278,265') +
+            openHead(278, 265, 82, 45) +
+            T(200, 72, 'S', 62),
+    };
+    return wrap((builders[key] || builders.delay)());
 }
 
 // ===== Definition Lists =====
