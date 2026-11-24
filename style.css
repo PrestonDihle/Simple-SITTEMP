@@ -1400,6 +1400,20 @@ html, body {
     margin-left: auto;
 }
 
+/* ===== Control measures (popover) ===== */
+.popover-select {
+    background: #14171c;
+    color: #e8eaf0;
+    border: 1px solid #3a3f4a;
+    border-radius: 3px;
+    padding: 2px 3px;
+    font-size: 11px;
+    max-width: 170px;
+}
+
+.popover-text { text-transform: uppercase; }
+.popover-text::placeholder { text-transform: none; color: #6b707a; }
+
 /* ===== Elevation Shading ===== */
 .popover-elev-btn { margin-top: 4px; }
 
