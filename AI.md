@@ -76,7 +76,7 @@ Simple-SITTEMP/
 
 ### Viewsheds (`js/viewshed.js`)
 - Equipment, unit, and enemy-unit popovers have "+ Add viewshed"; the viewshed moves with its symbol
-- Parameters: range (m), azimuth + arc (mils/degrees toggle, preference saved in localStorage `sittemp_angle_unit`; stored internally as degrees from true north), observer height, target height, color, opacity
+- Parameters: range (m), azimuth + arc (mils/degrees toggle, preference saved in localStorage `sittemp_angle_unit`; stored internally as degrees from true north), observer height, target height, color, fill opacity, and outline width / opacity / line type (solid, dashed, dotted) independent of the symbol's stroke. The outline is a separate `google.maps.Polyline` (polygons can't dash); dashes and dots are repeated polyline icons
 - Range fan is drawn instantly (geometric sector/circle). "Terrain mask" checkbox runs line-of-sight using `google.maps.ElevationService`: up to 120 radial rays × 128 samples, batched 512 locations/request (~30 requests for 360°), with Earth curvature + refraction (k = 0.13); only visible ground is shaded
 - Config is stored in `marker._sittemp.viewshed` (in undo snapshots); overlays (`marker._vs`) and computed masks (in-memory cache keyed by position + params) are runtime-only
 - Requires the Elevation API to be enabled on the Maps key; on REQUEST_DENIED the mask is disabled for the session with a toast

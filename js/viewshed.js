@@ -30,9 +30,50 @@ export const VIEWSHED_DEFAULTS = {
     obsHeight: 2,     // meters above ground at the observer
     tgtHeight: 2,     // meters above ground at the target
     color: '#FF8C00',
-    opacity: 0.3,
+    opacity: 0.3,     // fill opacity
+    lineWidth: 2,     // outline thickness (px)
+    lineOpacity: 0.9, // outline opacity
+    lineType: 'solid', // 'solid' | 'dashed' | 'dotted'
     terrain: false,
 };
+
+export const VIEWSHED_LINE_TYPES = [
+    { key: 'solid', name: 'Solid' },
+    { key: 'dashed', name: 'Dashed' },
+    { key: 'dotted', name: 'Dotted' },
+];
+
+/** Outline style with defaults filled in (older saved viewsheds lack these fields). */
+function _lineStyle(vs) {
+    const w = +vs.lineWidth;
+    const op = +vs.lineOpacity;
+    return {
+        width: Math.max(1, Math.min(10, isNaN(w) ? VIEWSHED_DEFAULTS.lineWidth : w)),
+        opacity: Math.max(0, Math.min(1, (vs.lineOpacity === undefined || isNaN(op)) ? VIEWSHED_DEFAULTS.lineOpacity : op)),
+        type: ['solid', 'dashed', 'dotted'].indexOf(vs.lineType) !== -1 ? vs.lineType : 'solid',
+    };
+}
+
+/**
+ * google.maps.Polyline options for the fan outline. Polygons can't draw dashed
+ * edges, so the outline is a separate polyline; dashes/dots use repeated symbols.
+ */
+function _outlineOptions(vs) {
+    const s = _lineStyle(vs);
+    if (s.type === 'solid') {
+        return { strokeColor: vs.color, strokeOpacity: s.opacity, strokeWeight: s.width, icons: [] };
+    }
+    let icon, repeat;
+    if (s.type === 'dashed') {
+        const dash = Math.max(3, s.width * 2);   // half-length of each dash in px
+        icon = { path: 'M 0,-1 0,1', strokeColor: vs.color, strokeOpacity: s.opacity, strokeWeight: s.width, scale: dash };
+        repeat = (dash * 4) + 'px';
+    } else {
+        icon = { path: google.maps.SymbolPath.CIRCLE, fillColor: vs.color, fillOpacity: s.opacity, strokeWeight: 0, scale: Math.max(1, s.width / 2) };
+        repeat = Math.max(5, s.width * 3) + 'px';
+    }
+    return { strokeColor: vs.color, strokeOpacity: 0, strokeWeight: s.width, icons: [{ icon: icon, offset: '0', repeat: repeat }] };
+}
 
 const VS_COLORS = ['#FF8C00', '#FF0000', '#0000FF', '#00AA00', '#800080', '#000000', '#FFFFFF', '#808080'];
 
@@ -77,6 +118,12 @@ export function fanPath(pos, vs) {
     for (let i = 0; i <= steps; i++) path.push(destPoint(pos.lat, pos.lng, start + v.arc * i / steps, v.range));
     path.push({ lat: pos.lat, lng: pos.lng });
     return path;
+}
+
+function _closed(path) {
+    if (!path.length) return path;
+    const a = path[0], b = path[path.length - 1];
+    return (a.lat === b.lat && a.lng === b.lng) ? path : path.concat([a]);
 }
 
 function _posOf(marker) {
@@ -227,6 +274,7 @@ export function clearViewshedOverlays(marker) {
     const o = marker && marker._vs;
     if (!o) return;
     o.fan.setMap(null);
+    o.outline.setMap(null);
     o.mask.setMap(null);
     o.listeners.forEach(function (l) { google.maps.event.removeListener(l); });
     marker._vs = null;
@@ -242,13 +290,16 @@ export function syncViewshed(marker) {
     if (!marker._vs) {
         const common = { map: map, clickable: false };
         marker._vs = {
-            fan: new google.maps.Polygon(Object.assign({ zIndex: 4 }, common)),
+            fan: new google.maps.Polygon(Object.assign({ zIndex: 4, strokeWeight: 0 }, common)),
+            outline: new google.maps.Polyline(Object.assign({ zIndex: 5 }, common)),
             mask: new google.maps.Polygon(Object.assign({ zIndex: 3, strokeWeight: 0 }, common)),
             listeners: [],
         };
         marker._vs.listeners.push(marker.addListener('drag', function () {
             if (!marker._vs) return;
-            marker._vs.fan.setPath(fanPath(_posOf(marker), marker._sittemp.viewshed));
+            const path = fanPath(_posOf(marker), marker._sittemp.viewshed);
+            marker._vs.fan.setPath(path);
+            marker._vs.outline.setPath(_closed(path));
             marker._vs.mask.setPaths([]);
         }));
         marker._vs.listeners.push(marker.addListener('dragend', function () { syncViewshed(marker); }));
@@ -256,14 +307,15 @@ export function syncViewshed(marker) {
 
     const o = marker._vs;
     const opacity = Math.max(0, Math.min(1, vs.opacity !== undefined ? +vs.opacity : VIEWSHED_DEFAULTS.opacity));
+    const path = fanPath(pos, vs);
     o.fan.setOptions({
-        strokeColor: vs.color,
-        strokeOpacity: 0.9,
-        strokeWeight: 2,
+        strokeWeight: 0,
         fillColor: vs.color,
         fillOpacity: vs.terrain ? 0 : opacity,
     });
-    o.fan.setPath(fanPath(pos, vs));
+    o.fan.setPath(path);
+    o.outline.setOptions(_outlineOptions(vs));
+    o.outline.setPath(_closed(path));
     o.mask.setOptions({ fillColor: vs.color, fillOpacity: opacity });
 
     if (!vs.terrain) {
@@ -462,24 +514,62 @@ export function buildViewshedSection(popover, marker, onChange) {
         cRow.appendChild(sws);
         section.appendChild(cRow);
 
-        // Opacity slider
-        const oRow = document.createElement('div');
-        oRow.className = 'popover-row';
-        oRow.innerHTML = '<span class="popover-label">Opacity</span>';
-        const sl = document.createElement('input');
-        sl.type = 'range'; sl.className = 'popover-slider';
-        sl.min = 0; sl.max = 1; sl.step = 0.05; sl.value = vs.opacity;
-        const val = document.createElement('span');
-        val.className = 'popover-val';
-        val.textContent = Math.round(vs.opacity * 100) + '%';
-        sl.addEventListener('input', function () {
-            vs.opacity = parseFloat(sl.value);
-            val.textContent = Math.round(vs.opacity * 100) + '%';
-            commit();
+        function sliderRow(label, title, min, max, step, value, fmt, onSet) {
+            const row = document.createElement('div');
+            row.className = 'popover-row';
+            row.title = title;
+            const lbl = document.createElement('span');
+            lbl.className = 'popover-label';
+            lbl.textContent = label;
+            const sl = document.createElement('input');
+            sl.type = 'range'; sl.className = 'popover-slider';
+            sl.min = min; sl.max = max; sl.step = step; sl.value = value;
+            const val = document.createElement('span');
+            val.className = 'popover-val';
+            val.textContent = fmt(value);
+            sl.addEventListener('input', function () {
+                const v = parseFloat(sl.value);
+                onSet(v);
+                val.textContent = fmt(v);
+                commit();
+            });
+            row.appendChild(lbl);
+            row.appendChild(sl);
+            row.appendChild(val);
+            section.appendChild(row);
+        }
+        const pct = function (v) { return Math.round(v * 100) + '%'; };
+        const ls = _lineStyle(vs);
+
+        // Fill (shaded area) opacity
+        sliderRow('Fill', 'Opacity of the shaded fan / visible terrain', 0, 1, 0.05, vs.opacity, pct,
+            function (v) { vs.opacity = v; });
+
+        // Outline: thickness, opacity, line type (independent of the symbol's own stroke)
+        sliderRow('Width', 'Outline thickness', 1, 10, 1, ls.width, function (v) { return Math.round(v) + 'px'; },
+            function (v) { vs.lineWidth = v; });
+        sliderRow('Line', 'Outline opacity', 0, 1, 0.05, ls.opacity, pct,
+            function (v) { vs.lineOpacity = v; });
+
+        const tyRow = document.createElement('div');
+        tyRow.className = 'popover-row';
+        tyRow.innerHTML = '<span class="popover-label">Style</span>';
+        const tyGroup = document.createElement('div');
+        tyGroup.className = 'popover-seg';
+        VIEWSHED_LINE_TYPES.forEach(function (t) {
+            const b = document.createElement('button');
+            b.className = 'popover-seg-btn' + (t.key === ls.type ? ' active' : '');
+            b.textContent = t.name;
+            b.addEventListener('click', function () {
+                tyGroup.querySelectorAll('.popover-seg-btn').forEach(function (x) { x.classList.remove('active'); });
+                b.classList.add('active');
+                vs.lineType = t.key;
+                commit();
+            });
+            tyGroup.appendChild(b);
         });
-        oRow.appendChild(sl);
-        oRow.appendChild(val);
-        section.appendChild(oRow);
+        tyRow.appendChild(tyGroup);
+        section.appendChild(tyRow);
     }
 
     render();
@@ -496,7 +586,7 @@ export function initViewshedPrefs() {
 // ===== KML =====
 
 function _kmlColor(hex, opacity) {
-    const h = (hex || '#FF8C00').replace('#', '');
+    const h = (hex || '#FF8C00').replace('#', '').toLowerCase();
     const a = Math.round(Math.max(0, Math.min(1, opacity)) * 255).toString(16).padStart(2, '0');
     return a + h.slice(4, 6) + h.slice(2, 4) + h.slice(0, 2);
 }
@@ -514,11 +604,13 @@ export function viewshedKML(marker, name) {
     if (!vs) return '';
     const pos = _posOf(marker);
     const opacity = vs.opacity !== undefined ? vs.opacity : VIEWSHED_DEFAULTS.opacity;
-    const line = _kmlColor(vs.color, 0.9);
+    // KML has no dashed lines, so line type is not exported; width and opacity are.
+    const ls = _lineStyle(vs);
+    const line = _kmlColor(vs.color, ls.opacity);
     let kml = '';
 
     kml += '<Placemark>\n<name>' + name + ' range fan</name>\n';
-    kml += '<Style><LineStyle><color>' + line + '</color><width>2</width></LineStyle>'
+    kml += '<Style><LineStyle><color>' + line + '</color><width>' + ls.width + '</width></LineStyle>'
         + '<PolyStyle><color>' + _kmlColor(vs.color, vs.terrain ? 0 : opacity) + '</color></PolyStyle></Style>\n';
     kml += _kmlRing(fanPath(pos, vs));
     kml += '</Placemark>\n';

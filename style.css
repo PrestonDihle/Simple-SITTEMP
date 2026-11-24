@@ -1371,6 +1371,29 @@ html, body {
     white-space: nowrap;
 }
 
+.popover-seg {
+    display: flex;
+    gap: 2px;
+}
+
+.popover-seg-btn {
+    background: #2d323c;
+    color: #c8ccd4;
+    border: 1px solid #3a3f4a;
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.popover-seg-btn:hover { background: #3a404c; }
+
+.popover-seg-btn.active {
+    background: #4a5262;
+    color: #fff;
+    border-color: #8b909a;
+}
+
 .popover-vs-status {
     font-size: 10px;
     color: #8b909a;
