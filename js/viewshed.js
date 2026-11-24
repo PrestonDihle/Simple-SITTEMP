@@ -158,6 +158,38 @@ function _getElevations(locations) {
     });
 }
 
+/** Number of Elevation service requests needed for n points. */
+export function elevationRequestCount(n) {
+    return Math.ceil(n / LOCATIONS_PER_REQUEST);
+}
+
+/**
+ * Elevations (m) for an array of google.maps.LatLng, fetched in batches of 512
+ * with limited concurrency and retry on rate limiting. Rejects with
+ * Error('REQUEST_DENIED') when the Elevation API is not enabled for the key.
+ */
+export async function fetchElevations(pts, onProgress) {
+    const batches = [];
+    for (let k = 0; k < pts.length; k += LOCATIONS_PER_REQUEST) batches.push(k);
+    const elev = new Array(pts.length);
+    let done = 0;
+    let next = 0;
+    async function worker() {
+        while (next < batches.length) {
+            const k = batches[next++];
+            const chunk = pts.slice(k, k + LOCATIONS_PER_REQUEST);
+            const res = await _getElevations(chunk);
+            for (let n = 0; n < res.length; n++) elev[k + n] = res[n];
+            done++;
+            if (onProgress) onProgress(done / batches.length);
+        }
+    }
+    const workers = [];
+    for (let w = 0; w < Math.min(MAX_CONCURRENT, batches.length); w++) workers.push(worker());
+    await Promise.all(workers);
+    return elev;
+}
+
 async function _computeMask(pos, vs, onProgress) {
     const v = _norm(vs);
     const full = v.arc >= 360;
@@ -178,25 +210,7 @@ async function _computeMask(pos, vs, onProgress) {
         }
     }
 
-    // Fetch elevations in batches with limited concurrency.
-    const batches = [];
-    for (let k = 0; k < pts.length; k += LOCATIONS_PER_REQUEST) batches.push(k);
-    const elev = new Array(pts.length);
-    let done = 0;
-    let next = 0;
-    async function worker() {
-        while (next < batches.length) {
-            const k = batches[next++];
-            const chunk = pts.slice(k, k + LOCATIONS_PER_REQUEST);
-            const res = await _getElevations(chunk);
-            for (let n = 0; n < res.length; n++) elev[k + n] = res[n];
-            done++;
-            if (onProgress) onProgress(done / batches.length);
-        }
-    }
-    const workers = [];
-    for (let w = 0; w < Math.min(MAX_CONCURRENT, batches.length); w++) workers.push(worker());
-    await Promise.all(workers);
+    const elev = await fetchElevations(pts, onProgress);
 
     // Line of sight along each ray, with Earth curvature and refraction.
     const rings = [];
