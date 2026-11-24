@@ -39,6 +39,17 @@ export const PALETTES = [
 ];
 export const DEFAULT_PALETTE = 'classic';
 
+// Relief (hillshade) options
+export const SHADE_STYLES = [
+    { key: 'bands', name: 'Bands' },
+    { key: 'bands_relief', name: 'Bands + relief' },
+    { key: 'relief', name: 'Relief only' },
+];
+export const DEFAULT_EXAGGERATION = 3;
+export const MAX_EXAGGERATION = 10;
+const SUN_AZ = 315;    // degrees from north (northwest light, cartographic convention)
+const SUN_ALT = 45;    // degrees above the horizon
+
 let _shades = [];               // { id, ring:[[lat,lng]...], bounds:{n,s,e,w}, interval, opacity, overlay, status, stats }
 const _grids = new Map();       // id -> { rows, cols, elev: Float64Array }
 let _nextId = 1;
@@ -140,9 +151,14 @@ export function renderShade(shade, grid) {
     }
     if (min === Infinity) { min = Math.min.apply(null, elev); max = Math.max.apply(null, elev); }
 
+    const style = SHADE_STYLES.some(function (s) { return s.key === shade.style; }) ? shade.style : 'bands';
+    const useBands = style !== 'relief';
+    const hs = style !== 'bands' ? hillshadeGrid(grid, b, shade.exaggeration) : null;
+
     const W = Math.min(MAX_CANVAS, cols * UPSAMPLE);
     const H = Math.min(MAX_CANVAS, rows * UPSAMPLE);
     const bands = new Int32Array(W * H);
+    const light = hs ? new Float32Array(W * H) : null;
     for (let py = 0; py < H; py++) {
         const gy = py / (H - 1) * (rows - 1);
         const r0 = Math.min(rows - 2, Math.floor(gy)), ty = gy - r0;
@@ -150,9 +166,12 @@ export function renderShade(shade, grid) {
             const gx = px / (W - 1) * (cols - 1);
             const c0 = Math.min(cols - 2, Math.floor(gx)), tx = gx - c0;
             const i00 = r0 * cols + c0;
-            const e = (elev[i00] * (1 - tx) + elev[i00 + 1] * tx) * (1 - ty)
-                + (elev[i00 + cols] * (1 - tx) + elev[i00 + cols + 1] * tx) * ty;
+            const w00 = (1 - tx) * (1 - ty), w01 = tx * (1 - ty), w10 = (1 - tx) * ty, w11 = tx * ty;
+            const e = elev[i00] * w00 + elev[i00 + 1] * w01 + elev[i00 + cols] * w10 + elev[i00 + cols + 1] * w11;
             bands[py * W + px] = Math.floor(e / interval);
+            // Hillshade is computed on the sample grid and interpolated, which avoids
+            // the faceting you'd get from differentiating the bilinear surface
+            if (light) light[py * W + px] = hs[i00] * w00 + hs[i00 + 1] * w01 + hs[i00 + cols] * w10 + hs[i00 + cols + 1] * w11;
         }
     }
 
@@ -163,13 +182,25 @@ export function renderShade(shade, grid) {
     const palette = shade.palette || DEFAULT_PALETTE;
     const minBand = Math.floor(min / interval), maxBand = Math.floor(max / interval);
     const colorCache = new Map();
+    const FLAT = Math.sin(SUN_ALT * D2R);   // brightness of level ground
     for (let p = 0; p < W * H; p++) {
-        const band = bands[p];
-        let rgb = colorCache.get(band);
-        if (!rgb) { rgb = bandColor(palette, band, minBand, maxBand); colorCache.set(band, rgb); }
-        img.data[p * 4] = rgb[0];
-        img.data[p * 4 + 1] = rgb[1];
-        img.data[p * 4 + 2] = rgb[2];
+        let r, g, bl;
+        if (useBands) {
+            const band = bands[p];
+            let rgb = colorCache.get(band);
+            if (!rgb) { rgb = bandColor(palette, band, minBand, maxBand); colorCache.set(band, rgb); }
+            r = rgb[0]; g = rgb[1]; bl = rgb[2];
+            if (light) {
+                // Multiply blend normalized so level ground keeps its band color
+                const f = Math.max(0.2, Math.min(1.45, light[p] / FLAT));
+                r = Math.min(255, r * f); g = Math.min(255, g * f); bl = Math.min(255, bl * f);
+            }
+        } else {
+            r = g = bl = Math.round(40 + 215 * light[p]);
+        }
+        img.data[p * 4] = r;
+        img.data[p * 4 + 1] = g;
+        img.data[p * 4 + 2] = bl;
         img.data[p * 4 + 3] = 255;
     }
     ctx.putImageData(img, 0, 0);
@@ -191,7 +222,33 @@ export function renderShade(shade, grid) {
     }
 
     const bandList = Array.from(bandSet).sort(function (a, c) { return c - a; });
-    return { url: canvas.toDataURL('image/png'), stats: { min: min, max: max, bands: bandList, interval: interval, palette: palette, minBand: minBand, maxBand: maxBand } };
+    return { url: canvas.toDataURL('image/png'), stats: { min: min, max: max, bands: bandList, interval: interval, palette: palette, minBand: minBand, maxBand: maxBand, style: style } };
+}
+
+/**
+ * Lambertian hillshade (0..1) for each grid sample, sun from the northwest at
+ * 45°. Slopes are multiplied by the vertical exaggeration before shading.
+ */
+export function hillshadeGrid(grid, bounds, exaggeration) {
+    const rows = grid.rows, cols = grid.cols, elev = grid.elev;
+    const z = Math.max(1, Math.min(MAX_EXAGGERATION, +exaggeration || DEFAULT_EXAGGERATION));
+    const midLat = (bounds.n + bounds.s) / 2;
+    const dx = (bounds.e - bounds.w) * 111320 * Math.cos(midLat * D2R) / (cols - 1);   // m per column
+    const dy = (bounds.n - bounds.s) * 111320 / (rows - 1);                              // m per row
+    const az = SUN_AZ * D2R, alt = SUN_ALT * D2R;
+    const Lx = Math.sin(az) * Math.cos(alt), Ly = Math.cos(az) * Math.cos(alt), Lz = Math.sin(alt);
+    const out = new Float32Array(rows * cols);
+    for (let r = 0; r < rows; r++) {
+        const rN = Math.max(0, r - 1), rS = Math.min(rows - 1, r + 1);
+        for (let c = 0; c < cols; c++) {
+            const cW = Math.max(0, c - 1), cE = Math.min(cols - 1, c + 1);
+            const dzdx = (elev[r * cols + cE] - elev[r * cols + cW]) / ((cE - cW) * dx) * z;   // rise toward east
+            const dzdy = (elev[rN * cols + c] - elev[rS * cols + c]) / ((rS - rN) * dy) * z;   // rise toward north (row 0 is north)
+            const len = Math.sqrt(dzdx * dzdx + dzdy * dzdy + 1);
+            out[r * cols + c] = Math.max(0, (-dzdx * Lx - dzdy * Ly + Lz) / len);
+        }
+    }
+    return out;
 }
 
 // ===== Shade lifecycle =====
@@ -259,7 +316,8 @@ function _add(ring, isView) {
     const spec = gridSpec(bounds);
     const shade = {
         id: _nextId++, ring: ring, bounds: bounds, isView: !!isView,
-        interval: _defaultInterval(), palette: _defaultPalette(), opacity: DEFAULT_OPACITY, overlay: null, status: '', stats: null,
+        interval: _defaultInterval(), palette: _defaultPalette(), style: 'bands', exaggeration: DEFAULT_EXAGGERATION,
+        opacity: DEFAULT_OPACITY, overlay: null, status: '', stats: null,
     };
     _shades.push(shade);
     const reqs = elevationRequestCount(spec.rows * spec.cols);
@@ -338,7 +396,8 @@ export function shadeCurrentView() {
 /** Serializable shade configs for undo snapshots. */
 export function getShadeConfigs() {
     return _shades.map(function (s) {
-        return { id: s.id, ring: s.ring, isView: s.isView, interval: s.interval, palette: s.palette, opacity: s.opacity };
+        return { id: s.id, ring: s.ring, isView: s.isView, interval: s.interval, palette: s.palette,
+            style: s.style, exaggeration: s.exaggeration, opacity: s.opacity };
     });
 }
 
@@ -348,7 +407,8 @@ export function restoreShades(configs) {
     _shades = (configs || []).map(function (c) {
         _nextId = Math.max(_nextId, c.id + 1);
         return { id: c.id, ring: c.ring, bounds: boundsOfRing(c.ring), isView: !!c.isView,
-            interval: c.interval, palette: c.palette || DEFAULT_PALETTE, opacity: c.opacity, overlay: null, status: '', stats: null };
+            interval: c.interval, palette: c.palette || DEFAULT_PALETTE, style: c.style || 'bands',
+            exaggeration: c.exaggeration || DEFAULT_EXAGGERATION, opacity: c.opacity, overlay: null, status: '', stats: null };
     });
     _shades.forEach(function (s) { _load(s); });
     _renderLegend();
@@ -425,13 +485,51 @@ function _renderLegend() {
         ctl.appendChild(inp); ctl.appendChild(lbl); ctl.appendChild(sl);
         box.appendChild(ctl);
 
-        // Palette picker (redraws from the cached grid, no new requests)
-        const pRow = document.createElement('div');
-        pRow.className = 'elev-ctl';
-        pRow.appendChild(_paletteSelect(shade.palette || DEFAULT_PALETTE, function (v) {
-            shade.palette = v; _draw(shade); _notify();
-        }));
-        box.appendChild(pRow);
+        // Style (bands / relief) and exaggeration (redraws from the cached grid, no new requests)
+        const sRow = document.createElement('div');
+        sRow.className = 'elev-ctl';
+        const styleSel = document.createElement('select');
+        styleSel.className = 'popover-select';
+        styleSel.title = 'Relief adds hillshading from the same elevation data';
+        SHADE_STYLES.forEach(function (s) {
+            const op = document.createElement('option');
+            op.value = s.key; op.textContent = s.name;
+            styleSel.appendChild(op);
+        });
+        styleSel.value = shade.style || 'bands';
+        styleSel.addEventListener('keydown', function (e) { e.stopPropagation(); });
+        styleSel.addEventListener('change', function () { shade.style = styleSel.value; _draw(shade); _notify(); });
+        sRow.appendChild(styleSel);
+        box.appendChild(sRow);
+
+        if (shade.style && shade.style !== 'bands') {
+            const eRow = document.createElement('div');
+            eRow.className = 'elev-ctl';
+            eRow.title = 'Vertical exaggeration of the relief shading';
+            const eLbl = document.createElement('span');
+            eLbl.textContent = 'Exag';
+            const ex = document.createElement('input');
+            ex.type = 'range'; ex.min = 1; ex.max = MAX_EXAGGERATION; ex.step = 0.5;
+            ex.value = shade.exaggeration || DEFAULT_EXAGGERATION;
+            ex.className = 'popover-slider';
+            const eVal = document.createElement('span');
+            eVal.className = 'elev-exag-val';
+            eVal.textContent = (+ex.value) + '×';
+            ex.addEventListener('input', function () { eVal.textContent = (+ex.value) + '×'; });
+            ex.addEventListener('change', function () { shade.exaggeration = +ex.value; _draw(shade); _notify(); });
+            eRow.appendChild(eLbl); eRow.appendChild(ex); eRow.appendChild(eVal);
+            box.appendChild(eRow);
+        }
+
+        // Palette picker (not used by relief-only)
+        if (shade.style !== 'relief') {
+            const pRow = document.createElement('div');
+            pRow.className = 'elev-ctl';
+            pRow.appendChild(_paletteSelect(shade.palette || DEFAULT_PALETTE, function (v) {
+                shade.palette = v; _draw(shade); _notify();
+            }));
+            box.appendChild(pRow);
+        }
 
         const st = shade.stats;
         if (st) {
@@ -439,7 +537,8 @@ function _renderLegend() {
             mm.className = 'elev-status';
             mm.textContent = 'Min ' + _fmt(st.min) + ' · Max ' + _fmt(st.max);
             box.appendChild(mm);
-
+        }
+        if (st && st.style !== 'relief') {
             const list = document.createElement('div');
             list.className = 'elev-bands';
             const n = st.bands.length;
