@@ -36,6 +36,7 @@ Simple-SITTEMP/
     elevation.js       # Elevation band shading for drawn areas or the current view
     measures.js        # Control-measure tags (PZ/LZ/DZ/HA/FARP/BP, airspace zones) on drawn areas
     routes.js          # Flight routes (SP/ACP/RP), air corridors, route card, CSV/PDF
+    contours.js        # Vector contour lines for the current view (marching squares)
   README.md            # Human-facing documentation
   AI.md                # This file - AI agent working memory
   LICENSE              # MIT License
@@ -101,6 +102,12 @@ Simple-SITTEMP/
 - Leg labels on the map ("034°M 4.4NM 2:54"); route card panel (`#route-card`, bottom center) with editable name, color, declination, GS/alt per leg, SP/RP names, remove-ACP, totals, CSV and PDF (jsPDF) export, delete
 - Air corridor option: type AC/LLTR/MRR/SL/SC/SAAFR/TC/UA, width (ft), min/max alt (AGL/MSL), DTG start/end → corridor edges between circles of radius width/2 at each checkpoint, rotated "SAAFR BLUE" label on the longest leg, and the NAME/WIDTH/MIN ALT/MAX ALT/DTG block
 - Route data is in undo snapshots (`routes`); KML export writes each route as a LineString plus checkpoint Points
+
+### Contour Lines (`js/contours.js`)
+- Map submenu → Contours: interval (m, default 20) + "Contour current view". Separate from elevation shading; each run costs its own ~20 Elevation requests (`fetchElevations` from viewshed.js, `gridSpec`/`gridPoints` from elevation.js)
+- Marching squares on the ~100×100 grid (saddles resolved by the cell-center average), segments joined into polylines by shared edge keys, drawn as non-clickable `google.maps.Polyline`s so they stay crisp at any zoom; capped at 250 levels
+- Legend entry (`#contour-legend`, stacked with `#elev-legend` in `#map-legends` bottom-left): interval, width, 8 colors (brown default), index lines (every 5th contour, +1.5 px), elevation labels on index lines (rotated along the line), remove
+- Configs (`contours`) in undo snapshots; grids cached by id. KML export writes each contour as a styled LineString
 
 ### Elevation Shading (`js/elevation.js`)
 - Sources: "Shade elevation" button in the popover of polygon / rectangle / circle / freehand features, or Map submenu → Elevation → "Shade current view" (band interval input there sets the default)
