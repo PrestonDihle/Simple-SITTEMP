@@ -10,6 +10,7 @@ import { showToast } from './toolbar.js';
 import { viewshedKML } from './viewshed.js';
 import { measureTitle, measureLines } from './measures.js';
 import { routesKML } from './routes.js';
+import { contoursKML } from './contours.js';
 
 // ===== Export Setup =====
 
@@ -101,6 +102,7 @@ function exportKML() {
     });
 
     kml += routesKML();
+    kml += contoursKML();
 
     kml += '</Document>\n</kml>';
 

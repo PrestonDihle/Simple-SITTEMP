@@ -222,6 +222,15 @@
                 </label>
                 <button class="map-type-btn elev-shade-btn" id="elev-shade-view" title="Color the current map view by elevation bands (~20 Elevation API requests). To shade a drawn shape, click it and choose Shade elevation.">Shade current view</button>
             </div>
+            <h3>Contours</h3>
+            <div class="elev-submenu">
+                <label class="elev-interval-row">
+                    <span>Interval</span>
+                    <input type="number" id="contour-interval" min="1" step="5" value="20">
+                    <span>m</span>
+                </label>
+                <button class="map-type-btn elev-shade-btn" id="contour-view-btn" title="Draw contour lines for the current map view (~20 Elevation API requests). Color, width, index lines and labels are set in the contour legend.">Contour current view</button>
+            </div>
         </div>
 
         <!-- MGRS Grid Controls -->

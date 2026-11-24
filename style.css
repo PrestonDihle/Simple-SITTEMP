@@ -1557,13 +1557,25 @@ input.rc-input::placeholder { text-transform: none; color: #6b707a; }
 
 .elev-shade-btn { width: 100%; }
 
-#elev-legend {
-    display: none;
+/* Bottom-left stack for the elevation and contour legends */
+#map-legends {
     position: absolute;
     left: calc(70px + 1vw);
     bottom: 24px;
     z-index: 900;
-    max-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 70vh;
+    pointer-events: none;
+}
+
+#map-legends > * { pointer-events: auto; }
+
+#elev-legend,
+#contour-legend {
+    display: none;
+    max-height: 45vh;
     overflow-y: auto;
     background: rgba(30, 34, 40, 0.92);
     border: 1px solid #3a3f4a;

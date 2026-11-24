@@ -361,10 +361,20 @@ function _legendEl() {
     if (!el) {
         el = document.createElement('div');
         el.id = 'elev-legend';
-        const container = document.getElementById('map-container') || document.body;
-        container.appendChild(el);
+        legendHost().appendChild(el);
     }
     return el;
+}
+
+/** Bottom-left stack that holds the elevation and contour legends. */
+export function legendHost() {
+    let host = document.getElementById('map-legends');
+    if (!host) {
+        host = document.createElement('div');
+        host.id = 'map-legends';
+        (document.getElementById('map-container') || document.body).appendChild(host);
+    }
+    return host;
 }
 
 function _fmt(m) { return Math.round(m).toLocaleString('en-US'); }

@@ -13,6 +13,7 @@ import { setupExport } from './js/export.js';
 import { initViewshedPrefs } from './js/viewshed.js';
 import { setupElevationShading } from './js/elevation.js';
 import { setupRoutes } from './js/routes.js';
+import { setupContours } from './js/contours.js';
 import { pushUndoState } from './js/drawing.js';
 
 // ===== Initialization =====
@@ -78,6 +79,7 @@ function initMap() {
     initViewshedPrefs();
     setupElevationShading(pushUndoState);
     setupRoutes(pushUndoState);
+    setupContours(pushUndoState);
 
     // Keyboard shortcut: R to rotate selected equipment/unit symbol
     document.addEventListener('keydown', function (e) {

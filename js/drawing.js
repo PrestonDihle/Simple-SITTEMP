@@ -16,6 +16,7 @@ import { syncViewshed, clearViewshedOverlays, buildViewshedSection } from './vie
 import { shadeFeature, getShadeConfigs, restoreShades } from './elevation.js';
 import { buildMeasureSection, syncMeasureLabel, syncAllMeasureLabels, forgetMeasure } from './measures.js';
 import { enterRoutePlacement, exitRoutePlacement, getRouteConfigs, restoreRoutes } from './routes.js';
+import { getContourConfigs, restoreContours } from './contours.js';
 
 // ===== Per-Feature Style Helper Functions =====
 // These are passed as function-based styles to Terra Draw so each feature
@@ -1162,7 +1163,8 @@ export function pushUndoState() {
         featureStyles: Object.assign({}, get('featureStyles')),
         featureMeasures: JSON.parse(JSON.stringify(get('featureMeasures') || {})),
         elevationShades: getShadeConfigs(),
-        routes: getRouteConfigs()
+        routes: getRouteConfigs(),
+        contours: getContourConfigs()
     };
 
     undoStack.push(JSON.stringify(snapshot));
@@ -1274,6 +1276,9 @@ function restoreState(stateJson) {
 
     // Restore flight routes
     restoreRoutes(saved.routes || []);
+
+    // Restore contour line sets (grids are cached, so this doesn't re-query)
+    restoreContours(saved.contours || []);
 }
 
 function recreateMarker(data) {
