@@ -120,6 +120,7 @@ Simple-SITTEMP/
 ### MGRS Features
 - Real-time cursor coordinate display (Lat/Lon + MGRS) in upper-right
 - **MGRS Center-On Input:** text field + Go button in `#coord-display`; strips spaces, calls `mgrs.toPoint()`, calls `map.setCenter()` preserving zoom, error-toasts on invalid input
+- **Training-area quick links** (below the MGRS input): JMRC, NTC (= `DEFAULT_CENTER`), JRTC, JPMRC buttons; coordinates in `data-lat`/`data-lng` on the buttons in index.html, wired in `setupMGRSGoto()`; center at `DEFAULT_ZOOM`
 - MGRS grid overlay with easting/northing labels
 - Three scale options: 1:50K (1km), 1:100K, 1:250K
 - Grid color/weight selection, dynamic update on pan/zoom
