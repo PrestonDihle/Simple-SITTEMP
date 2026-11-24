@@ -6,8 +6,9 @@
  *
  * A ~100x100 grid of elevations is fetched from the Google Maps Elevation service
  * (~20 requests), upsampled with bilinear interpolation, classified into bands of
- * a fixed interval, colored on an absolute hypsometric ramp (so a color means the
- * same elevation everywhere), clipped to the shape, and shown as a GroundOverlay.
+ * a fixed interval, colored with one of five palettes (Muted, Soft, Classic, Bold,
+ * Dark) stretched from the lowest to the highest band in the area, clipped to the
+ * shape, and shown as a GroundOverlay. Bands are flat fills with no contour lines.
  * Grid rows are spaced evenly in Web Mercator so the image lines up with the map.
  *
  * Shade configs (area, interval, opacity) are part of undo snapshots; fetched
@@ -27,11 +28,16 @@ const MAX_CANVAS = 1200;
 export const DEFAULT_INTERVAL = 50;   // meters
 const DEFAULT_OPACITY = 0.55;
 
-// Absolute hypsometric ramp: [elevation m, color]
-const HYPSO = [
-    [-500, '#2b5f9e'], [0, '#4f9a5e'], [300, '#86c07a'], [700, '#d6e29a'],
-    [1200, '#e8c27a'], [1800, '#c98e52'], [2600, '#946748'], [3500, '#b3aaa1'], [4500, '#ffffff'],
+// Color palettes, muted → bold, plus a dark theme. Stops run low → peak and are
+// stretched across the bands present in each shaded area.
+export const PALETTES = [
+    { key: 'muted', name: 'Muted', stops: ['#6f7d6a', '#959a7e', '#b4ad92', '#cbc2b0', '#e4dfd6'] },
+    { key: 'soft', name: 'Soft', stops: ['#9fcfae', '#cfe5ad', '#f2e3a6', '#e9c39d', '#d9a88f', '#f7efe8'] },
+    { key: 'classic', name: 'Classic', stops: ['#4f9a5e', '#86c07a', '#d6e29a', '#e8c27a', '#c98e52', '#946748', '#ffffff'] },
+    { key: 'bold', name: 'Bold', stops: ['#006837', '#1a9850', '#a6d96a', '#fee08b', '#f46d43', '#d73027', '#7f0000'] },
+    { key: 'dark', name: 'Dark (white peaks)', stops: ['#0b1026', '#1b2a55', '#2d4f86', '#4f86ad', '#93bfd0', '#d6e8ee', '#ffffff'] },
 ];
+export const DEFAULT_PALETTE = 'classic';
 
 let _shades = [];               // { id, ring:[[lat,lng]...], bounds:{n,s,e,w}, interval, opacity, overlay, status, stats }
 const _grids = new Map();       // id -> { rows, cols, elev: Float64Array }
@@ -49,19 +55,23 @@ function hexToRgb(h) {
     h = h.replace('#', '');
     return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
 }
-const _RAMP = HYPSO.map(function (s) { return [s[0], hexToRgb(s[1])]; });
+const _RGB = {};
+PALETTES.forEach(function (p) { _RGB[p.key] = p.stops.map(hexToRgb); });
 
-/** RGB for an absolute elevation on the hypsometric ramp. */
-export function rampColor(elev) {
-    if (elev <= _RAMP[0][0]) return _RAMP[0][1];
-    for (let i = 1; i < _RAMP.length; i++) {
-        if (elev <= _RAMP[i][0]) {
-            const a = _RAMP[i - 1], b = _RAMP[i];
-            const t = (elev - a[0]) / (b[0] - a[0]);
-            return [0, 1, 2].map(function (k) { return Math.round(a[1][k] + (b[1][k] - a[1][k]) * t); });
-        }
-    }
-    return _RAMP[_RAMP.length - 1][1];
+/** RGB at position t (0 = low, 1 = peak) on a palette. */
+export function paletteColor(key, t) {
+    const stops = _RGB[key] || _RGB[DEFAULT_PALETTE];
+    t = Math.max(0, Math.min(1, t));
+    const x = t * (stops.length - 1);
+    const i = Math.min(stops.length - 2, Math.floor(x)), f = x - i;
+    const a = stops[i], b = stops[i + 1];
+    return [0, 1, 2].map(function (k) { return Math.round(a[k] + (b[k] - a[k]) * f); });
+}
+
+/** RGB for a band, stretched so the lowest band in the area is the first stop and the highest the peak. */
+export function bandColor(key, band, minBand, maxBand) {
+    const t = maxBand > minBand ? (band - minBand) / (maxBand - minBand) : 0.5;
+    return paletteColor(key, t);
 }
 
 /** Grid dimensions for a bounds box, keeping cells roughly square on the ground. */
@@ -150,18 +160,16 @@ export function renderShade(shade, grid) {
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
     const img = ctx.createImageData(W, H);
+    const palette = shade.palette || DEFAULT_PALETTE;
+    const minBand = Math.floor(min / interval), maxBand = Math.floor(max / interval);
     const colorCache = new Map();
     for (let p = 0; p < W * H; p++) {
         const band = bands[p];
         let rgb = colorCache.get(band);
-        if (!rgb) { rgb = rampColor((band + 0.5) * interval); colorCache.set(band, rgb); }
-        // Darken band boundaries so each band edge reads like a contour
-        const x = p % W;
-        const edge = (x + 1 < W && bands[p + 1] !== band) || (p + W < W * H && bands[p + W] !== band);
-        const f = edge ? 0.55 : 1;
-        img.data[p * 4] = rgb[0] * f;
-        img.data[p * 4 + 1] = rgb[1] * f;
-        img.data[p * 4 + 2] = rgb[2] * f;
+        if (!rgb) { rgb = bandColor(palette, band, minBand, maxBand); colorCache.set(band, rgb); }
+        img.data[p * 4] = rgb[0];
+        img.data[p * 4 + 1] = rgb[1];
+        img.data[p * 4 + 2] = rgb[2];
         img.data[p * 4 + 3] = 255;
     }
     ctx.putImageData(img, 0, 0);
@@ -183,7 +191,7 @@ export function renderShade(shade, grid) {
     }
 
     const bandList = Array.from(bandSet).sort(function (a, c) { return c - a; });
-    return { url: canvas.toDataURL('image/png'), stats: { min: min, max: max, bands: bandList, interval: interval } };
+    return { url: canvas.toDataURL('image/png'), stats: { min: min, max: max, bands: bandList, interval: interval, palette: palette, minBand: minBand, maxBand: maxBand } };
 }
 
 // ===== Shade lifecycle =====
@@ -251,7 +259,7 @@ function _add(ring, isView) {
     const spec = gridSpec(bounds);
     const shade = {
         id: _nextId++, ring: ring, bounds: bounds, isView: !!isView,
-        interval: _defaultInterval(), opacity: DEFAULT_OPACITY, overlay: null, status: '', stats: null,
+        interval: _defaultInterval(), palette: _defaultPalette(), opacity: DEFAULT_OPACITY, overlay: null, status: '', stats: null,
     };
     _shades.push(shade);
     const reqs = elevationRequestCount(spec.rows * spec.cols);
@@ -266,6 +274,36 @@ function _remove(shade, notify) {
     // Grid stays cached so undoing the removal doesn't re-query the service
     _renderLegend();
     if (notify !== false) _notify();
+}
+
+function _defaultPalette() {
+    const sel = document.getElementById('elev-palette');
+    const v = sel ? sel.value : null;
+    return PALETTES.some(function (p) { return p.key === v; }) ? v : DEFAULT_PALETTE;
+}
+
+/** Palette <select> whose options show a small gradient preview. */
+function _paletteSelect(value, onSet) {
+    const sel = document.createElement('select');
+    sel.className = 'popover-select elev-palette-select';
+    PALETTES.forEach(function (p) {
+        const op = document.createElement('option');
+        op.value = p.key; op.textContent = p.name;
+        sel.appendChild(op);
+    });
+    sel.value = value;
+    const paint = function () {
+        const p = PALETTES.find(function (x) { return x.key === sel.value; }) || PALETTES[0];
+        sel.style.borderLeft = '14px solid ' + p.stops[Math.floor(p.stops.length / 2)];
+        sel.style.backgroundImage = 'linear-gradient(to right, ' + p.stops.join(',') + ')';
+        sel.style.backgroundSize = '100% 3px';
+        sel.style.backgroundRepeat = 'no-repeat';
+        sel.style.backgroundPosition = 'bottom';
+    };
+    paint();
+    sel.addEventListener('keydown', function (e) { e.stopPropagation(); });
+    sel.addEventListener('change', function () { paint(); onSet(sel.value); });
+    return sel;
 }
 
 function _defaultInterval() {
@@ -300,7 +338,7 @@ export function shadeCurrentView() {
 /** Serializable shade configs for undo snapshots. */
 export function getShadeConfigs() {
     return _shades.map(function (s) {
-        return { id: s.id, ring: s.ring, isView: s.isView, interval: s.interval, opacity: s.opacity };
+        return { id: s.id, ring: s.ring, isView: s.isView, interval: s.interval, palette: s.palette, opacity: s.opacity };
     });
 }
 
@@ -310,7 +348,7 @@ export function restoreShades(configs) {
     _shades = (configs || []).map(function (c) {
         _nextId = Math.max(_nextId, c.id + 1);
         return { id: c.id, ring: c.ring, bounds: boundsOfRing(c.ring), isView: !!c.isView,
-            interval: c.interval, opacity: c.opacity, overlay: null, status: '', stats: null };
+            interval: c.interval, palette: c.palette || DEFAULT_PALETTE, opacity: c.opacity, overlay: null, status: '', stats: null };
     });
     _shades.forEach(function (s) { _load(s); });
     _renderLegend();
@@ -387,6 +425,14 @@ function _renderLegend() {
         ctl.appendChild(inp); ctl.appendChild(lbl); ctl.appendChild(sl);
         box.appendChild(ctl);
 
+        // Palette picker (redraws from the cached grid, no new requests)
+        const pRow = document.createElement('div');
+        pRow.className = 'elev-ctl';
+        pRow.appendChild(_paletteSelect(shade.palette || DEFAULT_PALETTE, function (v) {
+            shade.palette = v; _draw(shade); _notify();
+        }));
+        box.appendChild(pRow);
+
         const st = shade.stats;
         if (st) {
             const mm = document.createElement('div');
@@ -404,10 +450,11 @@ function _renderLegend() {
                 row.className = 'elev-band' + (compact ? ' compact' : '');
                 const sw = document.createElement('span');
                 sw.className = 'elev-swatch';
-                const rgb = rampColor((band + 0.5) * st.interval);
+                const rgb = bandColor(st.palette, band, st.minBand, st.maxBand);
                 sw.style.background = 'rgb(' + rgb.join(',') + ')';
                 row.appendChild(sw);
-                if (i % labelEvery === 0 || i === n - 1) {
+                // Label every Nth band; label the last band too unless that would crowd the previous label
+                if (i % labelEvery === 0 || (i === n - 1 && i % labelEvery >= 2)) {
                     const t = document.createElement('span');
                     t.textContent = _fmt(band * st.interval) + '–' + _fmt((band + 1) * st.interval);
                     row.appendChild(t);
@@ -429,5 +476,17 @@ export function setupElevationShading(onChange) {
     if (btn) btn.addEventListener('click', shadeCurrentView);
     const inp = document.getElementById('elev-interval');
     if (inp) inp.addEventListener('keydown', function (e) { e.stopPropagation(); });
+
+    // Default palette for new shadings (remembered between visits)
+    const holder = document.getElementById('elev-palette-holder');
+    if (holder) {
+        let saved = DEFAULT_PALETTE;
+        try { saved = localStorage.getItem('sittemp_elev_palette') || DEFAULT_PALETTE; } catch (e) { /* ignore */ }
+        const sel = _paletteSelect(PALETTES.some(function (p) { return p.key === saved; }) ? saved : DEFAULT_PALETTE, function (v) {
+            try { localStorage.setItem('sittemp_elev_palette', v); } catch (e) { /* ignore */ }
+        });
+        sel.id = 'elev-palette';
+        holder.appendChild(sel);
+    }
     _renderLegend();
 }

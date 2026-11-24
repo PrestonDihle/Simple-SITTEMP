@@ -104,9 +104,9 @@ Simple-SITTEMP/
 
 ### Elevation Shading (`js/elevation.js`)
 - Sources: "Shade elevation" button in the popover of polygon / rectangle / circle / freehand features, or Map submenu → Elevation → "Shade current view" (band interval input there sets the default)
-- Fixed bands in meters: color comes from an absolute hypsometric ramp at the band midpoint, so a color means the same elevation anywhere; band edges are darkened to read as contours
+- Fixed bands in meters, flat fills (no contour lines). Five palettes (`PALETTES`): Muted, Soft, Classic, Bold, Dark (white peaks), stretched from the lowest to the highest band inside the area, so the top band is always the peak color; colors are not comparable between separate shadings. Default palette picker in Map submenu (localStorage `sittemp_elev_palette`); per-shading picker in the legend
 - ~100×100 grid (≈20 Elevation requests), rows spaced evenly in Web Mercator so the GroundOverlay lines up; bilinear upsample ×4 (max 1200 px), clipped to the shape on a canvas; warns when samples are > 300 m apart
-- Legend (`#elev-legend`, bottom-left, inside `#map-container` so PDF/PNG capture it): per-shading interval input, opacity slider, min/max, band list, × to remove
+- Legend (`#elev-legend`, bottom-left, inside `#map-container` so PDF/PNG capture it): per-shading interval input, opacity slider, palette picker, min/max, band list, × to remove
 - Shade configs are in undo snapshots (`elevationShades`); fetched grids are cached in memory by shade id, so undo/redo and interval changes don't re-query
 - A shading is a snapshot of the area when created; moving or deleting the source shape does not change it. Not included in KML export
 
