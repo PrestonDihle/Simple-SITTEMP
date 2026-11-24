@@ -12,6 +12,7 @@ import { setupCoordinateDisplay, setupRightClickMGRS, setupMGRSGrid, setupMGRSGo
 import { setupExport } from './js/export.js';
 import { initViewshedPrefs } from './js/viewshed.js';
 import { setupElevationShading } from './js/elevation.js';
+import { setupRoutes } from './js/routes.js';
 import { pushUndoState } from './js/drawing.js';
 
 // ===== Initialization =====
@@ -76,6 +77,7 @@ function initMap() {
     setupExport();
     initViewshedPrefs();
     setupElevationShading(pushUndoState);
+    setupRoutes(pushUndoState);
 
     // Keyboard shortcut: R to rotate selected equipment/unit symbol
     document.addEventListener('keydown', function (e) {

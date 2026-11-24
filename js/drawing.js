@@ -15,6 +15,7 @@ import { showToast } from './toolbar.js';
 import { syncViewshed, clearViewshedOverlays, buildViewshedSection } from './viewshed.js';
 import { shadeFeature, getShadeConfigs, restoreShades } from './elevation.js';
 import { buildMeasureSection, syncMeasureLabel, syncAllMeasureLabels, forgetMeasure } from './measures.js';
+import { enterRoutePlacement, exitRoutePlacement, getRouteConfigs, restoreRoutes } from './routes.js';
 
 // ===== Per-Feature Style Helper Functions =====
 // These are passed as function-based styles to Terra Draw so each feature
@@ -243,9 +244,12 @@ export function activateShape(key) {
     if (!get('ready')) return;
     exitTextPlacement();
     exitSymbolPlacement();
+    exitRoutePlacement();
     const draw = get('draw');
 
-    if (key === 'triangle') {
+    if (key === 'flight_route') {
+        enterRoutePlacement();
+    } else if (key === 'triangle') {
         enterTrianglePlacement();
     } else if (key === 'star') {
         enterStarPlacement();
@@ -260,6 +264,7 @@ export function activateShape(key) {
 export function enterSymbolPlacement(type, key) {
     exitSymbolPlacement();
     exitTextPlacement();
+    exitRoutePlacement();
     set('pendingSymbolType', type);
     set('pendingSymbolKey', key);
 
@@ -1156,7 +1161,8 @@ export function pushUndoState() {
         featureLineTypes: Object.assign({}, get('featureLineTypes')),
         featureStyles: Object.assign({}, get('featureStyles')),
         featureMeasures: JSON.parse(JSON.stringify(get('featureMeasures') || {})),
-        elevationShades: getShadeConfigs()
+        elevationShades: getShadeConfigs(),
+        routes: getRouteConfigs()
     };
 
     undoStack.push(JSON.stringify(snapshot));
@@ -1265,6 +1271,9 @@ function restoreState(stateJson) {
 
     // Restore elevation shading (grids are cached, so this doesn't re-query)
     restoreShades(saved.elevationShades || []);
+
+    // Restore flight routes
+    restoreRoutes(saved.routes || []);
 }
 
 function recreateMarker(data) {
@@ -1627,6 +1636,7 @@ export function enterMeasureMode() {
     exitMeasureMode();
     exitTextPlacement();
     exitSymbolPlacement();
+    exitRoutePlacement();
     if (get('ready')) get('draw').setMode('select');
 
     measureState.active = true;

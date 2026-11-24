@@ -9,6 +9,7 @@ import { escapeXml } from './symbols.js';
 import { showToast } from './toolbar.js';
 import { viewshedKML } from './viewshed.js';
 import { measureTitle, measureLines } from './measures.js';
+import { routesKML } from './routes.js';
 
 // ===== Export Setup =====
 
@@ -98,6 +99,8 @@ function exportKML() {
         kml += '</Placemark>\n';
         kml += viewshedKML(m, name);
     });
+
+    kml += routesKML();
 
     kml += '</Document>\n</kml>';
 
