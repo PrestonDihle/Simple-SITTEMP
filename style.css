@@ -1608,7 +1608,6 @@ input.rc-input::placeholder { text-transform: none; color: #6b707a; }
 }
 
 .elev-num { width: 50px; }
-.elev-exag-val { flex: 0 0 28px; text-align: right; color: #8b909a; }
 
 .elev-status {
     color: #8b909a;
