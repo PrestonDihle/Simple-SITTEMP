@@ -32,7 +32,8 @@ Simple-SITTEMP/
     symbols.js         # SVG generation for equipment/unit/enemy/tactical/star/text symbols
     grid.js            # MGRS grid overlay, coordinate display, MGRS goto input
     export.js          # KML, PDF, and screenshot export
-    viewshed.js        # Range fans + terrain-masked viewsheds attached to symbols
+    viewshed.js        # Range fans + terrain-masked viewsheds attached to symbols; shared fetchElevations()
+    elevation.js       # Elevation band shading for drawn areas or the current view
   README.md            # Human-facing documentation
   AI.md                # This file - AI agent working memory
   LICENSE              # MIT License
@@ -81,6 +82,14 @@ Simple-SITTEMP/
 - Config is stored in `marker._sittemp.viewshed` (in undo snapshots); overlays (`marker._vs`) and computed masks (in-memory cache keyed by position + params) are runtime-only
 - Requires the Elevation API to be enabled on the Maps key; on REQUEST_DENIED the mask is disabled for the session with a toast
 - KML export writes the range fan and, when computed, the visible-terrain MultiGeometry
+
+### Elevation Shading (`js/elevation.js`)
+- Sources: "Shade elevation" button in the popover of polygon / rectangle / circle / freehand features, or Map submenu → Elevation → "Shade current view" (band interval input there sets the default)
+- Fixed bands in meters: color comes from an absolute hypsometric ramp at the band midpoint, so a color means the same elevation anywhere; band edges are darkened to read as contours
+- ~100×100 grid (≈20 Elevation requests), rows spaced evenly in Web Mercator so the GroundOverlay lines up; bilinear upsample ×4 (max 1200 px), clipped to the shape on a canvas; warns when samples are > 300 m apart
+- Legend (`#elev-legend`, bottom-left, inside `#map-container` so PDF/PNG capture it): per-shading interval input, opacity slider, min/max, band list, × to remove
+- Shade configs are in undo snapshots (`elevationShades`); fetched grids are cached in memory by shade id, so undo/redo and interval changes don't re-query
+- A shading is a snapshot of the area when created; moving or deleting the source shape does not change it. Not included in KML export
 
 ### MGRS Features
 - Real-time cursor coordinate display (Lat/Lon + MGRS) in upper-right

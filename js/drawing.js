@@ -13,6 +13,7 @@ import {
 } from './symbols.js';
 import { showToast } from './toolbar.js';
 import { syncViewshed, clearViewshedOverlays, buildViewshedSection } from './viewshed.js';
+import { shadeFeature, getShadeConfigs, restoreShades } from './elevation.js';
 
 // ===== Per-Feature Style Helper Functions =====
 // These are passed as function-based styles to Terra Draw so each feature
@@ -1006,6 +1007,22 @@ function _buildPopoverContent(popover, type, info) {
             function (v) { return parseFloat(v).toFixed(1) + 'x'; }));
     }
 
+    // Elevation shading for area shapes
+    if (hasFill) {
+        var featureId = get('selectedFeatureId');
+        if (featureId) {
+            var shadeBtn = document.createElement('button');
+            shadeBtn.className = 'popover-vs-add popover-elev-btn';
+            shadeBtn.textContent = 'Shade elevation';
+            shadeBtn.title = 'Color this area by elevation bands (uses ~20 Elevation API requests)';
+            shadeBtn.addEventListener('click', function () {
+                _hidePopover();
+                shadeFeature(featureId);
+            });
+            popover.appendChild(shadeBtn);
+        }
+    }
+
     // Viewshed controls for equipment / unit / enemy unit symbols
     if (type === 'equipment' || type === 'unit' || type === 'enemy_unit') {
         var selMarker = get('markers').find(function (m) { return m._selected; });
@@ -1121,7 +1138,8 @@ export function pushUndoState() {
             };
         }),
         featureLineTypes: Object.assign({}, get('featureLineTypes')),
-        featureStyles: Object.assign({}, get('featureStyles'))
+        featureStyles: Object.assign({}, get('featureStyles')),
+        elevationShades: getShadeConfigs()
     };
 
     undoStack.push(JSON.stringify(snapshot));
@@ -1221,6 +1239,9 @@ function restoreState(stateJson) {
     saved.markers.forEach(function (data) {
         recreateMarker(data);
     });
+
+    // Restore elevation shading (grids are cached, so this doesn't re-query)
+    restoreShades(saved.elevationShades || []);
 }
 
 function recreateMarker(data) {
