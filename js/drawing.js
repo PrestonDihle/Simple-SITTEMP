@@ -14,6 +14,7 @@ import {
 import { showToast } from './toolbar.js';
 import { syncViewshed, clearViewshedOverlays, buildViewshedSection } from './viewshed.js';
 import { shadeFeature, getShadeConfigs, restoreShades } from './elevation.js';
+import { buildMeasureSection, syncMeasureLabel, syncAllMeasureLabels, forgetMeasure } from './measures.js';
 
 // ===== Per-Feature Style Helper Functions =====
 // These are passed as function-based styles to Terra Draw so each feature
@@ -179,7 +180,16 @@ export function initTerraDraw() {
     });
 
     draw.on('change', function (ids, type) {
-        if (type === 'delete') pushUndoState();
+        if (type === 'delete') {
+            ids.forEach(forgetMeasure);
+            pushUndoState();
+        }
+
+        // Keep control-measure labels on their shapes
+        if (type === 'update') {
+            var measures = get('featureMeasures');
+            ids.forEach(function (id) { if (measures[id]) syncMeasureLabel(id); });
+        }
 
         // Sync overlay positions when features are updated (dragged/edited)
         if (type === 'update') {
@@ -769,6 +779,7 @@ function _applyStyleToFeature(featureId, prop, value) {
     if (!featureStyles[featureId]) featureStyles[featureId] = {};
     featureStyles[featureId][prop] = value;
     updateDrawStyles(); // triggers re-render of all features using the updated function
+    if (prop === 'lineColor') syncMeasureLabel(featureId); // label follows the outline color
     _scheduleUndoPush();
 }
 
@@ -1007,6 +1018,11 @@ function _buildPopoverContent(popover, type, info) {
             function (v) { return parseFloat(v).toFixed(1) + 'x'; }));
     }
 
+    // Control measure tagging (PZ/LZ/BP..., airspace zones) for area shapes
+    if (hasFill && get('selectedFeatureId')) {
+        buildMeasureSection(popover, get('selectedFeatureId'), _scheduleUndoPush);
+    }
+
     // Elevation shading for area shapes
     if (hasFill) {
         var featureId = get('selectedFeatureId');
@@ -1139,6 +1155,7 @@ export function pushUndoState() {
         }),
         featureLineTypes: Object.assign({}, get('featureLineTypes')),
         featureStyles: Object.assign({}, get('featureStyles')),
+        featureMeasures: JSON.parse(JSON.stringify(get('featureMeasures') || {})),
         elevationShades: getShadeConfigs()
     };
 
@@ -1212,6 +1229,12 @@ function restoreState(stateJson) {
             try { draw.addFeatures(saved.features); } catch (e) { /* ignore */ }
         }
     }
+
+    // Restore control-measure tags (after draw.clear(), whose delete events drop tags)
+    const featureMeasures = get('featureMeasures');
+    for (const id of Object.keys(featureMeasures)) delete featureMeasures[id];
+    if (saved.featureMeasures) Object.assign(featureMeasures, JSON.parse(JSON.stringify(saved.featureMeasures)));
+    syncAllMeasureLabels();
 
     // Re-apply line type overlays for restored features
     const map = get('map');

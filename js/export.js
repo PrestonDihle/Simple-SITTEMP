@@ -8,6 +8,7 @@ import { get } from './state.js';
 import { escapeXml } from './symbols.js';
 import { showToast } from './toolbar.js';
 import { viewshedKML } from './viewshed.js';
+import { measureTitle, measureLines } from './measures.js';
 
 // ===== Export Setup =====
 
@@ -105,8 +106,10 @@ function exportKML() {
 }
 
 function featureToKML(feature, index) {
+    const m = (get('featureMeasures') || {})[feature.id];
     let kml = '<Placemark>\n';
-    kml += '<name>Feature ' + index + '</name>\n';
+    kml += '<name>' + escapeXml(measureTitle(m) || ('Feature ' + index)) + '</name>\n';
+    if (m) kml += '<description>' + escapeXml(measureLines(m).join('\n')) + '</description>\n';
 
     const geom = feature.geometry;
     if (geom.type === 'Point') {

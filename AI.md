@@ -34,6 +34,7 @@ Simple-SITTEMP/
     export.js          # KML, PDF, and screenshot export
     viewshed.js        # Range fans + terrain-masked viewsheds attached to symbols; shared fetchElevations()
     elevation.js       # Elevation band shading for drawn areas or the current view
+    measures.js        # Control-measure tags (PZ/LZ/DZ/HA/FARP/BP, airspace zones) on drawn areas
   README.md            # Human-facing documentation
   AI.md                # This file - AI agent working memory
   LICENSE              # MIT License
@@ -82,6 +83,14 @@ Simple-SITTEMP/
 - Config is stored in `marker._sittemp.viewshed` (in undo snapshots); overlays (`marker._vs`) and computed masks (in-memory cache keyed by position + params) are runtime-only
 - Requires the Elevation API to be enabled on the Maps key; on REQUEST_DENIED the mask is disabled for the session with a toast
 - KML export writes the range fan and, when computed, the visible-terrain MultiGeometry
+
+### Control Measures (`js/measures.js`)
+- Popover of any polygon / rectangle / circle / freehand has a "Control measure" section: Type + fields
+- Area (FM 1-02.2 INCL C1 Tables 5-4/5-5): PZ, LZ, DZ, HA, FARP → label "PZ WOLF" at the area centroid; BP → name inside plus echelon glyph (I, II, X…) on the bottom edge (its white halo stands in for the doctrinal gap). HA is not in Table 5-4 and uses the same template
+- Airspace (Table 5-23): ROZ, HIDACZ, AARROZ, UAROZ, WEZ, JEZ, MEZ, LOMEZ, HIMEZ, SHORAD EZ → block: function, unit (T), MIN/MAX ALT in feet AGL or MSL, TIME FROM/TO (DTG)
+- Tags in `state.featureMeasures[featureId]` (in undo snapshots); labels are non-clickable markers that follow Terra Draw `change` update/delete events and the outline color
+- KML: tagged features export with the measure as the Placemark name and the label block as description
+- Not implemented: BP planned/prepared (dashed) variants — Terra Draw polygons can't dash; coordinating altitude (not in the extract)
 
 ### Elevation Shading (`js/elevation.js`)
 - Sources: "Shade elevation" button in the popover of polygon / rectangle / circle / freehand features, or Map submenu → Elevation → "Shade current view" (band interval input there sets the default)

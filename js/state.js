@@ -78,6 +78,9 @@ const initialState = {
     // Per-feature style overrides keyed by feature ID
     featureStyles: {},
 
+    // Control-measure tags keyed by feature ID (PZ/LZ/BP..., airspace zones)
+    featureMeasures: {},
+
     // Selection info for panel sync (set by drawing.js, read by toolbar.js)
     selectionInfo: null,
 
