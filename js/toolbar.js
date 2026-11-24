@@ -4,7 +4,7 @@
  * Toolbar button handlers, submenu building, color picker, and toast notifications.
  */
 
-import { get, set, subscribe, COLORS } from './state.js';
+import { get, set, subscribe, COLORS, SYMBOL_MAX_SCALE, TASK_MAX_SCALE } from './state.js';
 import {
     equipmentSVG, unitSVG, enemyUnitSVG, tacticalTaskSVG,
     EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
@@ -474,6 +474,16 @@ function buildColorSubmenu() {
     subscribe('selectionInfo', function (info) {
         var indicator = document.getElementById('color-selection-indicator');
         var indicatorText = document.getElementById('color-selection-text');
+
+        // Tactical tasks can scale to 10x; everything else stays at 3x
+        var maxScale = (info && info.type === 'tactical_task') ? TASK_MAX_SCALE : SYMBOL_MAX_SCALE;
+        scaleSlider.max = maxScale;
+        if (!info && get('symbolScale') > SYMBOL_MAX_SCALE) {
+            set('symbolScale', SYMBOL_MAX_SCALE);
+            scaleSlider.value = SYMBOL_MAX_SCALE;
+            scaleLabel.textContent = SYMBOL_MAX_SCALE.toFixed(1) + 'x';
+        }
+
         if (!info) {
             if (indicator) indicator.style.display = 'none';
             return;
