@@ -1315,6 +1315,68 @@ html, body {
     color: #8b909a;
 }
 
+/* Viewshed section in the object popover */
+.popover-vs {
+    border-top: 1px solid #3a3f4a;
+    margin-top: 6px;
+    padding-top: 6px;
+    min-width: 210px;
+}
+
+.popover-vs-add,
+.popover-vs-remove,
+.popover-unit-toggle {
+    background: #2d323c;
+    color: #e8eaf0;
+    border: 1px solid #3a3f4a;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.popover-vs-add { width: 100%; padding: 5px 8px; }
+.popover-vs-add:hover,
+.popover-vs-remove:hover,
+.popover-unit-toggle:hover { background: #3a404c; }
+
+.popover-vs-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.popover-vs-remove { padding: 2px 6px; }
+.popover-unit-toggle { padding: 2px 5px; min-width: 36px; }
+
+.popover-num {
+    width: 68px;
+    background: #14171c;
+    color: #e8eaf0;
+    border: 1px solid #3a3f4a;
+    border-radius: 3px;
+    padding: 2px 4px;
+    font-size: 11px;
+}
+
+.popover-unit {
+    font-size: 11px;
+    color: #8b909a;
+}
+
+.popover-check {
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.popover-vs-status {
+    font-size: 10px;
+    color: #8b909a;
+    margin-left: auto;
+}
+
 /* ===== Help Dialog ===== */
 #help-dialog {
     position: fixed;

@@ -7,6 +7,7 @@
 import { get } from './state.js';
 import { escapeXml } from './symbols.js';
 import { showToast } from './toolbar.js';
+import { viewshedKML } from './viewshed.js';
 
 // ===== Export Setup =====
 
@@ -89,10 +90,12 @@ function exportKML() {
 
     markers.forEach(function (m, i) {
         const pos = m.getPosition();
+        const name = escapeXml((m._sittemp && m._sittemp.text) || (m._sittemp && m._sittemp.key) || 'Marker ' + i);
         kml += '<Placemark>\n';
-        kml += '<name>' + escapeXml((m._sittemp && m._sittemp.text) || (m._sittemp && m._sittemp.key) || 'Marker ' + i) + '</name>\n';
+        kml += '<name>' + name + '</name>\n';
         kml += '<Point><coordinates>' + pos.lng() + ',' + pos.lat() + ',0</coordinates></Point>\n';
         kml += '</Placemark>\n';
+        kml += viewshedKML(m, name);
     });
 
     kml += '</Document>\n</kml>';

@@ -95,6 +95,9 @@ const initialState = {
     showLabels: true,
     citiesOnly: false,
 
+    // Viewshed angle unit: 'mils' (6400) or 'deg'
+    angleUnit: 'mils',
+
     // Export pending callback
     exportCallback: null,
 };

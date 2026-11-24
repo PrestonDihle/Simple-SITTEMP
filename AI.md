@@ -32,6 +32,7 @@ Simple-SITTEMP/
     symbols.js         # SVG generation for equipment/unit/enemy/tactical/star/text symbols
     grid.js            # MGRS grid overlay, coordinate display, MGRS goto input
     export.js          # KML, PDF, and screenshot export
+    viewshed.js        # Range fans + terrain-masked viewsheds attached to symbols
   README.md            # Human-facing documentation
   AI.md                # This file - AI agent working memory
   LICENSE              # MIT License
@@ -72,6 +73,14 @@ Simple-SITTEMP/
 - **Enemy Units, Tactical Tasks** — additional symbol sets
 - Each symbol: SVG graphic + optional left text (20 char, bottom of symbol area) + optional right text (20 char, bottom of symbol area)
 - Symbols are selectable, draggable, deletable; scale/color editable in real time
+
+### Viewsheds (`js/viewshed.js`)
+- Equipment, unit, and enemy-unit popovers have "+ Add viewshed"; the viewshed moves with its symbol
+- Parameters: range (m), azimuth + arc (mils/degrees toggle, preference saved in localStorage `sittemp_angle_unit`; stored internally as degrees from true north), observer height, target height, color, opacity
+- Range fan is drawn instantly (geometric sector/circle). "Terrain mask" checkbox runs line-of-sight using `google.maps.ElevationService`: up to 120 radial rays × 128 samples, batched 512 locations/request (~30 requests for 360°), with Earth curvature + refraction (k = 0.13); only visible ground is shaded
+- Config is stored in `marker._sittemp.viewshed` (in undo snapshots); overlays (`marker._vs`) and computed masks (in-memory cache keyed by position + params) are runtime-only
+- Requires the Elevation API to be enabled on the Maps key; on REQUEST_DENIED the mask is disabled for the session with a toast
+- KML export writes the range fan and, when computed, the visible-terrain MultiGeometry
 
 ### MGRS Features
 - Real-time cursor coordinate display (Lat/Lon + MGRS) in upper-right
@@ -181,7 +190,7 @@ overlay.setMap(map);
 - [x] Right-click MGRS copy to clipboard
 - [x] Shapes (circle, rectangle, polygon, linestring, freehand, star, triangle)
 - [x] Line types (solid, dashed, dotted, dash-dot, mine belt, wire obstacle, tank ditch)
-- [x] 24+ equipment symbols, 11 unit symbols, enemy units, 15 tactical tasks (geometry verified against FM 3-90 Appendix B / Table 8-2 figures, including task-designator letters)
+- [x] 24+ equipment symbols, 11 unit symbols, enemy units, 15 tactical tasks (geometry matched to FM 1-02.2 INCL C1, Table 6-1; Delay is not in that table and keeps its FM 3-90 form)
 - [x] Coordinate display and Style Panel stacked in `#right-rail` (flex column) so they never overlap regardless of viewport height
 - [x] Symbol placement with left/right text labels (bottom of symbol area, `symY+40`)
 - [x] Symbol echelon markers
