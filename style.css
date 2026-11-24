@@ -1342,6 +1342,19 @@ html, body {
     color: #8b909a;
 }
 
+.popover-rot-btn {
+    background: #2d323c;
+    color: #e8eaf0;
+    border: 1px solid #3a3f4a;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 2px 8px;
+}
+
+.popover-rot-btn:hover { background: #3a404c; }
+
 /* Viewshed section in the object popover */
 .popover-vs {
     border-top: 1px solid #3a3f4a;

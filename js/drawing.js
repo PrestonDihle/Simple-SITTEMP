@@ -5,7 +5,7 @@
  * line-type styling, undo/redo, and draw-style updates.
  */
 
-import { get, set, subscribe, MAX_UNDO_STATES } from './state.js';
+import { get, set, subscribe, MAX_UNDO_STATES, SYMBOL_MAX_SCALE, TASK_MAX_SCALE } from './state.js';
 import {
     equipmentSVG, unitSVG, enemyUnitSVG, tacticalTaskSVG,
     EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
@@ -651,9 +651,8 @@ export function rotateSelectedMarker(degrees) {
     }
 
     const info = selected._sittemp;
-    // Only rotate equipment, unit, and enemy_unit symbols
-    if (info.type !== 'equipment' && info.type !== 'unit' && info.type !== 'enemy_unit') {
-        showToast('Rotation applies to equipment and unit symbols');
+    if (!isRotatable(info.type)) {
+        showToast('Rotation applies to equipment, unit and tactical task symbols');
         return;
     }
 
@@ -661,33 +660,20 @@ export function rotateSelectedMarker(degrees) {
     const currentRotation = info.rotation || 0;
     info.rotation = (currentRotation + degrees + 360) % 360;
 
-    // Rebuild the SVG icon with the new rotation
-    const sw = info.strokeWidth || 2;
-    var svgBase;
-    if (info.type === 'equipment') {
-        svgBase = equipmentSVG(info.key, info.color, sw);
-    } else if (info.type === 'enemy_unit') {
-        svgBase = enemyUnitSVG(info.key, info.color, sw);
-    } else if (info.type === 'tactical_task') {
-        svgBase = tacticalTaskSVG(info.key, info.color, sw);
-    } else {
-        svgBase = unitSVG(info.key, info.color, sw);
+    // An attached viewshed turns with its symbol (both measured clockwise)
+    if (info.viewshed) {
+        info.viewshed.azimuth = ((((+info.viewshed.azimuth || 0) + degrees) % 360) + 360) % 360;
+        syncViewshed(selected);
     }
-    const ech = info.echelon || 'none';
-    const fullSVG = buildSymbolWithLabels(svgBase, info.leftText, info.rightText, info.color, info.rotation, ech);
-    const scale = info.symbolScale || 1.0;
-    const echelonH = (ech !== 'none') ? 14 : 0;
-    const h = 50 + echelonH;
-    const iconUrl = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(fullSVG);
 
-    selected.setIcon({
-        url: iconUrl,
-        scaledSize: new google.maps.Size(150 * scale, h * scale),
-        anchor: new google.maps.Point(75 * scale, (h / 2) * scale)
-    });
-
+    rebuildMarkerIcon(selected);   // keeps the selection highlight
     showToast('Rotated to ' + info.rotation + '°');
     pushUndoState();
+}
+
+/** Symbol types that can be rotated with R / Shift+R or the popover buttons. */
+export function isRotatable(type) {
+    return type === 'equipment' || type === 'unit' || type === 'enemy_unit' || type === 'tactical_task';
 }
 
 // ===== Live Style Editing =====
@@ -1020,8 +1006,39 @@ function _buildPopoverContent(popover, type, info) {
     popover.appendChild(makeSliderRow('Stroke', 'strokeWidth', 1, 10, 1, strokeWidth,
         function (v) { return Math.round(v); }));
     if (isMarker) {
-        popover.appendChild(makeSliderRow('Scale', 'symbolScale', 0.5, 3, 0.1, symbolScale,
+        var maxScale = type === 'tactical_task' ? TASK_MAX_SCALE : SYMBOL_MAX_SCALE;
+        popover.appendChild(makeSliderRow('Scale', 'symbolScale', 0.5, maxScale, 0.1, symbolScale,
             function (v) { return parseFloat(v).toFixed(1) + 'x'; }));
+    }
+
+    // Rotate buttons (same 15° steps as R / Shift+R)
+    if (isRotatable(type)) {
+        var rotMarker = get('markers').find(function (m) { return m._selected; });
+        if (rotMarker) {
+            var rotRow = document.createElement('div');
+            rotRow.className = 'popover-row';
+            var rotLbl = document.createElement('span');
+            rotLbl.className = 'popover-label';
+            rotLbl.textContent = 'Rotate';
+            var rotVal = document.createElement('span');
+            rotVal.className = 'popover-val';
+            var showRot = function () { rotVal.textContent = (rotMarker._sittemp.rotation || 0) + '°'; };
+            var mkRotBtn = function (txt, deg, title) {
+                var b = document.createElement('button');
+                b.className = 'popover-rot-btn';
+                b.textContent = txt;
+                b.title = title;
+                // Rebuild the popover so the viewshed Az field shows the new azimuth
+                b.addEventListener('click', function () { rotateSelectedMarker(deg); _showPopoverForMarker(rotMarker); });
+                return b;
+            };
+            rotRow.appendChild(rotLbl);
+            rotRow.appendChild(mkRotBtn('⟲', -15, 'Rotate 15° counterclockwise (Shift+R)'));
+            rotRow.appendChild(mkRotBtn('⟳', 15, 'Rotate 15° clockwise (R)'));
+            rotRow.appendChild(rotVal);
+            showRot();
+            popover.appendChild(rotRow);
+        }
     }
 
     // Control measure tagging (PZ/LZ/BP..., airspace zones) for area shapes

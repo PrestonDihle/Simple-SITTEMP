@@ -247,6 +247,8 @@ overlay.setMap(map);
 - [x] Undo/redo (50-state stack) for Terra Draw features + markers + styles
 - [x] KML export, PDF export (Letter/Tabloid/Arch C), Screenshot (PNG)
 - [x] Keyboard shortcuts: R/Shift+R rotate, Ctrl+Z undo, Ctrl+Y redo, Delete clear
+- [x] Rotation (R/Shift+R or popover ⟲/⟳, 15° steps) applies to equipment, unit, enemy unit and tactical task symbols (`isRotatable()`); an attached viewshed azimuth turns with the symbol
+- [x] Scale limits: `SYMBOL_MAX_SCALE` = 3× for symbols, `TASK_MAX_SCALE` = 10× for tactical tasks (popover slider and Style Panel slider max follow the selection)
 
 ## Known Limitations & Gotchas
 - Terra Draw CDN versions pinned: terra-draw@1.24.2, terra-draw-google-maps-adapter@1.3.1

@@ -10,6 +10,8 @@
 export const DEFAULT_CENTER = { lat: 35.2625, lng: -116.6800 }; // Fort Irwin / NTC
 export const DEFAULT_ZOOM = 12;
 export const MAX_UNDO_STATES = 50;
+export const SYMBOL_MAX_SCALE = 3;    // max scale for symbols in general
+export const TASK_MAX_SCALE = 10;     // tactical task graphics can be drawn larger
 
 export const COLORS = {
     Green:  '#00AA00',
