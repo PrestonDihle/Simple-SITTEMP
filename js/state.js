@@ -13,6 +13,13 @@ export const MAX_UNDO_STATES = 50;
 export const SYMBOL_MAX_SCALE = 3;    // max scale for symbols in general
 export const TASK_MAX_SCALE = 10;     // tactical task graphics can be drawn larger
 
+// Default colors for placed symbols (friendly blue, enemy red, equipment black)
+export const SYMBOL_DEFAULT_COLORS = {
+    equipment: '#000000',
+    unit: '#0000FF',
+    enemy_unit: '#FF0000',
+};
+
 export const COLORS = {
     Green:  '#00AA00',
     Blue:   '#0000FF',
@@ -21,7 +28,8 @@ export const COLORS = {
     Orange: '#FF8C00',
     Black:  '#000000',
     White:  '#FFFFFF',
-    Grey:   '#808080'
+    Grey:   '#808080',
+    Yellow: '#FFFF00'
 };
 
 // ===== Initial State Shape =====

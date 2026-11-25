@@ -5,14 +5,14 @@
  * line-type styling, undo/redo, and draw-style updates.
  */
 
-import { get, set, subscribe, MAX_UNDO_STATES, SYMBOL_MAX_SCALE, TASK_MAX_SCALE } from './state.js';
+import { get, set, subscribe, MAX_UNDO_STATES, SYMBOL_MAX_SCALE, TASK_MAX_SCALE, SYMBOL_DEFAULT_COLORS } from './state.js';
 import {
     equipmentSVG, unitSVG, enemyUnitSVG, tacticalTaskSVG,
     EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
     buildSymbolWithLabels, escapeXml, LINE_TYPES, LINE_TYPE_COLORS, getLinePreviewSVG
 } from './symbols.js';
 import { showToast } from './toolbar.js';
-import { syncViewshed, clearViewshedOverlays, buildViewshedSection } from './viewshed.js';
+import { syncViewshed, clearViewshedOverlays, buildViewshedSection, getViewsheds } from './viewshed.js';
 import { shadeFeature, getShadeConfigs, restoreShades } from './elevation.js';
 import { buildMeasureSection, syncMeasureLabel, syncAllMeasureLabels, forgetMeasure } from './measures.js';
 import { enterRoutePlacement, exitRoutePlacement, getRouteConfigs, restoreRoutes } from './routes.js';
@@ -335,7 +335,8 @@ function placeSymbol(latLng, leftText, rightText, echelon) {
     if (!type || !key) return;
 
     echelon = echelon || 'none';
-    const color = get('lineColor');
+    // Friendly units blue, enemy red, equipment black; tactical tasks use the current line color
+    const color = SYMBOL_DEFAULT_COLORS[type] || get('lineColor');
     const strokeWidth = get('symbolStrokeWidth') || 2;
     var svgString;
     if (type === 'equipment') {
@@ -662,9 +663,10 @@ export function rotateSelectedMarker(degrees) {
     const currentRotation = info.rotation || 0;
     info.rotation = (currentRotation + degrees + 360) % 360;
 
-    // An attached viewshed turns with its symbol (both measured clockwise)
-    if (info.viewshed) {
-        info.viewshed.azimuth = ((((+info.viewshed.azimuth || 0) + degrees) % 360) + 360) % 360;
+    // Attached viewsheds turn with their symbol (both measured clockwise)
+    var vsList = getViewsheds(info);
+    if (vsList.length) {
+        vsList.forEach(function (vs) { vs.azimuth = ((((+vs.azimuth || 0) + degrees) % 360) + 360) % 360; });
         syncViewshed(selected);
     }
 
@@ -840,7 +842,7 @@ function _syncPanelToFeature(featureId) {
 
 function _typeLabel(type) {
     var labels = {
-        equipment: 'Equipment', unit: 'Unit', enemy_unit: 'Enemy Unit',
+        equipment: 'Equipment', unit: 'Friendly Unit', enemy_unit: 'Enemy Unit',
         tactical_task: 'Tactical Task', star: 'Star', triangle: 'Triangle',
         text: 'Text', polygon: 'Polygon', linestring: 'Line',
         rectangle: 'Rectangle', circle: 'Circle', freehand: 'Freehand'
@@ -914,7 +916,7 @@ function _getFeatureCentroid(featureId) {
     return new google.maps.LatLng(sumLat / ring.length, sumLng / ring.length);
 }
 
-var _POPOVER_COLORS = ['#000000', '#FF0000', '#0000FF', '#00AA00', '#FFFFFF', '#808080', '#FF8C00', '#800080'];
+var _POPOVER_COLORS = ['#000000', '#FF0000', '#0000FF', '#00AA00', '#FFFFFF', '#808080', '#FF8C00', '#800080', '#FFFF00'];
 
 function _buildPopoverContent(popover, type, info) {
     popover.innerHTML = '';
@@ -1119,11 +1121,17 @@ function _showPopoverAtLatLng(latLng, type, info) {
     if (!popover) return;
     _buildPopoverContent(popover, type, info || {});
     var px = _latLngToPixel(latLng);
+    popover.classList.remove('clamped');
     if (px) {
         popover.style.left = Math.round(px.x) + 'px';
         popover.style.top = Math.round(px.y) + 'px';
     }
     popover.style.display = 'block';
+    // Normally the popover sits above the object; if it's too tall for that, pin it to the top and let it scroll
+    if (px && px.y - popover.offsetHeight - 12 < 8) {
+        popover.classList.add('clamped');
+        popover.style.top = '8px';
+    }
 
     // Close on map pan/zoom
     var map = get('map');

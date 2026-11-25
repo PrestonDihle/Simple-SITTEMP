@@ -21,7 +21,7 @@
 
 import { get, subscribe } from './state.js';
 import { showToast } from './toolbar.js';
-import { escapeXml } from './symbols.js';
+import { escapeXml, haloFor } from './symbols.js';
 
 const NM = 1852;
 const FT = 0.3048;
@@ -39,7 +39,7 @@ export const CORRIDOR_TYPES = [
     { key: 'UA', name: 'UA - unmanned aircraft corridor' },
 ];
 
-const ROUTE_COLORS = ['#0000FF', '#000000', '#FF0000', '#00AA00', '#800080', '#FF8C00'];
+const ROUTE_COLORS = ['#0000FF', '#000000', '#FF0000', '#00AA00', '#800080', '#FF8C00', '#FFFF00'];
 
 let _routes = [];          // [{ data, ov }]
 let _nextId = 1;
@@ -154,7 +154,7 @@ function _spRpIcon(kind, name, color) {
     const boxH = name ? 32 : 22;
     const h = boxH + 18;
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">'
-        + '<path d="M1.5,1.5 H' + (w - 1.5) + ' V' + boxH + ' L' + (w / 2) + ',' + (h - 1.5) + ' L1.5,' + boxH + ' Z" fill="#fff" stroke="' + color + '" stroke-width="2" stroke-linejoin="round"/>'
+        + '<path d="M1.5,1.5 H' + (w - 1.5) + ' V' + boxH + ' L' + (w / 2) + ',' + (h - 1.5) + ' L1.5,' + boxH + ' Z" fill="' + haloFor(color) + '" stroke="' + color + '" stroke-width="2" stroke-linejoin="round"/>'
         + '<text x="' + (w / 2) + '" y="16" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="' + color + '">' + kind + '</text>'
         + (name ? '<text x="' + (w / 2) + '" y="28" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="' + color + '">' + escapeXml(name) + '</text>' : '')
         + '</svg>';
@@ -165,7 +165,7 @@ function _spRpIcon(kind, name, color) {
 function _acpIcon(num, color) {
     const s = 34;
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + s + '" height="' + s + '">'
-        + '<circle cx="17" cy="17" r="15.5" fill="#fff" stroke="' + color + '" stroke-width="2"/>'
+        + '<circle cx="17" cy="17" r="15.5" fill="' + haloFor(color) + '" stroke="' + color + '" stroke-width="2"/>'
         + '<text x="17" y="15" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="bold" fill="' + color + '">ACP</text>'
         + '<text x="17" y="26" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" font-weight="bold" fill="' + color + '">' + num + '</text>'
         + '</svg>';
@@ -188,7 +188,7 @@ function _textIcon(lines, color, opts) {
         const anchor = opts.left ? 'start' : 'middle';
         const x = opts.left ? 4 : w / 2;
         svg += '<text x="' + x + '" y="' + (3 + lh * (i + 1) - lh * 0.22) + '" text-anchor="' + anchor + '" font-family="Consolas,Menlo,monospace"'
-            + ' font-size="' + fs + '" font-weight="bold" fill="' + color + '" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">'
+            + ' font-size="' + fs + '" font-weight="bold" fill="' + color + '" stroke="' + haloFor(color) + '" stroke-width="3" stroke-linejoin="round" paint-order="stroke">'
             + escapeXml(l) + '</text>';
     });
     svg += '</g></svg>';
