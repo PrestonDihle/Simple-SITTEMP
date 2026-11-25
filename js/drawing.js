@@ -9,7 +9,7 @@ import { get, set, subscribe, MAX_UNDO_STATES, SYMBOL_MAX_SCALE, TASK_MAX_SCALE,
 import {
     equipmentSVG, unitSVG, enemyUnitSVG, tacticalTaskSVG,
     EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
-    buildSymbolWithLabels, escapeXml, LINE_TYPES, LINE_TYPE_COLORS, getLinePreviewSVG
+    buildSymbolWithLabels, symbolIconLayout, escapeXml, LINE_TYPES, LINE_TYPE_COLORS, getLinePreviewSVG
 } from './symbols.js';
 import { showToast } from './toolbar.js';
 import { syncViewshed, clearViewshedOverlays, buildViewshedSection, getViewsheds } from './viewshed.js';
@@ -354,7 +354,8 @@ function placeSymbol(latLng, leftText, rightText, echelon) {
     const echelonH = (echelon && echelon !== 'none') ? 14 : 0;
     const h = 50 + echelonH;
     const sittemp = { type, key, leftText, rightText, color, strokeWidth, symbolScale: scale, rotation: 0, echelon: echelon };
-    createMapMarker(latLng, fullSVG, new google.maps.Size(150 * scale, h * scale), new google.maps.Point(75 * scale, (h / 2) * scale), sittemp);
+    const lay = symbolIconLayout(leftText, rightText, 0);
+    createMapMarker(latLng, fullSVG, new google.maps.Size(lay.width * scale, h * scale), new google.maps.Point((lay.symX + 20) * scale, (h / 2) * scale), sittemp);
     pushUndoState();
 }
 
@@ -704,9 +705,10 @@ export function rebuildMarkerIcon(marker) {
         else if (info.type === 'tactical_task') svgBase = tacticalTaskSVG(info.key, info.color, sw);
         else svgBase = unitSVG(info.key, info.color, sw);
         svgString = buildSymbolWithLabels(svgBase, info.leftText, info.rightText, info.color, rot, ech);
-        if (marker._selected) svgString = _addSelectionHighlight(svgString, 150, h, info.color);
-        size = new google.maps.Size(150 * scale, h * scale);
-        anchor = new google.maps.Point(75 * scale, (h / 2) * scale);
+        var lay = symbolIconLayout(info.leftText, info.rightText, rot);
+        if (marker._selected) svgString = _addSelectionHighlight(svgString, lay.width, h, info.color);
+        size = new google.maps.Size(lay.width * scale, h * scale);
+        anchor = new google.maps.Point((lay.symX + 20) * scale, (h / 2) * scale);   // anchored on the symbol center
     } else if (info.type === 'star') {
         var svgFill = info.fill || info.color;
         var svgOpacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
@@ -1350,8 +1352,9 @@ function recreateMarker(data) {
         const echelonH = (ech !== 'none') ? 14 : 0;
         const h = 50 + echelonH;
         svgString = buildSymbolWithLabels(equipmentSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot, ech);
-        size = new google.maps.Size(150 * scale, h * scale);
-        anchor = new google.maps.Point(75 * scale, (h / 2) * scale);
+        const lay = symbolIconLayout(info.leftText, info.rightText, rot);
+        size = new google.maps.Size(lay.width * scale, h * scale);
+        anchor = new google.maps.Point((lay.symX + 20) * scale, (h / 2) * scale);
     } else if (info.type === 'unit') {
         const sw = info.strokeWidth || 2;
         const rot = info.rotation || 0;
@@ -1359,8 +1362,9 @@ function recreateMarker(data) {
         const echelonH = (ech !== 'none') ? 14 : 0;
         const h = 50 + echelonH;
         svgString = buildSymbolWithLabels(unitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot, ech);
-        size = new google.maps.Size(150 * scale, h * scale);
-        anchor = new google.maps.Point(75 * scale, (h / 2) * scale);
+        const lay = symbolIconLayout(info.leftText, info.rightText, rot);
+        size = new google.maps.Size(lay.width * scale, h * scale);
+        anchor = new google.maps.Point((lay.symX + 20) * scale, (h / 2) * scale);
     } else if (info.type === 'enemy_unit') {
         const sw = info.strokeWidth || 2;
         const rot = info.rotation || 0;
@@ -1368,8 +1372,9 @@ function recreateMarker(data) {
         const echelonH = (ech !== 'none') ? 14 : 0;
         const h = 50 + echelonH;
         svgString = buildSymbolWithLabels(enemyUnitSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot, ech);
-        size = new google.maps.Size(150 * scale, h * scale);
-        anchor = new google.maps.Point(75 * scale, (h / 2) * scale);
+        const lay = symbolIconLayout(info.leftText, info.rightText, rot);
+        size = new google.maps.Size(lay.width * scale, h * scale);
+        anchor = new google.maps.Point((lay.symX + 20) * scale, (h / 2) * scale);
     } else if (info.type === 'tactical_task') {
         const sw = info.strokeWidth || 2;
         const rot = info.rotation || 0;
@@ -1377,8 +1382,9 @@ function recreateMarker(data) {
         const echelonH = (ech !== 'none') ? 14 : 0;
         const h = 50 + echelonH;
         svgString = buildSymbolWithLabels(tacticalTaskSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot, ech);
-        size = new google.maps.Size(150 * scale, h * scale);
-        anchor = new google.maps.Point(75 * scale, (h / 2) * scale);
+        const lay = symbolIconLayout(info.leftText, info.rightText, rot);
+        size = new google.maps.Size(lay.width * scale, h * scale);
+        anchor = new google.maps.Point((lay.symX + 20) * scale, (h / 2) * scale);
     } else if (info.type === 'star') {
         const fill = info.fill || info.color;
         const opacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
