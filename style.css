@@ -953,7 +953,7 @@ html, body {
 }
 
 /* ===== PDF Size Selection Dialog ===== */
-#pdf-size-dialog {
+#export-setup-dialog {
     position: fixed;
     top: 0;
     left: 0;
@@ -966,11 +966,11 @@ html, body {
     z-index: 9100;
 }
 
-#pdf-size-dialog.visible {
+#export-setup-dialog.visible {
     display: flex;
 }
 
-#pdf-size-dialog .dialog-content {
+#export-setup-dialog .dialog-content {
     background: #2a2a2a;
     border: 1px solid #555;
     border-radius: 8px;
@@ -979,7 +979,7 @@ html, body {
     color: #fff;
 }
 
-#pdf-size-dialog .dialog-content h3 {
+#export-setup-dialog .dialog-content h3 {
     margin-bottom: 16px;
 }
 
@@ -997,6 +997,99 @@ html, body {
 
 .size-option:hover {
     background: #444;
+    color: #fff;
+}
+
+.size-option {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.size-desc { color: #888; font-size: 12px; }
+
+.size-group-label {
+    color: #888;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 10px 0 4px;
+}
+
+.export-setup-btns {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.export-setup-btns .dialog-close { flex: 1; margin-top: 0; }
+
+/* ===== Print-area selector (PDF / PNG export) ===== */
+#print-area-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 8000;
+    cursor: default;
+}
+
+#print-area-box {
+    position: absolute;
+    border: 2px solid #fff;
+    outline: 1px solid rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.45);   /* dims everything outside the box */
+    cursor: move;
+    touch-action: none;
+}
+
+.pa-handle {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border: 2px solid #007AFF;
+    border-radius: 3px;
+}
+
+.pa-handle[data-h="nw"] { left: -8px; top: -8px; cursor: nwse-resize; }
+.pa-handle[data-h="ne"] { right: -8px; top: -8px; cursor: nesw-resize; }
+.pa-handle[data-h="sw"] { left: -8px; bottom: -8px; cursor: nesw-resize; }
+.pa-handle[data-h="se"] { right: -8px; bottom: -8px; cursor: nwse-resize; }
+
+#print-area-bar {
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: rgba(30, 34, 40, 0.95);
+    border: 1px solid #3a3f4a;
+    border-radius: 8px;
+    color: #e8eaf0;
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: default;
+}
+
+#print-area-label { color: #aab; margin-right: 4px; }
+
+#print-area-bar button {
+    background: #2d323c;
+    color: #e8eaf0;
+    border: 1px solid #3a3f4a;
+    border-radius: 5px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+#print-area-bar button:hover { background: #3a404c; }
+
+#print-area-bar button.pa-primary {
+    background: #007AFF;
+    border-color: #007AFF;
     color: #fff;
 }
 
