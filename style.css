@@ -1342,6 +1342,42 @@ html, body {
     color: #8b909a;
 }
 
+/* Line type grid in the object popover */
+.popover-lt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+}
+
+.popover-lt-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 5px;
+    background: #2d323c;
+    color: #c8ccd4;
+    border: 1px solid #3a3f4a;
+    border-radius: 3px;
+    font-size: 10px;
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.popover-lt-item:hover { background: #3a404c; }
+
+.popover-lt-item.active {
+    background: #34507a;
+    border-color: #6b9bd8;
+    color: #fff;
+}
+
+.popover-lt-preview {
+    width: 22px;
+    flex-shrink: 0;
+    display: inline-flex;
+}
+
 .popover-rot-btn {
     background: #2d323c;
     color: #e8eaf0;
