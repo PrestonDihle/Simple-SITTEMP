@@ -92,6 +92,9 @@ const initialState = {
     // Control-measure tags keyed by feature ID (PZ/LZ/BP..., airspace zones)
     featureMeasures: {},
 
+    // Features showing the data box (side lengths / area) keyed by feature ID
+    featureDataBoxes: {},
+
     // Selection info for panel sync (set by drawing.js, read by toolbar.js)
     selectionInfo: null,
 

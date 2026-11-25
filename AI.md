@@ -37,6 +37,7 @@ Simple-SITTEMP/
     measures.js        # Control-measure tags (PZ/LZ/DZ/HA/FARP/BP, airspace zones) on drawn areas
     routes.js          # Flight routes (SP/ACP/RP), air corridors, route card, CSV/PDF
     contours.js        # Vector contour lines for the current view (marching squares)
+    databox.js         # "Data box" labels: side lengths / area, circle r / C / A, line segment lengths
   README.md            # Human-facing documentation
   AI.md                # This file - AI agent working memory
   LICENSE              # MIT License
@@ -93,6 +94,12 @@ Simple-SITTEMP/
 - Tags in `state.featureMeasures[featureId]` (in undo snapshots); labels are non-clickable markers that follow Terra Draw `change` update/delete events and the outline color
 - KML: tagged features export with the measure as the Placemark name and the label block as description
 - Not implemented: BP planned/prepared (dashed) variants — Terra Draw polygons can't dash; coordinating altitude (not in the extract)
+
+### Data Box (`js/databox.js`)
+- "Data box" checkbox in the object popover for circles, rectangles, polygons and lines (`DATA_BOX_TYPES`; not freehand). Replaces the old Measure tool, which was removed
+- Polygon / rectangle: each side's length at its midpoint + "Area …" just below the centroid (below any control-measure label). Circle: "r / C / A" at the center (radius from Terra Draw `radiusKilometers` when present, else mean vertex distance; C = 2πr, A = πr²). Line: each segment's length
+- Geodesic: haversine distances and spherical-excess ring area. Units: m below 1 km, else km (2 decimals under 10 km); m² below 0.1 km², else km²
+- Labels are non-clickable markers in the shape's line color with `haloFor()` outlines; they follow Terra Draw update events and line-color changes; `state.featureDataBoxes` is in undo snapshots; deleting the shape drops its data box
 
 ### Flight Routes (`js/routes.js`)
 - Shapes submenu → Flight Route: click SP, ACPs; double-click places RP and finishes (Enter also finishes, Esc cancels). Double-click zoom is disabled while placing
