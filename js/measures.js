@@ -40,6 +40,7 @@ export const AIRSPACE_ZONES = [
 ];
 
 const ECHELON_GLYPH = {
+    team: 'Ø', squad: '•', section: '••',
     platoon: 'â€¢â€¢â€¢', company: 'I', battalion: 'II', regiment: 'III',
     brigade: 'X', division: 'XX', corps: 'XXX',
 };

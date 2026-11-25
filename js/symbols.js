@@ -845,6 +845,9 @@ export function escapeXml(str) {
 // NATO echelon definitions: marks drawn above the unit frame
 export const ECHELON_LIST = [
     { key: 'none', name: 'None' },
+    { key: 'team', name: 'Team (Ø)' },
+    { key: 'squad', name: 'Squad (●)' },
+    { key: 'section', name: 'Section (●●)' },
     { key: 'platoon', name: 'Platoon (●●●)' },
     { key: 'company', name: 'Company (|)' },
     { key: 'battalion', name: 'Battalion (||)' },
@@ -855,11 +858,27 @@ export const ECHELON_LIST = [
 ];
 
 /**
+ * Layout of a symbol icon: the 40 px symbol plus just enough room on each side
+ * for that side's label. Returns { width, symX } where symX is the symbol's left
+ * edge; the marker is anchored on the symbol center (symX + 20), so the icon's
+ * click/selection box hugs the symbol and its labels. Rotated symbols get a few
+ * extra pixels so their corners aren't clipped.
+ */
+export function symbolIconLayout(leftText, rightText, rotation) {
+    const CHAR_W = 6.2;   // generous advance for 10 px Arial (labels are often capitals)
+    const minSide = (rotation || 0) % 90 !== 0 ? 9 : 3;
+    const lw = Math.max(minSide, leftText ? String(leftText).length * CHAR_W + 4 : 0);
+    const rw = Math.max(minSide, rightText ? String(rightText).length * CHAR_W + 4 : 0);
+    return { width: Math.ceil(lw + 40 + rw), symX: Math.ceil(lw) };
+}
+
+/**
  * Build an SVG that includes the symbol + optional left/right text labels + echelon marks.
  * Handles both legacy 40x40 viewBox (units) and new 350x350 viewBox (equipment).
  */
 export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rotation, echelon) {
-    const totalWidth = 150;
+    const layout = symbolIconLayout(leftText, rightText, rotation);
+    const totalWidth = layout.width;
     const echelonH = (echelon && echelon !== 'none') ? 14 : 0;
     const totalHeight = 50 + echelonH;
     rotation = rotation || 0;
@@ -872,13 +891,13 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rota
     // Symbol display area: 40x40 centered in the middle of the output SVG
     const symW = 40;
     const symH = 40;
-    const symX = 55; // left edge of symbol area
+    const symX = layout.symX; // left edge of symbol area
     const symY = 5 + echelonH;  // top edge of symbol area (shifted down if echelon present)
     const scaleX = symW / vbW;
     const scaleY = symH / vbH;
 
     // Center of the symbol area (for rotation pivot)
-    const symCX = symX + symW / 2; // 75
+    const symCX = symX + symW / 2;
     const symCY = symY + symH / 2;
 
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}">`;
@@ -889,7 +908,7 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rota
     }
 
     if (leftText) {
-        svg += `<text x="53" y="${symY + 40}" text-anchor="end" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(leftText)}</text>`;
+        svg += `<text x="${symX - 2}" y="${symY + 40}" text-anchor="end" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(leftText)}</text>`;
     }
 
     // Scale the inner SVG content to fit the 40x40 display area, with optional rotation
@@ -900,7 +919,7 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rota
     }
 
     if (rightText) {
-        svg += `<text x="97" y="${symY + 40}" text-anchor="start" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(rightText)}</text>`;
+        svg += `<text x="${symX + symW + 2}" y="${symY + 40}" text-anchor="start" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(rightText)}</text>`;
     }
 
     svg += '</svg>';
@@ -911,6 +930,17 @@ function buildEchelonMarks(echelon, cx, baseY, color) {
     let marks = '';
     const sw = 1.5;
     switch (echelon) {
+        case 'team': // circle with a diagonal slash (Ø)
+            marks += `<circle cx="${cx}" cy="${baseY - 6}" r="4" fill="none" stroke="${color}" stroke-width="${sw}"/>`;
+            marks += `<line x1="${cx - 6}" y1="${baseY - 0.5}" x2="${cx + 6}" y2="${baseY - 11.5}" stroke="${color}" stroke-width="${sw}"/>`;
+            break;
+        case 'squad': // one dot
+            marks += `<circle cx="${cx}" cy="${baseY - 5}" r="2" fill="${color}"/>`;
+            break;
+        case 'section': // two dots
+            marks += `<circle cx="${cx - 4}" cy="${baseY - 5}" r="2" fill="${color}"/>`;
+            marks += `<circle cx="${cx + 4}" cy="${baseY - 5}" r="2" fill="${color}"/>`;
+            break;
         case 'platoon': // three dots
             marks += `<circle cx="${cx - 8}" cy="${baseY - 5}" r="2" fill="${color}"/>`;
             marks += `<circle cx="${cx}" cy="${baseY - 5}" r="2" fill="${color}"/>`;

@@ -199,7 +199,7 @@ const [lng, lat] = mgrs.toPoint(mgrsStringNoSpaces);
 
 ### Symbol Placement Pattern
 - User clicks equipment/unit from submenu → dialog prompts for left/right text labels + echelon
-- `buildSymbolWithLabels()` generates a 150×(50+echelonH) SVG data-URL
+- `buildSymbolWithLabels()` generates a W×(50+echelonH) SVG data-URL, where W comes from `symbolIconLayout(left, right, rotation)`: the 40 px symbol plus just enough room on each side for that side's label (min 3 px, 9 px when rotated off-axis). Markers are anchored on the symbol center (`symX + 20`), so the click/selection box hugs the symbol and its labels (it used to be a fixed 150 px)
 - Left/right text labels rendered at `symY + 40` (bottom of the 40px symbol area)
 - Placed as `google.maps.Marker` with `_sittemp` metadata; added to `state.markers[]`
 - Marker click → `_syncPanelToMarker()` + `_showPopoverForMarker()` (Req 3 + 4)
@@ -229,7 +229,7 @@ overlay.setMap(map);
 - [x] 24+ equipment symbols, 11 unit symbols, enemy units, 15 tactical tasks (geometry matched to FM 1-02.2 INCL C1, Table 6-1; Delay is not in that table and keeps its FM 3-90 form)
 - [x] Coordinate display in `#right-rail` (the Style Panel that used to stack under it was removed)
 - [x] Symbol placement with left/right text labels (bottom of symbol area, `symY+40`)
-- [x] Symbol echelon markers
+- [x] Symbol echelon markers: none, team (Ø), squad (●), section (●●), platoon, company, battalion, regiment, brigade, division, corps (`ECHELON_LIST`; BP labels use the same set)
 - [x] Text labels (place anywhere, font styling)
 - [x] No Fill swatch in fill color palette
 - [x] Live style editing for selected objects (Req 3)
