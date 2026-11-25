@@ -130,7 +130,7 @@ Simple-SITTEMP/
 
 ### MGRS Features
 - Real-time cursor coordinate display (Lat/Lon + MGRS) in upper-right
-- **Location search** (the go-to box in `#coord-display`): tries MGRS first (`mgrsToLatLng()`), then lat/long (`parseLatLng()`: decimal, degrees-minutes, degrees-minutes-seconds, N/S/E/W prefix or suffix, comma or space separated, lat first unless hemisphere letters say otherwise), then a place-name search with `google.maps.Geocoder` (fits the result's viewport). MGRS and lat/long keep the zoom. Place search needs the Geocoding API enabled on the Maps key; REQUEST_DENIED shows a toast saying so
+- **Location search** (the go-to box in `#coord-display`): tries MGRS first (`mgrsToLatLng()`), then lat/long (`parseLatLng()`: decimal, degrees-minutes, degrees-minutes-seconds, N/S/E/W prefix or suffix, comma or space separated, lat first unless hemisphere letters say otherwise), then a place-name search via `placeSearch()`: `google.maps.Geocoder` first, falling back to OpenStreetMap Nominatim (no key, CORS-enabled) when Google returns anything but OK/ZERO_RESULTS or stays silent for 4 s (it never calls back when the key/referrer is rejected); ZERO_RESULTS also gets a Nominatim try. Fits the result's bounds. MGRS and lat/long keep the zoom
 - **Training-area quick links** (below the MGRS input): JMRC, NTC (= `DEFAULT_CENTER`), JRTC, JPMRC buttons; coordinates in `data-lat`/`data-lng` on the buttons in index.html, wired in `setupMGRSGoto()`; center at `DEFAULT_ZOOM`
 - MGRS grid overlay with easting/northing labels
 - Three scale options: 1:50K (1km), 1:100K, 1:250K
