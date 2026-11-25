@@ -102,6 +102,69 @@ export function mgrsToLatLng(raw) {
 
 let _geocoder = null;
 
+/**
+ * Google geocoder → { status, result } where result is { name, location, bounds } or null.
+ * Resolves with status 'TIMEOUT' if Google never answers (it stays silent when the key
+ * or referrer is rejected).
+ */
+function _googleGeocode(query) {
+    return new Promise(function (resolve) {
+        var done = false;
+        function finish(v) { if (!done) { done = true; resolve(v); } }
+        setTimeout(function () { finish({ status: 'TIMEOUT', result: null }); }, 4000);
+        try {
+            if (!_geocoder) _geocoder = new google.maps.Geocoder();
+            var ret = _geocoder.geocode({ address: query }, function (results, status) {
+                if (status === 'OK' && results && results.length) {
+                    var r = results[0];
+                    finish({ status: status, result: { name: r.formatted_address, location: r.geometry.location, bounds: r.geometry.viewport || null } });
+                } else {
+                    finish({ status: status || 'ERROR', result: null });
+                }
+            });
+            // Newer API versions also return a promise that rejects on failure
+            if (ret && typeof ret.catch === 'function') {
+                ret.catch(function (e) { finish({ status: (e && e.code) || 'ERROR', result: null }); });
+            }
+        } catch (e) {
+            finish({ status: 'ERROR', result: null });
+        }
+    });
+}
+
+/** OpenStreetMap Nominatim (no key needed) → { name, location, bounds } or null. */
+function _osmGeocode(query) {
+    var url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=' + encodeURIComponent(query);
+    return fetch(url, { headers: { 'Accept': 'application/json' } })
+        .then(function (resp) {
+            if (!resp.ok) throw new Error('OpenStreetMap search returned ' + resp.status);
+            return resp.json();
+        })
+        .then(function (list) {
+            if (!list || !list.length) return null;
+            var r = list[0];
+            var bb = r.boundingbox;   // [south, north, west, east] as strings
+            return {
+                name: r.display_name,
+                location: { lat: parseFloat(r.lat), lng: parseFloat(r.lon) },
+                bounds: bb ? { south: +bb[0], north: +bb[1], west: +bb[2], east: +bb[3] } : null,
+            };
+        });
+}
+
+/**
+ * Place-name search: Google first; if Google refuses, errors or times out, fall back
+ * to OpenStreetMap. Resolves with { name, location, bounds } or null (no match).
+ */
+export function placeSearch(query) {
+    return _googleGeocode(query).then(function (g) {
+        if (g.result) return g.result;
+        if (g.status === 'ZERO_RESULTS') return _osmGeocode(query).catch(function () { return null; });
+        console.warn('Google geocoder status ' + g.status + '; using OpenStreetMap');
+        return _osmGeocode(query);
+    });
+}
+
 /** Search box: MGRS, then lat/long, then a place-name search (Google geocoder). */
 export function setupMGRSGoto() {
     var input = document.getElementById('mgrs-goto-input');
@@ -126,21 +189,18 @@ export function setupMGRSGoto() {
         }
 
         // Anything else: place-name search
-        if (!_geocoder) _geocoder = new google.maps.Geocoder();
         showToast('Searching for "' + raw + '"...');
-        _geocoder.geocode({ address: raw }, function (results, status) {
-            if (status === 'OK' && results && results.length) {
-                var r = results[0];
-                if (r.geometry.viewport) map.fitBounds(r.geometry.viewport);
-                else { map.setCenter(r.geometry.location); map.setZoom(DEFAULT_ZOOM); }
-                showToast('Found: ' + r.formatted_address);
-            } else if (status === 'ZERO_RESULTS') {
-                showToast('No match for "' + raw + '" (not a place, MGRS or lat/long)');
-            } else if (status === 'REQUEST_DENIED') {
-                showToast('Place search unavailable: the Geocoding API is not enabled for this map key', 5000);
+        placeSearch(raw).then(function (r) {
+            if (r) {
+                if (r.bounds) map.fitBounds(r.bounds);
+                else { map.setCenter(r.location); map.setZoom(DEFAULT_ZOOM); }
+                showToast('Found: ' + r.name, 4000);
             } else {
-                showToast('Search failed (' + status + ')');
+                showToast('No match for "' + raw + '" (not a place, MGRS or lat/long)');
             }
+        }).catch(function (err) {
+            console.warn('Place search failed', err);
+            showToast('Place search failed: ' + (err && err.message || err), 5000);
         });
     }
 
