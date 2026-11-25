@@ -11,7 +11,8 @@ export const DEFAULT_CENTER = { lat: 35.2625, lng: -116.6800 }; // Fort Irwin / 
 export const DEFAULT_ZOOM = 12;
 export const MAX_UNDO_STATES = 50;
 export const SYMBOL_MAX_SCALE = 3;    // max scale for symbols in general
-export const TASK_MAX_SCALE = 10;     // tactical task graphics can be drawn larger
+export const TASK_MAX_SCALE = 20;     // tactical task graphics can be drawn larger
+export const TASK_MIN_STROKE = 0.1;   // tactical tasks can use hairline strokes
 
 // Default colors for placed symbols (friendly blue, enemy red, equipment black)
 export const SYMBOL_DEFAULT_COLORS = {
