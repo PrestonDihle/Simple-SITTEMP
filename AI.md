@@ -30,7 +30,7 @@ Simple-SITTEMP/
     drawing.js         # Terra Draw init, shape activation, undo/redo, live-style editing, popover
     toolbar.js         # Toolbar UI, submenus, color/style panel, keyboard shortcuts
     symbols.js         # SVG generation for equipment/unit/enemy/tactical/star/text symbols
-    grid.js            # MGRS grid overlay, coordinate display, MGRS goto input
+    grid.js            # MGRS grid overlay, coordinate display, location search (MGRS, lat/long, place)
     export.js          # KML, PDF, and screenshot export
     viewshed.js        # Range fans + terrain-masked viewsheds attached to symbols; shared fetchElevations()
     elevation.js       # Elevation band shading for drawn areas or the current view
@@ -130,7 +130,7 @@ Simple-SITTEMP/
 
 ### MGRS Features
 - Real-time cursor coordinate display (Lat/Lon + MGRS) in upper-right
-- **MGRS Center-On Input:** text field + Go button in `#coord-display`; strips spaces, calls `mgrs.toPoint()`, calls `map.setCenter()` preserving zoom, error-toasts on invalid input
+- **Location search** (the go-to box in `#coord-display`): tries MGRS first (`mgrsToLatLng()`), then lat/long (`parseLatLng()`: decimal, degrees-minutes, degrees-minutes-seconds, N/S/E/W prefix or suffix, comma or space separated, lat first unless hemisphere letters say otherwise), then a place-name search with `google.maps.Geocoder` (fits the result's viewport). MGRS and lat/long keep the zoom. Place search needs the Geocoding API enabled on the Maps key; REQUEST_DENIED shows a toast saying so
 - **Training-area quick links** (below the MGRS input): JMRC, NTC (= `DEFAULT_CENTER`), JRTC, JPMRC buttons; coordinates in `data-lat`/`data-lng` on the buttons in index.html, wired in `setupMGRSGoto()`; center at `DEFAULT_ZOOM`
 - MGRS grid overlay with easting/northing labels
 - Three scale options: 1:50K (1km), 1:100K, 1:250K
@@ -232,7 +232,7 @@ overlay.setMap(map);
 - [x] Toolbar UI (left side with tooltips), offset `calc(16px + 1vw)` from left
 - [x] Sub-menus offset `calc(58px + 1vw)` from left
 - [x] Classification warning modal (green, UNCLASSIFIED USE ONLY)
-- [x] Coordinate display (Lat/Lon + MGRS) + MGRS center-on input
+- [x] Coordinate display (Lat/Lon + MGRS) + location search (MGRS, lat/long, place name)
 - [x] MGRS grid overlay (toggle, color, weight, scale)
 - [x] Right-click MGRS copy to clipboard
 - [x] Shapes (circle, rectangle, polygon, linestring, freehand, star, triangle)
@@ -279,7 +279,7 @@ overlay.setMap(map);
 - [ ] Map loads and centers on Fort Irwin/NTC
 - [ ] Classification warning modal appears (green) on first load
 - [ ] Coordinate display updates in real time (both lat/lon and MGRS)
-- [ ] MGRS goto input: type a valid MGRS, press Go → map centers; invalid → error toast
+- [ ] Location search: MGRS, decimal or DMS lat/long, and a place name each center the map; nonsense → "No match" toast
 - [ ] Right-click copies MGRS to clipboard with toast confirmation
 - [ ] All toolbar buttons visible with tooltips; toolbar offset from left edge
 - [ ] Select mode allows clicking and dragging features

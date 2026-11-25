@@ -258,8 +258,8 @@
                 <div><span class="label">Lat/Lon:</span> <span id="coord-latlon">---, ---</span></div>
                 <div><span class="label">MGRS:</span> <span id="coord-mgrs">---</span></div>
                 <div class="mgrs-goto-row" style="pointer-events: auto;">
-                    <input id="mgrs-goto-input" type="text" placeholder="Go to MGRS..." maxlength="20" autocomplete="off" spellcheck="false">
-                    <button id="mgrs-goto-btn" title="Center map on MGRS">Go</button>
+                    <input id="mgrs-goto-input" type="text" placeholder="MGRS, lat/long, or place..." maxlength="120" title="MGRS (11SNV1234567890), lat/long (35.26, -116.68 or 35°15'45&quot;N 116°40'48&quot;W), or a place name" autocomplete="off" spellcheck="false">
+                    <button id="mgrs-goto-btn" title="Go to MGRS, lat/long, or place">Go</button>
                 </div>
                 <div class="quick-links" style="pointer-events: auto;">
                     <button class="quick-link" data-lat="49.22462117742148" data-lng="11.830509504470864" title="Joint Multinational Readiness Center, Hohenfels, Germany">JMRC</button>
@@ -410,6 +410,8 @@
                 <section>
                     <h4>MGRS Grid</h4>
                     <p>Open the Map menu on the left toolbar and use the MGRS Grid section to show or hide the grid and set its color and weight. Right-click the map to copy MGRS coordinates.</p>
+                    <h4>Find a Location</h4>
+                    <p>Type in the box under the coordinate readout (top right) and press Enter or Go: an MGRS grid (11SNV 12345 67890), a lat/long (35.2625, -116.68 or 35°15'45"N 116°40'48"W), or a place name (Fort Irwin, Hohenfels).</p>
                 </section>
                 <section>
                     <h4>Tips</h4>
