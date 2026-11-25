@@ -141,6 +141,13 @@ export function setupToolbar() {
 
 // ===== Submenu Helpers =====
 
+/** Align a submenu with its button, shifting it up so a tall menu stays on screen. */
+function placeMenu(menu, btn) {
+    const top = btn.getBoundingClientRect().top;
+    const bottomRoom = window.innerHeight - menu.offsetHeight - 10;   // offsetHeight is 0 while hidden
+    menu.style.top = Math.max(10, Math.min(top, bottomRoom > 0 && menu.offsetHeight ? bottomRoom : top)) + 'px';
+}
+
 function positionSubmenus() {
     const menuMap = {
         'btn-shapes': 'submenu-shapes',
@@ -155,8 +162,7 @@ function positionSubmenus() {
     for (const [btnId, menuId] of Object.entries(menuMap)) {
         const btn = document.getElementById(btnId);
         const menu = document.getElementById(menuId);
-        const rect = btn.getBoundingClientRect();
-        menu.style.top = rect.top + 'px';
+        placeMenu(menu, btn);
     }
 }
 
@@ -168,8 +174,7 @@ function toggleSubmenu(menuId, btnId) {
         menu.classList.add('visible');
         set('openSubmenu', menuId);
         const btn = document.getElementById(btnId);
-        const rect = btn.getBoundingClientRect();
-        menu.style.top = rect.top + 'px';
+        placeMenu(menu, btn);
     }
 }
 

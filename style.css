@@ -1141,66 +1141,24 @@ html, body {
     font-size: 13px;
 }
 
-/* ===== MGRS Grid Controls ===== */
-#mgrs-controls {
-    position: absolute;
-    top: 10px;
-    left: 70px;
-    background: rgba(255, 255, 255, 0.96);
-    border-radius: 10px;
-    padding: 6px 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    z-index: 1000;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
-                0 4px 12px rgba(0, 0, 0, 0.12);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-}
+/* ===== MGRS Grid Controls (Map submenu) ===== */
+.grid-options { margin-bottom: 12px; }
 
-#mgrs-controls label {
-    color: #555;
-    font-size: 12px;
-    font-weight: 500;
-}
+.grid-select-row { justify-content: space-between; color: #333; }
 
-#mgrs-controls select {
+.grid-select-row select {
     background: rgba(0, 0, 0, 0.04);
     color: #333;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 6px;
     padding: 4px 6px;
     font-size: 12px;
-    transition: border-color 0.15s ease;
+    min-width: 90px;
 }
 
-#mgrs-controls select:focus {
+.grid-select-row select:focus {
     border-color: #007AFF;
     outline: none;
-}
-
-#mgrs-controls .grid-toggle {
-    padding: 4px 10px;
-    background: rgba(0, 0, 0, 0.04);
-    color: #555;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
-    transition: background 0.15s ease;
-}
-
-#mgrs-controls .grid-toggle:hover {
-    background: rgba(0, 0, 0, 0.08);
-}
-
-#mgrs-controls .grid-toggle.active {
-    background: #007AFF;
-    color: #fff;
-    border-color: #007AFF;
 }
 
 /* ===== Scrollbar styling for sub-menus ===== */

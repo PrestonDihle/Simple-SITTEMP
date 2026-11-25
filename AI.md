@@ -123,7 +123,7 @@ Simple-SITTEMP/
 - **Training-area quick links** (below the MGRS input): JMRC, NTC (= `DEFAULT_CENTER`), JRTC, JPMRC buttons; coordinates in `data-lat`/`data-lng` on the buttons in index.html, wired in `setupMGRSGoto()`; center at `DEFAULT_ZOOM`
 - MGRS grid overlay with easting/northing labels
 - Three scale options: 1:50K (1km), 1:100K, 1:250K
-- Grid color/weight selection, dynamic update on pan/zoom
+- Grid controls live in the Map submenu "MGRS Grid" section (`#grid-toggle` switch, `#grid-color`, `#grid-weight`); the old floating box at the top-left was removed. Dynamic update on pan/zoom
 - Right-click to copy MGRS to clipboard with toast notification
 
 ### Export Features

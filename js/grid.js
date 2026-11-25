@@ -129,10 +129,11 @@ export function setupRightClickMGRS() {
 export function setupMGRSGrid() {
     const map = get('map');
 
-    document.getElementById('grid-toggle').addEventListener('click', function () {
-        const visible = !get('mgrsGridVisible');
-        set('mgrsGridVisible', visible);
-        this.classList.toggle('active', visible);
+    // Grid controls live in the Map submenu (MGRS Grid section)
+    const toggle = document.getElementById('grid-toggle');
+    toggle.checked = !!get('mgrsGridVisible');
+    toggle.addEventListener('change', function () {
+        set('mgrsGridVisible', this.checked);
         drawMGRSGrid();
     });
 
