@@ -569,7 +569,14 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
     const f1 = (n) => Math.round(n * 10) / 10;
 
     // Stroked path (no fill)
-    const P = (d, extra) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"${extra ? ' ' + extra : ''}/>`;
+    // Stroked path (no fill). `extra` attributes override the defaults rather than
+    // repeating them: a duplicated attribute makes the SVG invalid XML, and the map
+    // (which draws symbols as SVG images) then shows nothing.
+    const P = (d, extra) => {
+        const attrs = { fill: 'none', stroke: c, 'stroke-width': sw, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
+        (extra || '').replace(/([\w-]+)="([^"]*)"/g, function (m, k, v) { attrs[k] = v; return m; });
+        return '<path d="' + d + '"' + Object.keys(attrs).map(function (k) { return ' ' + k + '="' + attrs[k] + '"'; }).join('') + '/>';
+    };
     // Letter centered on (x, y)
     const T = (x, y, txt, size) => {
         size = size || 75;
@@ -651,15 +658,13 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
             P('M125,175 L148,175 L172,120 L198,230 L224,120 L248,175 L268,175') +
             fillHead(318, 175, 0, 50),
 
-        // Follow and assume — unit (A) in a pointed frame, dashed line, outlined double chevron
+        // Follow and assume — empty pointed frame (unit), dashed line, outlined double chevron
         follow_and_assume: () => P('M30,125 L145,125 L190,175 L145,225 L30,225 Z') +
-            T(88, 175, 'A', 70) +
             P('M190,175 L262,175', `stroke-dasharray="${f1(sw * 1.4)} ${f1(sw * 1.2)}" stroke-linecap="butt"`) +
             P('M250,128 L275,128 L322,175 L275,222 L250,222 L297,175 Z'),
 
-        // Follow and support — unit (A) in a notched pointed frame, solid line, open arrowhead
+        // Follow and support — empty notched pointed frame (unit), solid line, open arrowhead
         follow_and_support: () => P('M20,125 L145,125 L190,175 L145,225 L20,225 L55,175 Z') +
-            T(105, 175, 'A', 70) +
             P('M190,175 L315,175') +
             openHead(315, 175, 0, 48),
 
@@ -696,9 +701,8 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
             openHead(arcEnd[0], arcEnd[1], tangentCW(A1) + 15, 45) +
             T(310, 175, 'S', 70),
 
-        // Seize — unit (A) in a circle, curved arrow with S, open arrowhead at the objective
+        // Seize — empty circle (unit), curved arrow with S, open arrowhead at the objective
         seize: () => `<circle cx="85" cy="120" r="58" fill="none" stroke="${c}" stroke-width="${sw}"/>` +
-            T(85, 120, 'A', 60) +
             P('M143,120 C215,115 262,165 278,265') +
             openHead(278, 265, 82, 45) +
             T(200, 72, 'S', 62),

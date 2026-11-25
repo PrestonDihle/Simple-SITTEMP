@@ -5,7 +5,7 @@
  * line-type styling, undo/redo, and draw-style updates.
  */
 
-import { get, set, subscribe, MAX_UNDO_STATES, SYMBOL_MAX_SCALE, TASK_MAX_SCALE, SYMBOL_DEFAULT_COLORS } from './state.js';
+import { get, set, subscribe, MAX_UNDO_STATES, SYMBOL_MAX_SCALE, TASK_MAX_SCALE, TASK_MIN_STROKE, SYMBOL_DEFAULT_COLORS } from './state.js';
 import {
     equipmentSVG, unitSVG, enemyUnitSVG, tacticalTaskSVG,
     EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
@@ -787,7 +787,7 @@ function _applyStyleToMarker(marker, prop, value) {
     if (prop === 'lineColor') { info.color = value; }
     else if (prop === 'fillColor') { info.fill = value; }
     else if (prop === 'fillOpacity') { info.fillOpacity = parseFloat(value); }
-    else if (prop === 'strokeWidth') { info.strokeWidth = parseInt(value, 10); }
+    else if (prop === 'strokeWidth') { info.strokeWidth = parseFloat(value); }   // fractional for tactical tasks
     else if (prop === 'symbolScale') { info.symbolScale = parseFloat(value); }
     rebuildMarkerIcon(marker);
     _scheduleUndoPush();
@@ -1004,7 +1004,8 @@ function _buildPopoverContent(popover, type, info) {
             applyStyleToSelected(propName, v);
             // The popover is the only style control, so it also sets the default for the next object
             if (propName === 'fillOpacity') set('fillOpacity', v);
-            else if (propName === 'strokeWidth') set('symbolStrokeWidth', v);
+            // Hairline task strokes don't become the default for other symbols
+            else if (propName === 'strokeWidth' && type !== 'tactical_task') set('symbolStrokeWidth', v);
             else if (propName === 'symbolScale') set('symbolScale', Math.min(v, SYMBOL_MAX_SCALE));
         });
         row.appendChild(sl);
@@ -1022,8 +1023,14 @@ function _buildPopoverContent(popover, type, info) {
         popover.appendChild(makeSliderRow('Opacity', 'lineOpacity', 0.05, 1, 0.05, lineOpacity,
             function (v) { return Math.round(v * 100) + '%'; }));
     }
-    popover.appendChild(makeSliderRow('Stroke', 'strokeWidth', 1, 10, 1, strokeWidth,
-        function (v) { return Math.round(v); }));
+    if (type === 'tactical_task') {
+        // Tactical tasks go down to a 0.1 hairline in 0.1 steps
+        popover.appendChild(makeSliderRow('Stroke', 'strokeWidth', TASK_MIN_STROKE, 10, 0.1, strokeWidth,
+            function (v) { return (Math.round(v * 10) / 10).toFixed(1); }));
+    } else {
+        popover.appendChild(makeSliderRow('Stroke', 'strokeWidth', 1, 10, 1, strokeWidth,
+            function (v) { return Math.round(v); }));
+    }
     if (isMarker) {
         var maxScale = type === 'tactical_task' ? TASK_MAX_SCALE : SYMBOL_MAX_SCALE;
         popover.appendChild(makeSliderRow('Scale', 'symbolScale', 0.5, maxScale, 0.1, symbolScale,

@@ -247,7 +247,7 @@ overlay.setMap(map);
 - [x] KML export, PDF export (paper or shape + orientation + framed print area), Screenshot (PNG, framed or full view)
 - [x] Keyboard shortcuts: R/Shift+R rotate, Ctrl+Z undo, Ctrl+Y redo, Delete clear
 - [x] Rotation (R/Shift+R or popover ⟲/⟳, 15° steps) applies to equipment, unit, enemy unit and tactical task symbols (`isRotatable()`); an attached viewshed azimuth turns with the symbol
-- [x] Scale limits: `SYMBOL_MAX_SCALE` = 3× for symbols, `TASK_MAX_SCALE` = 10× for tactical tasks (popover slider and Style Panel slider max follow the selection)
+- [x] Scale limits: `SYMBOL_MAX_SCALE` = 3× for symbols, `TASK_MAX_SCALE` = 20× for tactical tasks (popover slider). Tactical task stroke goes down to `TASK_MIN_STROKE` = 0.1 in 0.1 steps (other symbols 1–10); a task's hairline stroke does not become the default for other symbols
 
 ## Known Limitations & Gotchas
 - Terra Draw CDN versions pinned: terra-draw@1.24.2, terra-draw-google-maps-adapter@1.3.1
