@@ -6,8 +6,10 @@
  *   - Terrain mask (optional): line-of-sight along radial rays using the Google
  *     Maps Elevation service; only the ground the observer can see is shaded.
  *
- * Config lives in marker._sittemp.viewshed (so it rides along in undo snapshots).
- * Map overlays (marker._vs) and computed masks (_maskCache) are runtime-only.
+ * Up to three viewsheds per symbol. Config lives in marker._sittemp.viewsheds (so
+ * it rides along in undo snapshots; a legacy single `viewshed` is migrated on read).
+ * Map overlays (marker._vs, one entry per viewshed) and computed masks
+ * (_maskCache) are runtime-only.
  * Azimuths are stored in degrees from true north; the UI shows mils or degrees.
  */
 
@@ -75,7 +77,8 @@ function _outlineOptions(vs) {
     return { strokeColor: vs.color, strokeOpacity: 0, strokeWeight: s.width, icons: [{ icon: icon, offset: '0', repeat: repeat }] };
 }
 
-const VS_COLORS = ['#FF8C00', '#FF0000', '#0000FF', '#00AA00', '#800080', '#000000', '#FFFFFF', '#808080'];
+const NEW_VS_COLORS = ['#FF8C00', '#FFFF00', '#0000FF'];   // default colors for viewsheds 1, 2, 3
+const VS_COLORS = ['#FF8C00', '#FFFF00', '#FF0000', '#0000FF', '#00AA00', '#800080', '#000000', '#FFFFFF', '#808080'];
 
 const _maskCache = new Map();   // key -> array of rings [[lat,lng], ...]
 const _inFlight = new Map();    // key -> Promise
@@ -252,16 +255,31 @@ async function _computeMask(pos, vs, onProgress) {
     return rings;
 }
 
-function _requestMask(marker) {
-    const vs = marker._sittemp.viewshed;
+export const MAX_VIEWSHEDS = 3;
+
+/**
+ * The marker's viewsheds as an array (up to MAX_VIEWSHEDS). Older data stored a
+ * single `viewshed` object; it is moved into `viewsheds` the first time it's read.
+ */
+export function getViewsheds(info) {
+    if (!info) return [];
+    if (info.viewshed && !info.viewsheds) {
+        info.viewsheds = [info.viewshed];
+    }
+    delete info.viewshed;
+    if (!Array.isArray(info.viewsheds)) info.viewsheds = [];
+    return info.viewsheds;
+}
+
+function _requestMask(marker, idx, vs) {
     const pos = _posOf(marker);
     const key = maskKey(pos, vs);
     if (_maskCache.has(key)) return Promise.resolve(_maskCache.get(key));
     if (_inFlight.has(key)) return _inFlight.get(key);
 
-    _setStatus(marker, 'Computing… 0%');
+    _setStatus(marker, idx, 'Computing… 0%');
     const p = _computeMask(pos, vs, function (f) {
-        _setStatus(marker, 'Computing… ' + Math.round(f * 100) + '%');
+        _setStatus(marker, idx, 'Computing… ' + Math.round(f * 100) + '%');
     }).then(function (rings) {
         _maskCache.set(key, rings);
         if (_maskCache.size > MAX_CACHE) _maskCache.delete(_maskCache.keys().next().value);
@@ -275,51 +293,69 @@ function _requestMask(marker) {
     return p;
 }
 
-function _setStatus(marker, text) {
-    marker._vsStatus = text;
-    const el = document.getElementById('vs-status');
+function _setStatus(marker, idx, text) {
+    if (!marker._vsStatus) marker._vsStatus = [];
+    marker._vsStatus[idx] = text;
+    const el = document.getElementById('vs-status-' + idx);
     if (el && el._marker === marker) el.textContent = text;
 }
 
 // ===== Overlays =====
 
-/** Remove a marker's viewshed overlays and listeners from the map. */
-export function clearViewshedOverlays(marker) {
-    const o = marker && marker._vs;
-    if (!o) return;
+function _removeOne(o) {
     o.fan.setMap(null);
     o.outline.setMap(null);
     o.mask.setMap(null);
-    o.listeners.forEach(function (l) { google.maps.event.removeListener(l); });
-    marker._vs = null;
 }
 
-/** Create/update overlays for a marker from marker._sittemp.viewshed. */
-export function syncViewshed(marker) {
-    const vs = marker && marker._sittemp && marker._sittemp.viewshed;
-    if (!vs || !marker.getMap()) { clearViewshedOverlays(marker); return; }
-    const map = get('map');
-    const pos = _posOf(marker);
+/** Remove all of a marker's viewshed overlays and listeners from the map. */
+export function clearViewshedOverlays(marker) {
+    if (!marker) return;
+    (marker._vs || []).forEach(_removeOne);
+    (marker._vsListeners || []).forEach(function (l) { google.maps.event.removeListener(l); });
+    marker._vs = null;
+    marker._vsListeners = null;
+}
 
-    if (!marker._vs) {
+/** Create/update overlays for every viewshed in marker._sittemp.viewsheds. */
+export function syncViewshed(marker) {
+    const list = marker && marker._sittemp ? getViewsheds(marker._sittemp) : [];
+    if (!list.length || !marker.getMap()) { clearViewshedOverlays(marker); return; }
+    const map = get('map');
+
+    if (!marker._vs) marker._vs = [];
+    // Drop overlays for viewsheds that were removed
+    while (marker._vs.length > list.length) _removeOne(marker._vs.pop());
+    while (marker._vs.length < list.length) {
         const common = { map: map, clickable: false };
-        marker._vs = {
+        marker._vs.push({
             fan: new google.maps.Polygon(Object.assign({ zIndex: 4, strokeWeight: 0 }, common)),
             outline: new google.maps.Polyline(Object.assign({ zIndex: 5 }, common)),
             mask: new google.maps.Polygon(Object.assign({ zIndex: 3, strokeWeight: 0 }, common)),
-            listeners: [],
-        };
-        marker._vs.listeners.push(marker.addListener('drag', function () {
-            if (!marker._vs) return;
-            const path = fanPath(_posOf(marker), marker._sittemp.viewshed);
-            marker._vs.fan.setPath(path);
-            marker._vs.outline.setPath(_closed(path));
-            marker._vs.mask.setPaths([]);
-        }));
-        marker._vs.listeners.push(marker.addListener('dragend', function () { syncViewshed(marker); }));
+        });
     }
+    if (!marker._vsListeners) {
+        marker._vsListeners = [
+            marker.addListener('drag', function () {
+                if (!marker._vs) return;
+                const pos = _posOf(marker);
+                getViewsheds(marker._sittemp).forEach(function (vs, i) {
+                    const o = marker._vs[i];
+                    if (!o) return;
+                    const path = fanPath(pos, vs);
+                    o.fan.setPath(path);
+                    o.outline.setPath(_closed(path));
+                    o.mask.setPaths([]);
+                });
+            }),
+            marker.addListener('dragend', function () { syncViewshed(marker); }),
+        ];
+    }
+    list.forEach(function (vs, i) { _syncOne(marker, i, vs, marker._vs[i]); });
+}
 
-    const o = marker._vs;
+function _syncOne(marker, idx, vs, o) {
+    const pos = _posOf(marker);
     const opacity = Math.max(0, Math.min(1, vs.opacity !== undefined ? +vs.opacity : VIEWSHED_DEFAULTS.opacity));
     const path = fanPath(pos, vs);
     o.fan.setOptions({
@@ -334,12 +370,12 @@ export function syncViewshed(marker) {
 
     if (!vs.terrain) {
         o.mask.setPaths([]);
-        _setStatus(marker, '');
+        _setStatus(marker, idx, '');
         return;
     }
     if (_elevationDenied) {
         o.mask.setPaths([]);
-        _setStatus(marker, 'Elevation API unavailable');
+        _setStatus(marker, idx, 'Elevation API unavailable');
         return;
     }
 
@@ -347,16 +383,14 @@ export function syncViewshed(marker) {
     const cached = _maskCache.get(key);
     if (cached) {
         o.mask.setPaths(cached.map(function (r) { return r.map(function (p) { return { lat: p[0], lng: p[1] }; }); }));
-        _setStatus(marker, 'Terrain mask on');
+        _setStatus(marker, idx, 'Terrain mask on');
         return;
     }
     o.mask.setPaths([]);
-    _requestMask(marker).then(function () {
-        // Only draw if this marker still wants this exact mask
-        if (marker._vs && marker._sittemp.viewshed && marker._sittemp.viewshed.terrain &&
-            maskKey(_posOf(marker), marker._sittemp.viewshed) === key) {
-            syncViewshed(marker);
-        }
+    _requestMask(marker, idx, vs).then(function () {
+        // Only redraw if this viewshed still wants this exact mask
+        const cur = marker._vs && getViewsheds(marker._sittemp)[idx];
+        if (cur && cur.terrain && maskKey(_posOf(marker), cur) === key) syncViewshed(marker);
     }, function (err) {
         const msg = String(err && err.message || err);
         if (msg === 'REQUEST_DENIED') {
@@ -365,7 +399,7 @@ export function syncViewshed(marker) {
         } else {
             showToast('Terrain mask failed (' + msg + ')');
         }
-        _setStatus(marker, 'Failed: ' + msg);
+        _setStatus(marker, idx, 'Failed: ' + msg);
     });
 }
 
@@ -402,33 +436,48 @@ export function buildViewshedSection(popover, marker, onChange) {
     }
 
     function render() {
-        const vs = marker._sittemp.viewshed;
-        if (!vs) {
+        const list = getViewsheds(marker._sittemp);
+        list.forEach(function (vs, idx) { renderOne(vs, idx, list.length); });
+        if (list.length < MAX_VIEWSHEDS) {
             const add = document.createElement('button');
             add.className = 'popover-vs-add';
-            add.textContent = '+ Add viewshed';
+            add.textContent = list.length ? '+ Add another viewshed (' + list.length + '/' + MAX_VIEWSHEDS + ')' : '+ Add viewshed';
             add.addEventListener('click', function () {
-                marker._sittemp.viewshed = Object.assign({}, VIEWSHED_DEFAULTS);
+                // Each new viewshed gets a color the others aren't using
+                const used = list.map(function (v) { return v.color; });
+                const color = NEW_VS_COLORS.find(function (c) { return used.indexOf(c) === -1; }) || VIEWSHED_DEFAULTS.color;
+                list.push(Object.assign({}, VIEWSHED_DEFAULTS, { color: color }));
                 commit();
                 rerender();
             });
             section.appendChild(add);
-            return;
         }
+    }
+
+    function renderOne(vs, idx, count) {
+        const box = document.createElement('div');
+        box.className = 'popover-vs-item';
+        section.appendChild(box);
 
         const head = document.createElement('div');
         head.className = 'popover-vs-head';
-        head.innerHTML = '<span>Viewshed</span>';
+        const title = document.createElement('span');
+        title.textContent = count > 1 ? 'Viewshed ' + (idx + 1) : 'Viewshed';
+        const dot = document.createElement('span');
+        dot.className = 'popover-vs-dot';
+        dot.style.background = vs.color;
+        title.prepend(dot);
+        head.appendChild(title);
         const rm = document.createElement('button');
         rm.className = 'popover-vs-remove';
         rm.textContent = 'Remove';
         rm.addEventListener('click', function () {
-            delete marker._sittemp.viewshed;
+            getViewsheds(marker._sittemp).splice(idx, 1);
             commit();
             rerender();
         });
         head.appendChild(rm);
-        section.appendChild(head);
+        box.appendChild(head);
 
         function numRow(label, value, unitText, onSet, opts) {
             const row = document.createElement('div');
@@ -452,7 +501,7 @@ export function buildViewshedSection(popover, marker, onChange) {
                 u.textContent = unitText;
                 row.appendChild(u);
             }
-            section.appendChild(row);
+            box.appendChild(row);
             return row;
         }
 
@@ -500,12 +549,12 @@ export function buildViewshedSection(popover, marker, onChange) {
         tLbl.appendChild(document.createTextNode(' Terrain mask'));
         tRow.appendChild(tLbl);
         const status = document.createElement('span');
-        status.id = 'vs-status';
+        status.id = 'vs-status-' + idx;
         status.className = 'popover-vs-status';
         status._marker = marker;
-        status.textContent = marker._vsStatus || '';
+        status.textContent = (marker._vsStatus && marker._vsStatus[idx]) || '';
         tRow.appendChild(status);
-        section.appendChild(tRow);
+        box.appendChild(tRow);
 
         // Color swatches
         const cRow = document.createElement('div');
@@ -522,11 +571,12 @@ export function buildViewshedSection(popover, marker, onChange) {
                 sw.classList.add('active');
                 vs.color = c;
                 commit();
+                rerender();   // updates the color dot in the header
             });
             sws.appendChild(sw);
         });
         cRow.appendChild(sws);
-        section.appendChild(cRow);
+        box.appendChild(cRow);
 
         function sliderRow(label, title, min, max, step, value, fmt, onSet) {
             const row = document.createElement('div');
@@ -550,7 +600,7 @@ export function buildViewshedSection(popover, marker, onChange) {
             row.appendChild(lbl);
             row.appendChild(sl);
             row.appendChild(val);
-            section.appendChild(row);
+            box.appendChild(row);
         }
         const pct = function (v) { return Math.round(v * 100) + '%'; };
         const ls = _lineStyle(vs);
@@ -583,7 +633,7 @@ export function buildViewshedSection(popover, marker, onChange) {
             tyGroup.appendChild(b);
         });
         tyRow.appendChild(tyGroup);
-        section.appendChild(tyRow);
+        box.appendChild(tyRow);
     }
 
     render();
@@ -612,10 +662,15 @@ function _kmlRing(points) {
     return s + '</coordinates></LinearRing></outerBoundaryIs></Polygon>\n';
 }
 
-/** KML Placemark(s) for a marker's viewshed, or '' if it has none. */
+/** KML Placemark(s) for all of a marker's viewsheds, or '' if it has none. */
 export function viewshedKML(marker, name) {
-    const vs = marker._sittemp && marker._sittemp.viewshed;
-    if (!vs) return '';
+    const list = marker._sittemp ? getViewsheds(marker._sittemp) : [];
+    return list.map(function (vs, i) {
+        return _oneKML(marker, list.length > 1 ? name + ' viewshed ' + (i + 1) : name, vs);
+    }).join('');
+}
+
+function _oneKML(marker, name, vs) {
     const pos = _posOf(marker);
     const opacity = vs.opacity !== undefined ? vs.opacity : VIEWSHED_DEFAULTS.opacity;
     // KML has no dashed lines, so line type is not exported; width and opacity are.

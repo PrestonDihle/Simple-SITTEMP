@@ -15,7 +15,7 @@
  */
 
 import { get } from './state.js';
-import { ECHELON_LIST, escapeXml } from './symbols.js';
+import { ECHELON_LIST, escapeXml, haloFor } from './symbols.js';
 
 export const AREA_MEASURES = [
     { key: 'PZ', name: 'PZ - pickup zone' },
@@ -98,7 +98,7 @@ function _textSVG(lines, color, opts) {
         const size = (i === 0 && opts.titleScale) ? fs * opts.titleScale : fs;
         svg += '<text x="' + x + '" y="' + (pad + lh * (i + 1) - lh * 0.25) + '" text-anchor="' + anchor + '"'
             + ' font-family="Consolas,Menlo,monospace" font-size="' + size + '" font-weight="' + bold + '"'
-            + ' fill="' + color + '" stroke="#ffffff" stroke-width="3" stroke-linejoin="round" paint-order="stroke">'
+            + ' fill="' + color + '" stroke="' + haloFor(color) + '" stroke-width="3" stroke-linejoin="round" paint-order="stroke">'
             + escapeXml(l) + '</text>';
     });
     return { svg: svg + '</svg>', w: w, h: h };

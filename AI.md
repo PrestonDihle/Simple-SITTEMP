@@ -54,7 +54,7 @@ Simple-SITTEMP/
 - **Shapes:** Circle, Triangle, Rectangle, Polygon, LineString, Five-Point Star, Freehand
 - **Line Types:** Solid, Dashed, Dotted, Dash-Dot, FLOT, Low Wire, 1x Concertina, Arrow, AT Ditch, AT Ditch (unfinished), AP Mine, AT Mine. Chosen per shape in the object popover ("Line type" grid) for lines, polygons, rectangles, circles and freehand shapes (`LINE_TYPE_SHAPES`); not for stars or flight routes. Picking a type applies its default color (`LINE_TYPE_COLORS` in symbols.js)
 - **Select Mode:** Click to select, drag to move, delete selected features
-- **Color Picker:** Line colors (Green, Blue, Red, Purple, Orange, Black, White, Grey)
+- **Color Picker:** Line colors (Green, Blue, Red, Purple, Orange, Black, White, Grey, Yellow). Labels drawn in light colors (yellow, white) get a dark outline via `haloFor()` in symbols.js
 - **Fill Colors:** Same set, plus "No Fill" swatch (sentinel `fillColor: 'none'` → `fillOpacity: 0`)
 - **Transparency Slider:** 0-100% opacity for fill
 
@@ -73,16 +73,16 @@ Simple-SITTEMP/
 
 ### Military Symbols
 - **Equipment (24+):** Rifle, Machine Gun, Grenade Launcher, Flame Thrower, AT Rifle, Recoilless Rifle, Mortar, Howitzer, Gun, Rocket Launcher, Missile Launcher, SSM, AT Gun, AD Gun, SAM, ATGM, Tank, APC, Radar, Fixed Wing, Rotary Wing, UAV, Observation Post, Electronic Warfare
-- **Units (11):** Infantry, Armor, Armored Infantry, Artillery, Engineers, Aviation, Military Intelligence, Military Police, Reconnaissance, Signal, Electronic Warfare
+- **Friendly Units (toolbar "Friendly Units"):** Infantry, Armor, Armored Infantry, Artillery, Engineers, Aviation, Military Intelligence, Military Police, Reconnaissance, Signal, Electronic Warfare. Default colors when placed (`SYMBOL_DEFAULT_COLORS` in state.js): friendly units blue, enemy units red, equipment black; tactical tasks use the current line color
 - **Enemy Units, Tactical Tasks** — additional symbol sets
 - Each symbol: SVG graphic + optional left text (20 char, bottom of symbol area) + optional right text (20 char, bottom of symbol area)
 - Symbols are selectable, draggable, deletable; scale/color editable in real time
 
 ### Viewsheds (`js/viewshed.js`)
-- Equipment, unit, and enemy-unit popovers have "+ Add viewshed"; the viewshed moves with its symbol
+- Equipment, unit, and enemy-unit popovers have "+ Add viewshed"; up to three per symbol (`MAX_VIEWSHEDS`), each with its own settings and default color (orange, yellow, blue); all move and rotate with the symbol
 - Parameters: range (m), azimuth + arc (mils/degrees toggle, preference saved in localStorage `sittemp_angle_unit`; stored internally as degrees from true north), observer height, target height, color, fill opacity, and outline width / opacity / line type (solid, dashed, dotted) independent of the symbol's stroke. The outline is a separate `google.maps.Polyline` (polygons can't dash); dashes and dots are repeated polyline icons
 - Range fan is drawn instantly (geometric sector/circle). "Terrain mask" checkbox runs line-of-sight using `google.maps.ElevationService`: up to 120 radial rays × 128 samples, batched 512 locations/request (~30 requests for 360°), with Earth curvature + refraction (k = 0.13); only visible ground is shaded
-- Config is stored in `marker._sittemp.viewshed` (in undo snapshots); overlays (`marker._vs`) and computed masks (in-memory cache keyed by position + params) are runtime-only
+- Config is stored in `marker._sittemp.viewsheds` (array, in undo snapshots; a legacy single `viewshed` object is migrated by `getViewsheds()`); overlays (`marker._vs`, one per viewshed) and computed masks (in-memory cache keyed by position + params) are runtime-only
 - Requires the Elevation API to be enabled on the Maps key; on REQUEST_DENIED the mask is disabled for the session with a toast
 - KML export writes the range fan and, when computed, the visible-terrain MultiGeometry
 
@@ -135,7 +135,7 @@ Simple-SITTEMP/
 ### UI Features
 - Left-side vertical toolbar, offset `calc(16px + 1vw)` from left edge
 - Sub-menus offset `calc(58px + 1vw)` from left edge
-- Tooltips on hover for all toolbar icons
+- Toolbar hover labels: a floating `#toolbar-tooltip` placed beside the hovered button from its `data-tooltip` (a CSS ::after label was clipped by the scrolling toolbar)
 - Classification warning modal on first load (green — UNCLASSIFIED USE ONLY)
 - No right-side Style Panel: `#right-rail` holds only the coordinate box; styling lives in the object popover
 

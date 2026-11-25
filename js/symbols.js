@@ -799,6 +799,14 @@ export const SHAPE_LIST = [
     { key: 'flight_route', name: 'Flight Route', icon: '<polyline points="4,23 12,12 18,17 25,5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="17" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M1,20 h6 v3 l-3,3 l-3,-3 z" fill="none" stroke="currentColor" stroke-width="1.2"/>' },
 ];
 
+/** Outline color that keeps text readable: dark behind light colors (yellow, white), white otherwise. */
+export function haloFor(color) {
+    const h = String(color || '#000000').replace('#', '');
+    if (h.length < 6) return '#ffffff';
+    const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6 ? '#000000' : '#ffffff';
+}
+
 // Default line color applied when a line type is chosen
 export const LINE_TYPE_COLORS = {
     solid: '#000000', dashed: '#000000', dotted: '#000000', dashdot: '#000000',

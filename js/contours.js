@@ -16,9 +16,9 @@ import { get } from './state.js';
 import { showToast } from './toolbar.js';
 import { fetchElevations, elevationRequestCount } from './viewshed.js';
 import { gridSpec, gridPoints, legendHost } from './elevation.js';
-import { escapeXml } from './symbols.js';
+import { escapeXml, haloFor } from './symbols.js';
 
-export const CONTOUR_COLORS = ['#8B4513', '#000000', '#FFFFFF', '#FF0000', '#0000FF', '#FF8C00', '#00AA00', '#800080'];
+export const CONTOUR_COLORS = ['#8B4513', '#000000', '#FFFFFF', '#FF0000', '#0000FF', '#FF8C00', '#00AA00', '#800080', '#FFFF00'];
 const DEFAULTS = { interval: 20, color: '#8B4513', width: 1, index: true, labels: true };
 const MAX_LEVELS = 250;
 const INDEX_EVERY = 5;
@@ -143,7 +143,7 @@ function _labelIcon(text, color, rot) {
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + S + '" height="' + S + '">'
         + '<g transform="rotate(' + rot + ' ' + S / 2 + ' ' + S / 2 + ')">'
         + '<text x="' + S / 2 + '" y="' + (S / 2 + 4) + '" text-anchor="middle" font-family="Arial,sans-serif" font-size="' + fs + '" font-weight="bold"'
-        + ' fill="' + color + '" stroke="' + (color.toUpperCase() === '#FFFFFF' ? '#000' : '#fff') + '" stroke-width="3" paint-order="stroke">' + escapeXml(text) + '</text></g></svg>';
+        + ' fill="' + color + '" stroke="' + haloFor(color) + '" stroke-width="3" paint-order="stroke">' + escapeXml(text) + '</text></g></svg>';
     return {
         url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
         scaledSize: new google.maps.Size(S, S), anchor: new google.maps.Point(S / 2, S / 2),

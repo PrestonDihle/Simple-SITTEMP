@@ -4,7 +4,7 @@
  * Toolbar button handlers, submenu building, color picker, and toast notifications.
  */
 
-import { get, set, subscribe } from './state.js';
+import { get, set, subscribe, SYMBOL_DEFAULT_COLORS } from './state.js';
 import {
     equipmentSVG, unitSVG, enemyUnitSVG, tacticalTaskSVG,
     EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
@@ -30,6 +30,7 @@ export function showToast(message, duration) {
 // ===== Toolbar Setup =====
 
 export function setupToolbar() {
+    setupToolbarTooltips();
     buildShapesSubmenu();
     buildEquipmentSubmenu();
     buildUnitsSubmenu();
@@ -139,6 +140,32 @@ export function setupToolbar() {
     positionSubmenus();
 }
 
+// ===== Toolbar hover labels =====
+// A single floating label next to the hovered button. (A CSS ::after label is clipped
+// because the toolbar scrolls on short screens.)
+function setupToolbarTooltips() {
+    const tip = document.createElement('div');
+    tip.id = 'toolbar-tooltip';
+    document.body.appendChild(tip);
+    let timer = null;
+    const hide = function () { clearTimeout(timer); tip.classList.remove('visible'); };
+    document.querySelectorAll('.toolbar-btn[data-tooltip]').forEach(function (btn) {
+        btn.addEventListener('mouseenter', function () {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                const r = btn.getBoundingClientRect();
+                tip.textContent = btn.dataset.tooltip;
+                tip.style.left = (r.right + 8) + 'px';
+                tip.style.top = (r.top + r.height / 2) + 'px';
+                tip.classList.add('visible');
+            }, 150);
+        });
+        btn.addEventListener('mouseleave', hide);
+        btn.addEventListener('click', hide);
+    });
+    document.getElementById('toolbar').addEventListener('scroll', hide);
+}
+
 // ===== Submenu Helpers =====
 
 /** Align a submenu with its button, shifting it up so a tall menu stays on screen. */
@@ -227,7 +254,7 @@ function buildEquipmentSubmenu() {
         item.dataset.eqKey = eq.key;
         const iconDiv = document.createElement('div');
         iconDiv.style.cssText = 'width:28px;height:28px;';
-        iconDiv.innerHTML = equipmentSVG(eq.key, get('lineColor'), get('symbolStrokeWidth'));
+        iconDiv.innerHTML = equipmentSVG(eq.key, SYMBOL_DEFAULT_COLORS.equipment, get('symbolStrokeWidth'));
         item.appendChild(iconDiv);
         const label = document.createElement('span');
         label.textContent = eq.name;
@@ -241,11 +268,10 @@ function buildEquipmentSubmenu() {
 
     // Update icons when line color or stroke width changes
     subscribe(['lineColor', 'symbolStrokeWidth'], function () {
-        const color = get('lineColor');
         const sw = get('symbolStrokeWidth');
         grid.querySelectorAll('.submenu-item[data-eq-key]').forEach(function (item) {
             const key = item.dataset.eqKey;
-            item.querySelector('div').innerHTML = equipmentSVG(key, color, sw);
+            item.querySelector('div').innerHTML = equipmentSVG(key, SYMBOL_DEFAULT_COLORS.equipment, sw);
         });
     });
 }
@@ -260,7 +286,7 @@ function buildUnitsSubmenu() {
         item.dataset.unitKey = unit.key;
         const iconDiv = document.createElement('div');
         iconDiv.style.cssText = 'width:28px;height:28px;';
-        iconDiv.innerHTML = unitSVG(unit.key, get('lineColor'), get('symbolStrokeWidth'));
+        iconDiv.innerHTML = unitSVG(unit.key, SYMBOL_DEFAULT_COLORS.unit, get('symbolStrokeWidth'));
         item.appendChild(iconDiv);
         const label = document.createElement('span');
         label.textContent = unit.name;
@@ -274,11 +300,10 @@ function buildUnitsSubmenu() {
 
     // Update icons when line color or stroke width changes
     subscribe(['lineColor', 'symbolStrokeWidth'], function () {
-        const color = get('lineColor');
         const sw = get('symbolStrokeWidth');
         grid.querySelectorAll('.submenu-item[data-unit-key]').forEach(function (item) {
             const key = item.dataset.unitKey;
-            item.querySelector('div').innerHTML = unitSVG(key, color, sw);
+            item.querySelector('div').innerHTML = unitSVG(key, SYMBOL_DEFAULT_COLORS.unit, sw);
         });
     });
 }
@@ -293,7 +318,7 @@ function buildEnemyUnitsSubmenu() {
         item.dataset.enemyUnitKey = unit.key;
         const iconDiv = document.createElement('div');
         iconDiv.style.cssText = 'width:28px;height:28px;';
-        iconDiv.innerHTML = enemyUnitSVG(unit.key, get('lineColor'), get('symbolStrokeWidth'));
+        iconDiv.innerHTML = enemyUnitSVG(unit.key, SYMBOL_DEFAULT_COLORS.enemy_unit, get('symbolStrokeWidth'));
         item.appendChild(iconDiv);
         const label = document.createElement('span');
         label.textContent = unit.name;
@@ -307,11 +332,10 @@ function buildEnemyUnitsSubmenu() {
 
     // Update icons when line color or stroke width changes
     subscribe(['lineColor', 'symbolStrokeWidth'], function () {
-        const color = get('lineColor');
         const sw = get('symbolStrokeWidth');
         grid.querySelectorAll('.submenu-item[data-enemy-unit-key]').forEach(function (item) {
             const key = item.dataset.enemyUnitKey;
-            item.querySelector('div').innerHTML = enemyUnitSVG(key, color, sw);
+            item.querySelector('div').innerHTML = enemyUnitSVG(key, SYMBOL_DEFAULT_COLORS.enemy_unit, sw);
         });
     });
 }

@@ -155,31 +155,24 @@ html, body {
     stroke: currentColor;
 }
 
-/* Toolbar Tooltip */
-.toolbar-btn::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: 50px;
-    top: 50%;
+/* Toolbar hover label (positioned by setupToolbarTooltips in toolbar.js) */
+#toolbar-tooltip {
+    position: fixed;
     transform: translateY(-50%);
-    background: rgba(30, 30, 30, 0.9);
+    background: rgba(30, 30, 30, 0.92);
     color: #fff;
     padding: 5px 10px;
     border-radius: 6px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.15s;
-    z-index: 1001;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    transition: opacity 0.12s;
+    z-index: 6000;
 }
 
-.toolbar-btn:hover::after {
-    opacity: 1;
-}
+#toolbar-tooltip.visible { opacity: 1; }
 
 /* Toolbar Divider */
 .toolbar-divider {
@@ -1382,6 +1375,34 @@ html, body {
 }
 
 .popover-vs-remove { padding: 2px 6px; }
+
+/* Each viewshed in a symbol's popover (up to three) */
+.popover-vs-item + .popover-vs-item,
+.popover-vs-item + .popover-vs-add {
+    border-top: 1px dashed #3a3f4a;
+    margin-top: 6px;
+    padding-top: 6px;
+}
+
+.popover-vs-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    margin-right: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    vertical-align: middle;
+}
+
+/* A popover too tall to fit above its object is pinned to the top and scrolls */
+#object-popover.clamped {
+    transform: translate(-50%, 0);
+    max-height: calc(100% - 16px);
+    overflow-y: auto;
+}
+
+#object-popover.clamped::before,
+#object-popover.clamped::after { display: none; }
 .popover-unit-toggle { padding: 2px 5px; min-width: 36px; }
 
 .popover-num {
