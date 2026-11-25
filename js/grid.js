@@ -43,6 +43,66 @@ function formatMGRS(mgrsStr) {
 
 // ===== Coordinate Display =====
 
+// ===== Location search =====
+
+/** One coordinate ("35.26", "-116.68", "35 15 45 N", "W116°40.8'") → signed degrees, or null. */
+function _parseCoord(str) {
+    const hemi = (str.match(/[NSEW]/i) || [''])[0].toUpperCase();
+    const nums = str.replace(/[NSEW]/ig, ' ').trim().split(/[\s°º'′"″:]+/).filter(Boolean);
+    if (!nums.length || nums.length > 3 || !nums.every(function (n) { return /^[+-]?\d+(\.\d+)?$/.test(n); })) return null;
+    const neg = nums[0].charAt(0) === '-';
+    const d = Math.abs(parseFloat(nums[0])), m = nums[1] ? parseFloat(nums[1]) : 0, sec = nums[2] ? parseFloat(nums[2]) : 0;
+    if (m >= 60 || sec >= 60) return null;
+    let v = d + m / 60 + sec / 3600;
+    if (neg || hemi === 'S' || hemi === 'W') v = -v;
+    return { value: v, hemi: hemi };
+}
+
+/**
+ * Parse a latitude/longitude pair. Accepts decimal degrees ("35.2625, -116.68",
+ * "35.2625 -116.68"), degrees-minutes and degrees-minutes-seconds with N/S/E/W
+ * ("35°15'45\"N 116°40'48\"W", "N35 15.75 W116 40.8"), lat first unless the
+ * hemisphere letters say otherwise. Returns {lat, lng} or null.
+ */
+export function parseLatLng(raw) {
+    const s = String(raw || '').trim().toUpperCase();
+    if (!s || /[^0-9NSEW\s.,°º'′"″:+-]/.test(s)) return null;
+    let parts;
+    if (s.indexOf(',') !== -1) {
+        parts = s.split(',');
+    } else if (/[NSEW]/.test(s)) {
+        // Split between the two coordinates using the hemisphere letters
+        const m = s.match(/^\s*([NS][^NSEW]+)([EW].+)$/) || s.match(/^\s*([EW][^NSEW]+)([NS].+)$/) ||
+                  s.match(/^(.+?[NS])\s*(.+?[EW])\s*$/) || s.match(/^(.+?[EW])\s*(.+?[NS])\s*$/);
+        if (!m) return null;
+        parts = [m[1], m[2]];
+    } else {
+        parts = s.split(/\s+/);
+    }
+    if (parts.length !== 2) return null;
+    const a = _parseCoord(parts[0]), b = _parseCoord(parts[1]);
+    if (!a || !b) return null;
+    let lat = a.value, lng = b.value;
+    if (a.hemi === 'E' || a.hemi === 'W' || b.hemi === 'N' || b.hemi === 'S') { lat = b.value; lng = a.value; }
+    if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+    return { lat: lat, lng: lng };
+}
+
+/** MGRS string → {lat, lng}, or null if it isn't valid MGRS. */
+export function mgrsToLatLng(raw) {
+    const clean = String(raw || '').replace(/\s+/g, '').toUpperCase();
+    if (!/^\d{1,2}[C-HJ-NP-X][A-HJ-NP-Z]{2}(\d{2}){0,5}$/.test(clean)) return null;
+    try {
+        const pt = mgrs.toPoint(clean);   // [lng, lat]
+        return { lat: pt[1], lng: pt[0] };
+    } catch (e) {
+        return null;
+    }
+}
+
+let _geocoder = null;
+
+/** Search box: MGRS, then lat/long, then a place-name search (Google geocoder). */
 export function setupMGRSGoto() {
     var input = document.getElementById('mgrs-goto-input');
     var btn = document.getElementById('mgrs-goto-btn');
@@ -50,19 +110,43 @@ export function setupMGRSGoto() {
     function doGoto() {
         var raw = input.value.trim();
         if (!raw) return;
-        var clean = raw.replace(/\s+/g, '');
-        try {
-            var pt = mgrs.toPoint(clean); // returns [lng, lat]
-            var map = get('map');
-            map.setCenter({ lat: pt[1], lng: pt[0] });
+        var map = get('map');
+
+        var p = mgrsToLatLng(raw);
+        if (p) {
+            map.setCenter(p);
             showToast('Centered on ' + raw.toUpperCase());
-        } catch (err) {
-            showToast('Invalid MGRS: ' + raw);
+            return;
         }
+        p = parseLatLng(raw);
+        if (p) {
+            map.setCenter(p);
+            showToast('Centered on ' + p.lat.toFixed(5) + ', ' + p.lng.toFixed(5));
+            return;
+        }
+
+        // Anything else: place-name search
+        if (!_geocoder) _geocoder = new google.maps.Geocoder();
+        showToast('Searching for "' + raw + '"...');
+        _geocoder.geocode({ address: raw }, function (results, status) {
+            if (status === 'OK' && results && results.length) {
+                var r = results[0];
+                if (r.geometry.viewport) map.fitBounds(r.geometry.viewport);
+                else { map.setCenter(r.geometry.location); map.setZoom(DEFAULT_ZOOM); }
+                showToast('Found: ' + r.formatted_address);
+            } else if (status === 'ZERO_RESULTS') {
+                showToast('No match for "' + raw + '" (not a place, MGRS or lat/long)');
+            } else if (status === 'REQUEST_DENIED') {
+                showToast('Place search unavailable: the Geocoding API is not enabled for this map key', 5000);
+            } else {
+                showToast('Search failed (' + status + ')');
+            }
+        });
     }
 
     btn.addEventListener('click', doGoto);
     input.addEventListener('keydown', function (e) {
+        e.stopPropagation();   // typing here shouldn't trigger map shortcuts
         if (e.key === 'Enter') doGoto();
     });
 
