@@ -11,7 +11,7 @@ import {
     EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
     buildSymbolWithLabels, symbolIconLayout, escapeXml, LINE_TYPES, LINE_TYPE_COLORS, getLinePreviewSVG
 } from './symbols.js';
-import { showToast } from './toolbar.js';
+import { showToast, setActiveTool } from './toolbar.js';
 import { syncViewshed, clearViewshedOverlays, buildViewshedSection, getViewsheds } from './viewshed.js';
 import { shadeFeature, getShadeConfigs, restoreShades } from './elevation.js';
 import { buildMeasureSection, syncMeasureLabel, syncAllMeasureLabels, forgetMeasure } from './measures.js';
@@ -184,6 +184,8 @@ export function initTerraDraw() {
         if (context.action === 'draw') {
             pushUndoState();
             applyLineType(id);
+            // One shape per pick: go back to the Select tool (deferred so Terra Draw finishes first)
+            setTimeout(returnToSelect, 0);
         }
     });
 
@@ -262,6 +264,21 @@ export function activateShape(key) {
         const modeMap = { circle: 'circle', rectangle: 'rectangle', polygon: 'polygon', linestring: 'linestring', freehand: 'freehand' };
         if (modeMap[key]) draw.setMode(modeMap[key]);
     }
+}
+
+// ===== Return to Select =====
+
+/**
+ * After anything is placed (symbol, tactical task, shape, star, triangle, flight
+ * route), switch back to the Select tool so the next click selects instead of
+ * placing another one.
+ */
+export function returnToSelect() {
+    exitSymbolPlacement();
+    var draw = get('draw');
+    if (draw && get('ready')) { try { draw.setMode('select'); } catch (e) { /* ignore */ } }
+    setActiveTool('select');
+    document.querySelectorAll('.submenu-item.active, .submenu-list-item.active').forEach(function (el) { el.classList.remove('active'); });
 }
 
 // ===== Symbol Placement =====
@@ -361,6 +378,7 @@ function placeSymbol(latLng, leftText, rightText, echelon) {
     const lay = symbolIconLayout(leftText, rightText, 0);
     createMapMarker(latLng, fullSVG, new google.maps.Size(lay.width * scale, h * scale), new google.maps.Point((lay.symX + 20) * scale, (h / 2) * scale), sittemp);
     pushUndoState();
+    returnToSelect();
 }
 
 // ===== Star Placement =====
@@ -389,6 +407,7 @@ function placeStarMarker(latLng) {
     const scale = get('symbolScale') || 1.0;
     createMapMarker(latLng, svg, new google.maps.Size(30 * scale, 30 * scale), new google.maps.Point(15 * scale, 15 * scale), { type: 'star', color, fill, fillOpacity: opacity, strokeWidth: sw, symbolScale: scale });
     pushUndoState();
+    returnToSelect();
 }
 
 // ===== Triangle Placement =====
@@ -417,6 +436,7 @@ function placeTriangleMarker(latLng) {
     const scale = get('symbolScale') || 1.0;
     createMapMarker(latLng, svg, new google.maps.Size(30 * scale, 30 * scale), new google.maps.Point(15 * scale, 15 * scale), { type: 'triangle', color, fill, fillOpacity: opacity, strokeWidth: sw, symbolScale: scale });
     pushUndoState();
+    returnToSelect();
 }
 
 // ===== Text Placement =====
@@ -1134,21 +1154,37 @@ function _buildPopoverContent(popover, type, info) {
     }
 }
 
-function _showPopoverAtLatLng(latLng, type, info) {
+/**
+ * Show the popover beside the selected object rather than on top of it.
+ * `extent` is the object's on-screen box {left, right, top, bottom} in container
+ * pixels; the popover goes to its right (or left if there's no room), vertically
+ * centered on it and kept inside the map. Too tall to fit → pinned to the top and scrolls.
+ */
+export function popoverPlacement(box, w, h, cw, ch) {
+    var GAP = 16, EDGE = 8;
+    var x = box.right + GAP;                                   // right of the object
+    if (x + w > cw - EDGE) x = box.left - GAP - w;             // else left of it
+    if (x < EDGE) x = Math.max(EDGE, cw - w - EDGE);           // neither fits: hug the right edge
+    var clamped = h > ch - 2 * EDGE;
+    var y = clamped ? EDGE : Math.max(EDGE, Math.min(ch - h - EDGE, (box.top + box.bottom) / 2 - h / 2));
+    return { x: Math.round(x), y: Math.round(y), clamped: clamped };
+}
+
+function _showPopoverAtLatLng(latLng, type, info, extent) {
     var popover = document.getElementById('object-popover');
     if (!popover) return;
     _buildPopoverContent(popover, type, info || {});
-    var px = _latLngToPixel(latLng);
     popover.classList.remove('clamped');
-    if (px) {
-        popover.style.left = Math.round(px.x) + 'px';
-        popover.style.top = Math.round(px.y) + 'px';
-    }
+    popover.classList.add('beside');
     popover.style.display = 'block';
-    // Normally the popover sits above the object; if it's too tall for that, pin it to the top and let it scroll
-    if (px && px.y - popover.offsetHeight - 12 < 8) {
-        popover.classList.add('clamped');
-        popover.style.top = '8px';
+    var px = _latLngToPixel(latLng);
+    if (px) {
+        var box = extent || { left: px.x, right: px.x, top: px.y, bottom: px.y };
+        var container = document.getElementById('map-container') || document.body;
+        var pos = popoverPlacement(box, popover.offsetWidth, popover.offsetHeight, container.clientWidth, container.clientHeight);
+        if (pos.clamped) popover.classList.add('clamped');
+        popover.style.left = pos.x + 'px';
+        popover.style.top = pos.y + 'px';
     }
 
     // Close on map pan/zoom
@@ -1184,7 +1220,30 @@ function _showPopoverAtLatLng(latLng, type, info) {
 function _showPopoverForMarker(marker) {
     var info = get('selectionInfo') || {};
     var type = (marker._sittemp && marker._sittemp.type) || 'marker';
-    _showPopoverAtLatLng(marker.getPosition(), type, info);
+    // On-screen box of the marker icon, so the popover can sit beside it
+    var extent = null;
+    var px = _latLngToPixel(marker.getPosition());
+    var icon = marker.getIcon && marker.getIcon();
+    if (px && icon && icon.scaledSize && icon.anchor) {
+        var left = px.x - icon.anchor.x, top = px.y - icon.anchor.y;
+        extent = { left: left, right: left + icon.scaledSize.width, top: top, bottom: top + icon.scaledSize.height };
+    }
+    _showPopoverAtLatLng(marker.getPosition(), type, info, extent);
+}
+
+/** On-screen box of a Terra Draw feature (all its vertices). */
+function _featureExtent(feature) {
+    var g = feature && feature.geometry;
+    if (!g) return null;
+    var coords = g.type === 'Polygon' ? g.coordinates[0] : (g.type === 'LineString' ? g.coordinates : [g.coordinates]);
+    var box = null;
+    coords.forEach(function (c) {
+        var p = _latLngToPixel(new google.maps.LatLng(c[1], c[0]));
+        if (!p) return;
+        if (!box) box = { left: p.x, right: p.x, top: p.y, bottom: p.y };
+        else { box.left = Math.min(box.left, p.x); box.right = Math.max(box.right, p.x); box.top = Math.min(box.top, p.y); box.bottom = Math.max(box.bottom, p.y); }
+    });
+    return box;
 }
 
 function _showPopoverForFeature(featureId) {
@@ -1194,14 +1253,16 @@ function _showPopoverForFeature(featureId) {
     var draw = get('draw');
     var features = draw ? draw.getSnapshot() : [];
     var type = 'polygon';
+    var extent = null;
     for (var i = 0; i < features.length; i++) {
         if (features[i].id === featureId) {
             var mode = features[i].properties && features[i].properties.mode;
             type = mode || features[i].geometry.type.toLowerCase();
+            extent = _featureExtent(features[i]);
             break;
         }
     }
-    _showPopoverAtLatLng(centroid, type, info);
+    _showPopoverAtLatLng(centroid, type, info, extent);
 }
 
 function _hidePopover() {

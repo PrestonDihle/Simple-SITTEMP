@@ -16,6 +16,7 @@
 
 import { get } from './state.js';
 import { ECHELON_LIST, escapeXml, haloFor } from './symbols.js';
+import { applyStyleToSelected } from './drawing.js';
 
 export const AREA_MEASURES = [
     { key: 'PZ', name: 'PZ - pickup zone' },
@@ -24,7 +25,38 @@ export const AREA_MEASURES = [
     { key: 'HA', name: 'HA - holding area' },
     { key: 'FARP', name: 'FARP - fwd arming/refuel pt' },
     { key: 'BP', name: 'BP - battle position' },
+    { key: 'CBRN', name: 'CBRN - contaminated area' },
+    { key: 'CBRNE', name: 'CBRNE - contaminated area' },
 ];
+
+// CBRN contaminated area (FM 1-02.2 Table 5-28): agent letter in an inverted
+// triangle over the contamination mark. CBRNE adds E (explosive) to the choices.
+const CBRN_AGENTS = [
+    { key: 'B', name: 'B - biological' },
+    { key: 'C', name: 'C - chemical' },
+    { key: 'N', name: 'N - nuclear' },
+    { key: 'R', name: 'R - radiological' },
+];
+const CBRNE_AGENTS = CBRN_AGENTS.concat([{ key: 'E', name: 'E - explosive' }]);
+function _isCbrn(fn) { return fn === 'CBRN' || fn === 'CBRNE'; }
+
+/** Inverted-triangle CBRN marker with the agent letter, plus an optional name below. */
+function _cbrnIcon(agent, name, color) {
+    const w = Math.max(56, name.length * 9 + 10), triH = 44, h = name ? triH + 20 : triH + 4;
+    const cx = w / 2;
+    let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">'
+        + '<path d="M' + (cx - 26) + ',3 L' + (cx + 26) + ',3 L' + cx + ',' + (triH + 1) + ' Z" fill="#ffffff" stroke="' + color + '" stroke-width="2.5" stroke-linejoin="round"/>'
+        + '<text x="' + cx + '" y="18" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="' + color + '">' + escapeXml(agent) + '</text>'
+        // contamination mark: two dots joined by an arc
+        + '<circle cx="' + (cx - 8) + '" cy="26" r="2.6" fill="' + color + '"/><circle cx="' + (cx + 8) + '" cy="26" r="2.6" fill="' + color + '"/>'
+        + '<path d="M' + (cx - 8) + ',27 Q' + cx + ',18 ' + (cx + 8) + ',27" fill="none" stroke="' + color + '" stroke-width="1.4"/>';
+    if (name) {
+        svg += '<text x="' + cx + '" y="' + (triH + 16) + '" text-anchor="middle" font-family="Consolas,Menlo,monospace" font-size="12" font-weight="bold"'
+            + ' fill="' + color + '" stroke="' + haloFor(color) + '" stroke-width="3" paint-order="stroke">' + escapeXml(name) + '</text>';
+    }
+    svg += '</svg>';
+    return { svg: svg, w: w, h: h };
+}
 
 export const AIRSPACE_ZONES = [
     { key: 'ROZ', name: 'ROZ - restricted operations zone' },
@@ -71,6 +103,7 @@ export function measureLines(m) {
         return lines;
     }
     if (m.fn === 'BP') return [name || 'BP'];
+    if (_isCbrn(m.fn)) return [(m.fn + ' ' + (m.agent || (m.fn === 'CBRNE' ? 'E' : 'C')) + ' ' + name).trim()];
     return [(m.fn + ' ' + name).trim()];
 }
 
@@ -79,6 +112,7 @@ export function measureTitle(m) {
     if (!m || !m.fn) return '';
     if (_isZone(m.fn)) return (m.fn + ' ' + (m.unit || '')).trim().toUpperCase();
     if (m.fn === 'BP') return ('BP ' + (m.name || '')).trim().toUpperCase();
+    if (_isCbrn(m.fn)) return (m.fn + ' ' + (m.agent || '') + ' ' + (m.name || '')).replace(/\s+/g, ' ').trim().toUpperCase();
     return (m.fn + ' ' + (m.name || '')).trim().toUpperCase();
 }
 
@@ -182,7 +216,9 @@ export function syncMeasureLabel(featureId) {
     const color = _color(featureId);
     const zone = _isZone(m.fn);
     const lines = measureLines(m);
-    const t = _textSVG(lines, color, zone ? { fontSize: 11, align: 'left', titleScale: 1.15 } : { fontSize: 14, align: 'center', allBold: true });
+    const t = _isCbrn(m.fn)
+        ? _cbrnIcon(m.agent || (m.fn === 'CBRNE' ? 'E' : 'C'), (m.name || '').toUpperCase().trim(), color)
+        : _textSVG(lines, color, zone ? { fontSize: 11, align: 'left', titleScale: 1.15 } : { fontSize: 14, align: 'center', allBold: true });
     const c = ringCentroid(ring);
     const l = _labels[featureId] || { main: null, ech: null };
     l.main = _setMarker(l.main, c, _icon(t));
@@ -296,6 +332,15 @@ export function buildMeasureSection(popover, featureId, onChange) {
             if (!v) { delete measures[featureId]; }
             else if (!measures[featureId]) { measures[featureId] = { fn: v, name: '', minRef: 'AGL', maxRef: 'AGL', echelon: 'none' }; }
             else { measures[featureId].fn = v; }
+            if (_isCbrn(v)) {
+                const mm = measures[featureId];
+                const allowed = (v === 'CBRNE' ? CBRNE_AGENTS : CBRN_AGENTS).map(function (a) { return a.key; });
+                if (allowed.indexOf(mm.agent) === -1) mm.agent = v === 'CBRNE' ? 'E' : 'C';
+                // Contaminated areas: black outline, yellow fill (Terra Draw can't draw FM hatching)
+                applyStyleToSelected('lineColor', '#000000');
+                applyStyleToSelected('fillColor', '#FFFF00');
+                applyStyleToSelected('fillOpacity', 0.35);
+            }
             commit();
             rerender();
         });
@@ -313,7 +358,10 @@ export function buildMeasureSection(popover, featureId, onChange) {
             _input(_row(section, 'From'), 'text', m.timeFrom, 'DTG e.g. 030001ZJUL26', 130, function (v) { m.timeFrom = v; commit(); });
             _input(_row(section, 'To'), 'text', m.timeTo, 'DTG', 130, function (v) { m.timeTo = v; commit(); });
         } else {
-            _input(_row(section, 'Name'), 'text', m.name, 'e.g. WOLF', 130, function (v) { m.name = v; commit(); });
+            if (_isCbrn(m.fn)) {
+                _select(_row(section, 'Agent'), m.fn === 'CBRNE' ? CBRNE_AGENTS : CBRN_AGENTS, m.agent || 'C', function (v) { m.agent = v; commit(); });
+            }
+            _input(_row(section, 'Name'), 'text', m.name, _isCbrn(m.fn) ? 'optional' : 'e.g. WOLF', 130, function (v) { m.name = v; commit(); });
             if (m.fn === 'BP') {
                 _select(_row(section, 'Echelon'), ECHELON_LIST, m.echelon || 'none', function (v) { m.echelon = v; commit(); });
             }

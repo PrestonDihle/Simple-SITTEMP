@@ -59,6 +59,9 @@ Simple-SITTEMP/
 - **Fill Colors:** Same set, plus "No Fill" swatch (sentinel `fillColor: 'none'` → `fillOpacity: 0`)
 - **Transparency Slider:** 0-100% opacity for fill
 
+### Return to Select
+- After placing a symbol, tactical task, shape (Terra Draw `finish`), star, triangle or flight route, `returnToSelect()` switches back to the Select tool and clears the submenu highlight
+
 ### Live Style Editing
 - The right-side Style Panel was removed; all styling is per object in the object popover. Selecting an object sets `selectionInfo`, which the popover reads for current values
 - Popover color swatches, opacity, stroke and scale apply to the selected object in real time and also become the defaults for the next object drawn (`lineColor`, `fillColor`, `fillOpacity`, `symbolStrokeWidth`, `symbolScale` clamped to 3×)
@@ -67,7 +70,7 @@ Simple-SITTEMP/
 - Marker selection shown with a dashed-border highlight on the SVG icon
 
 ### Object Style Popover (Req 4)
-- Clicking any placed object opens a small popover anchored to its map position
+- Clicking any placed object opens a small popover beside it (right of its on-screen box, or left if there's no room; vertically centered, kept on screen; `popoverPlacement()`), so it doesn't cover the object
 - Contains: Delete button + line color and stroke for everything; fill color + opacity for polygons, rectangles, circles, freehand, stars and triangles; line opacity (`featureStyles[id].lineOpacity`, also applied to pattern overlays) for lines; scale for markers
 - Positioned via Google Maps OverlayView `fromLatLngToContainerPixel()`
 - Closes on Esc, map click, or when a new object is selected
@@ -89,6 +92,7 @@ Simple-SITTEMP/
 
 ### Control Measures (`js/measures.js`)
 - Popover of any polygon / rectangle / circle / freehand has a "Control measure" section: Type + fields
+- CBRN / CBRNE contaminated area (Table 5-28): inverted triangle with the agent letter (B, C, N, R; CBRNE also E for explosive) over the contamination mark, optional name below. Choosing it sets the shape to a black outline and 35% yellow fill (Terra Draw can't draw the FM hatching)
 - Area (FM 1-02.2 INCL C1 Tables 5-4/5-5): PZ, LZ, DZ, HA, FARP → label "PZ WOLF" at the area centroid; BP → name inside plus echelon glyph (I, II, X…) on the bottom edge (its white halo stands in for the doctrinal gap). HA is not in Table 5-4 and uses the same template
 - Airspace (Table 5-23): ROZ, HIDACZ, AARROZ, UAROZ, WEZ, JEZ, MEZ, LOMEZ, HIMEZ, SHORAD EZ → block: function, unit (T), MIN/MAX ALT in feet AGL or MSL, TIME FROM/TO (DTG)
 - Tags in `state.featureMeasures[featureId]` (in undo snapshots); labels are non-clickable markers that follow Terra Draw `change` update/delete events and the outline color

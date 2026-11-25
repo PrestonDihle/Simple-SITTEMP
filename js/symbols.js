@@ -585,9 +585,10 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
     // Point at angle a (deg, screen coords: 0 = right, 90 = down) on circle (cx, cy, r)
     const pt = (cx, cy, r, a) => [f1(cx + r * Math.cos(a * RAD)), f1(cy + r * Math.sin(a * RAD))];
     // Open (line) arrowhead with tip at (x, y) pointing toward angle a
-    const openHead = (x, y, a, len) => {
+    const openHead = (x, y, a, len, spread) => {
         len = len || 40;
-        const b1 = pt(x, y, -len, a - 30), b2 = pt(x, y, -len, a + 30);
+        spread = spread || 30;
+        const b1 = pt(x, y, -len, a - spread), b2 = pt(x, y, -len, a + spread);
         return P(`M${b1[0]},${b1[1]} L${x},${y} L${b2[0]},${b2[1]}`);
     };
     // Filled arrowhead with tip at (x, y) pointing toward angle a
@@ -668,17 +669,18 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
             P('M190,175 L315,175') +
             openHead(315, 175, 0, 48),
 
-        // Isolate — open circle ringed by outlined triangles pointing in at the enemy,
-        // arrowhead at the open end, I outside
+        // Isolate — open circle ringed by outlined triangles standing on the circle and
+        // pointing outward, arrowhead at the open end, I outside
         isolate: () => {
-            const r = 95;
+            const r = 92;
             let s = P(arc(CX, CY, r, A0, A1));
-            [228, 258, 288, 318, 62, 92, 122].forEach((a) => {
-                const b1 = pt(CX, CY, r + 40, a - 9), b2 = pt(CX, CY, r + 40, a + 9), tip = pt(CX, CY, r, a);
+            [228, 258, 288, 318, 48, 78, 108].forEach((a) => {
+                const b1 = pt(CX, CY, r, a - 9), b2 = pt(CX, CY, r, a + 9), tip = pt(CX, CY, r + 38, a);
                 s += P(`M${b1[0]},${b1[1]} L${tip[0]},${tip[1]} L${b2[0]},${b2[1]} Z`, `stroke-width="${f1(sw * 0.6)}"`);
             });
             const e = pt(CX, CY, r, A1);
-            return s + openHead(e[0], e[1], tangentCW(A1) + 15, 42) + T(318, 175, 'I', 70);
+            // Head on the arc's direction of travel, arms spread wide enough to clear the arc
+            return s + openHead(e[0], e[1], tangentCW(A1), 50, 38) + T(318, 175, 'I', 70);
         },
 
         // Neutralize — line broken by N, crossed by a dashed diagonal (also broken at N)
@@ -698,7 +700,7 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
 
         // Secure — open circle with an open arrowhead at the lower-left end, S outside
         secure: () => P(arc(CX, CY, CR, A0, A1)) +
-            openHead(arcEnd[0], arcEnd[1], tangentCW(A1) + 15, 45) +
+            openHead(arcEnd[0], arcEnd[1], tangentCW(A1), 52, 38) +
             T(310, 175, 'S', 70),
 
         // Seize — empty circle (unit), curved arrow with S, open arrowhead at the objective
