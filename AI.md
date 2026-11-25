@@ -128,9 +128,9 @@ Simple-SITTEMP/
 
 ### Export Features
 - **KML Export:** All placed entities as .kml file (no base map)
-- **PDF Export:** Full map view + grid + entities, page sizes: 8.5x11, 11x17, 18x24
-- **Screenshot:** PNG download
-- Interstitial ad placeholder (5-second countdown) before KML/PDF exports
+- **PDF Export:** choose a shape (Paper: Letter 8.5×11, Tabloid 11×17, Arch C 18×24; Shape: 1:1, 4:3, 16:9, Free), then portrait/landscape (not for 1:1/Free), then frame the print area on the map: a box that can be moved, resized from its corners (ratio locked except Free) and rotated in place, with the map locked and outside area dimmed (`startPrintArea()` in export.js). The area fills the page edge to edge; paper shapes print on that paper, other shapes on a custom page with an 11 in long side. Capture scale aims for 150 dpi on the page (2×–4×), then the capture is cropped to the box
+- **Screenshot:** PNG with the same flow plus a "Full view" option (whole screen, no box); framed PNGs are sized for an 11 in long side at 150 dpi
+- Interstitial ad placeholder (5-second countdown) before KML export only. Exports hide the toolbar, coordinate box, submenus, object popover and route card
 
 ### UI Features
 - Left-side vertical toolbar, offset `calc(16px + 1vw)` from left edge
@@ -244,7 +244,7 @@ overlay.setMap(map);
   - [x] Positioned via Google Maps OverlayView
   - [x] Closes on Esc, map click, or new selection
 - [x] Undo/redo (50-state stack) for Terra Draw features + markers + styles
-- [x] KML export, PDF export (Letter/Tabloid/Arch C), Screenshot (PNG)
+- [x] KML export, PDF export (paper or shape + orientation + framed print area), Screenshot (PNG, framed or full view)
 - [x] Keyboard shortcuts: R/Shift+R rotate, Ctrl+Z undo, Ctrl+Y redo, Delete clear
 - [x] Rotation (R/Shift+R or popover ⟲/⟳, 15° steps) applies to equipment, unit, enemy unit and tactical task symbols (`isRotatable()`); an attached viewshed azimuth turns with the symbol
 - [x] Scale limits: `SYMBOL_MAX_SCALE` = 3× for symbols, `TASK_MAX_SCALE` = 10× for tactical tasks (popover slider and Style Panel slider max follow the selection)
@@ -283,7 +283,7 @@ overlay.setMap(map);
 - [ ] Undo reverses the last action; Redo re-applies it
 - [ ] Clear Selected deletes selected features; Delete key also works
 - [ ] KML export downloads a valid .kml file
-- [ ] PDF export produces a PDF at the selected page size
+- [ ] PDF export: shape → orientation → print-area box (move, resize, rotate, Esc cancels) produces a page of the chosen size
 - [ ] Screenshot downloads a PNG
 - [ ] Select a polygon → Style Panel shows "Editing: Polygon"; swatches sync to polygon's colors
 - [ ] Change line/fill color of selected polygon → polygon updates immediately

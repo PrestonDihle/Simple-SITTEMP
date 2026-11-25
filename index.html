@@ -304,14 +304,14 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h4"/></svg>
                 <div>
                     <div class="export-label">Export as PDF</div>
-                    <div class="export-desc">Full map view with grid and symbols</div>
+                    <div class="export-desc">Choose a page shape, then frame the print area</div>
                 </div>
             </div>
             <div class="export-option" id="export-screenshot">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
                 <div>
                     <div class="export-label">Screenshot (PNG)</div>
-                    <div class="export-desc">Download current view as an image</div>
+                    <div class="export-desc">Full view, or frame an area in a chosen shape</div>
                 </div>
             </div>
             <button class="dialog-close" id="export-close">Cancel</button>
@@ -319,18 +319,20 @@
     </div>
 
     <!-- ===== PDF Size Selection Dialog ===== -->
-    <div id="pdf-size-dialog">
+    <!-- PDF / PNG export setup: aspect ratio, then orientation (built by export.js) -->
+    <div id="export-setup-dialog">
         <div class="dialog-content">
-            <h3>Select Page Size</h3>
-            <div class="size-option" data-size="letter">8.5 x 11 inches (Letter)</div>
-            <div class="size-option" data-size="tabloid">11 x 17 inches (Tabloid)</div>
-            <div class="size-option" data-size="arch">18 x 24 inches (Arch C)</div>
-            <button class="dialog-close" id="pdf-size-cancel">Cancel</button>
+            <h3 id="export-setup-title">Choose shape</h3>
+            <div id="export-setup-options"></div>
+            <div class="export-setup-btns">
+                <button class="dialog-close" id="export-setup-back">Back</button>
+                <button class="dialog-close" id="export-setup-cancel">Cancel</button>
+            </div>
         </div>
     </div>
 
     <!-- ===== Interstitial Ad Placeholder ===== -->
-    <!-- AD INTEGRATION POINT: Replace countdown with actual interstitial ad -->
+    <!-- AD INTEGRATION POINT: Replace countdown with actual interstitial ad (KML export only) -->
     <div id="interstitial-ad">
         <div class="ad-placeholder">Advertisement</div>
         <div class="countdown">Export will begin in <span id="countdown-timer">5</span> seconds...</div>
@@ -398,7 +400,7 @@
                         <li><strong>Text</strong> &mdash; Place text labels on the map with font styling options.</li>
                         <li><strong>Map Type</strong> &mdash; Switch between terrain and satellite; toggle roads, labels, and city-only overlays.</li>
                         <li><strong>Measure</strong> &mdash; Click two points to measure distance.</li>
-                        <li><strong>Export</strong> &mdash; Save your overlay as KML, PDF, or PNG screenshot.</li>
+                        <li><strong>Export</strong> &mdash; Save your overlay as KML, PDF, or PNG. For PDF and PNG, pick a page shape and orientation, then drag and resize the box on the map to frame what to print (Esc cancels).</li>
                     </ul>
                 </section>
                 <section>
