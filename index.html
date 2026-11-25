@@ -210,6 +210,33 @@
                     <span class="toggle-slider"></span>
                 </label>
             </div>
+            <h3>MGRS Grid</h3>
+            <div class="map-overlay-options grid-options">
+                <label class="toggle-row">
+                    <span>Show grid</span>
+                    <input type="checkbox" id="grid-toggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <label class="elev-interval-row grid-select-row">
+                    <span>Color</span>
+                    <select id="grid-color">
+                        <option value="#000000">Black</option>
+                        <option value="#808080">Grey</option>
+                        <option value="#FFFFFF">White</option>
+                        <option value="#FF0000">Red</option>
+                        <option value="#0000FF">Blue</option>
+                    </select>
+                </label>
+                <label class="elev-interval-row grid-select-row">
+                    <span>Weight</span>
+                    <select id="grid-weight">
+                        <option value="0.5" selected>Thin</option>
+                        <option value="2">Normal</option>
+                        <option value="5">Thick</option>
+                        <option value="9">Heavy</option>
+                    </select>
+                </label>
+            </div>
             <h3>Elevation</h3>
             <div class="elev-submenu">
                 <label class="elev-interval-row">
@@ -233,27 +260,7 @@
             </div>
         </div>
 
-        <!-- MGRS Grid Controls -->
-        <div id="mgrs-controls">
-            <button class="grid-toggle active" id="grid-toggle">Grid</button>
-            <label>Color:</label>
-            <select id="grid-color">
-                <option value="#000000">Black</option>
-                <option value="#808080">Grey</option>
-                <option value="#FFFFFF">White</option>
-                <option value="#FF0000">Red</option>
-                <option value="#0000FF">Blue</option>
-            </select>
-            <label>Weight:</label>
-            <select id="grid-weight">
-                <option value="0.5" selected>Thin</option>
-                <option value="2">Normal</option>
-                <option value="5">Thick</option>
-                <option value="9">Heavy</option>
-            </select>
-        </div>
-
-        <!-- Right Rail: Coordinate Display + Style Panel stacked to avoid overlap -->
+        <!-- Right Rail: Coordinate Display -->
         <div id="right-rail">
             <!-- Coordinate Display -->
             <div id="coord-display">
@@ -407,7 +414,7 @@
                 </section>
                 <section>
                     <h4>MGRS Grid</h4>
-                    <p>Toggle the MGRS grid overlay with the Grid button (top-left). Adjust grid color and weight. Right-click the map to copy MGRS coordinates.</p>
+                    <p>Open the Map menu on the left toolbar and use the MGRS Grid section to show or hide the grid and set its color and weight. Right-click the map to copy MGRS coordinates.</p>
                 </section>
                 <section>
                     <h4>Tips</h4>
