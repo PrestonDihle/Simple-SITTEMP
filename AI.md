@@ -59,15 +59,15 @@ Simple-SITTEMP/
 - **Transparency Slider:** 0-100% opacity for fill
 
 ### Live Style Editing
-- Selecting any object (Terra Draw feature or Google Maps marker) syncs the Style Panel controls to that object's current values and shows "Editing: \<type\>" in `#color-selection-indicator`
-- Color swatches, opacity slider, stroke slider, and scale slider all apply to the selected object in real time
+- The right-side Style Panel was removed; all styling is per object in the object popover. Selecting an object sets `selectionInfo`, which the popover reads for current values
+- Popover color swatches, opacity, stroke and scale apply to the selected object in real time and also become the defaults for the next object drawn (`lineColor`, `fillColor`, `fillOpacity`, `symbolStrokeWidth`, `symbolScale` clamped to 3×)
 - Per-feature style overrides stored in `featureStyles` state object; undo/redo restores them
 - Mutual exclusion: selecting a Terra Draw feature deselects all markers and vice versa
 - Marker selection shown with a dashed-border highlight on the SVG icon
 
 ### Object Style Popover (Req 4)
 - Clicking any placed object opens a small popover anchored to its map position
-- Contains: Delete button + contextual controls (line color, fill color/opacity for shapes, stroke width, scale for markers)
+- Contains: Delete button + line color and stroke for everything; fill color + opacity for polygons, rectangles, circles, freehand, stars and triangles; line opacity (`featureStyles[id].lineOpacity`, also applied to pattern overlays) for lines; scale for markers
 - Positioned via Google Maps OverlayView `fromLatLngToContainerPixel()`
 - Closes on Esc, map click, or when a new object is selected
 
@@ -137,7 +137,7 @@ Simple-SITTEMP/
 - Sub-menus offset `calc(58px + 1vw)` from left edge
 - Tooltips on hover for all toolbar icons
 - Classification warning modal on first load (green — UNCLASSIFIED USE ONLY)
-- Right-side Style Panel: Colors + opacity/stroke/scale sliders + selection indicator (line types moved to the object popover)
+- No right-side Style Panel: `#right-rail` holds only the coordinate box; styling lives in the object popover
 
 ## Architectural Decisions
 
@@ -227,15 +227,14 @@ overlay.setMap(map);
 - [x] Shapes (circle, rectangle, polygon, linestring, freehand, star, triangle)
 - [x] Line types (solid, dashed, dotted, dash-dot, mine belt, wire obstacle, tank ditch)
 - [x] 24+ equipment symbols, 11 unit symbols, enemy units, 15 tactical tasks (geometry matched to FM 1-02.2 INCL C1, Table 6-1; Delay is not in that table and keeps its FM 3-90 form)
-- [x] Coordinate display and Style Panel stacked in `#right-rail` (flex column) so they never overlap regardless of viewport height
+- [x] Coordinate display in `#right-rail` (the Style Panel that used to stack under it was removed)
 - [x] Symbol placement with left/right text labels (bottom of symbol area, `symY+40`)
 - [x] Symbol echelon markers
 - [x] Text labels (place anywhere, font styling)
 - [x] No Fill swatch in fill color palette
 - [x] Live style editing for selected objects (Req 3)
   - [x] Color/opacity/stroke/scale apply to selected object in real time
-  - [x] Style Panel syncs to selected object's values
-  - [x] `#color-selection-indicator` shows "Editing: \<type\>"
+  - [x] Object popover shows the selected object's current values
   - [x] Mutual exclusion between Terra Draw and marker selection
   - [x] Dashed-border highlight on selected markers
   - [x] Undo/redo includes per-feature style overrides

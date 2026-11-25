@@ -4,7 +4,7 @@
  * Toolbar button handlers, submenu building, color picker, and toast notifications.
  */
 
-import { get, set, subscribe, COLORS, SYMBOL_MAX_SCALE, TASK_MAX_SCALE } from './state.js';
+import { get, set, subscribe } from './state.js';
 import {
     equipmentSVG, unitSVG, enemyUnitSVG, tacticalTaskSVG,
     EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
@@ -14,8 +14,7 @@ import {
     activateShape, enterSymbolPlacement, exitSymbolPlacement,
     enterTextPlacement, exitTextPlacement, clearSelected,
     performUndo, performRedo, buildTextSVG, pushUndoState,
-    enterMeasureMode, exitMeasureMode, clearMeasurement,
-    applyStyleToSelected
+    enterMeasureMode, exitMeasureMode, clearMeasurement
 } from './drawing.js';
 
 // ===== Toast =====
@@ -36,7 +35,6 @@ export function setupToolbar() {
     buildUnitsSubmenu();
     buildEnemyUnitsSubmenu();
     buildTacticalTasksSubmenu();
-    buildColorSubmenu();
     buildTextSubmenu();
     buildMapSubmenu();
 
@@ -346,144 +344,7 @@ function buildTacticalTasksSubmenu() {
     });
 }
 
-// ===== Color Sub-menu =====
-
-function buildColorSubmenu() {
-    const lineSwatches = document.getElementById('line-color-swatches');
-    const fillSwatches = document.getElementById('fill-color-swatches');
-
-    for (const [name, hex] of Object.entries(COLORS)) {
-        // Line color swatch
-        const lineSwatch = document.createElement('div');
-        lineSwatch.className = 'color-swatch' + (hex === get('lineColor') ? ' active' : '');
-        lineSwatch.style.background = hex;
-        if (hex === '#FFFFFF') lineSwatch.style.border = '2px solid #999';
-        lineSwatch.title = name;
-        lineSwatch.addEventListener('click', function () {
-            set('lineColor', hex);
-            lineSwatches.querySelectorAll('.color-swatch').forEach(function (s) { s.classList.remove('active'); });
-            lineSwatch.classList.add('active');
-            applyStyleToSelected('lineColor', hex);
-        });
-        lineSwatches.appendChild(lineSwatch);
-
-        // Fill color swatch
-        const fillSwatch = document.createElement('div');
-        fillSwatch.className = 'color-swatch' + (hex === get('fillColor') ? ' active' : '');
-        fillSwatch.style.background = hex;
-        if (hex === '#FFFFFF') fillSwatch.style.border = '2px solid #999';
-        fillSwatch.title = name;
-        fillSwatch.addEventListener('click', function () {
-            set('fillColor', hex);
-            fillSwatches.querySelectorAll('.color-swatch').forEach(function (s) { s.classList.remove('active'); });
-            fillSwatch.classList.add('active');
-            applyStyleToSelected('fillColor', hex);
-        });
-        fillSwatches.appendChild(fillSwatch);
-    }
-
-    // No Fill swatch — sentinel value 'none' = transparent fill
-    var noFillSwatch = document.createElement('div');
-    noFillSwatch.className = 'color-swatch no-fill-swatch' + (get('fillColor') === 'none' ? ' active' : '');
-    noFillSwatch.title = 'No Fill';
-    noFillSwatch.addEventListener('click', function () {
-        set('fillColor', 'none');
-        fillSwatches.querySelectorAll('.color-swatch').forEach(function (s) { s.classList.remove('active'); });
-        noFillSwatch.classList.add('active');
-        applyStyleToSelected('fillColor', 'none');
-    });
-    fillSwatches.appendChild(noFillSwatch);
-
-    const slider = document.getElementById('opacity-slider');
-    const valueLabel = document.getElementById('opacity-value');
-    slider.addEventListener('input', function () {
-        var val = parseInt(slider.value) / 100;
-        set('fillOpacity', val);
-        valueLabel.textContent = slider.value + '%';
-        applyStyleToSelected('fillOpacity', val);
-    });
-
-    var swSlider = document.getElementById('stroke-width-slider');
-    var swLabel = document.getElementById('stroke-width-value');
-    swSlider.addEventListener('input', function () {
-        var val = parseInt(swSlider.value);
-        set('symbolStrokeWidth', val);
-        swLabel.textContent = swSlider.value;
-        applyStyleToSelected('strokeWidth', val);
-    });
-
-    var scaleSlider = document.getElementById('symbol-scale-slider');
-    var scaleLabel = document.getElementById('symbol-scale-value');
-    scaleSlider.addEventListener('input', function () {
-        var val = parseFloat(scaleSlider.value);
-        set('symbolScale', val);
-        scaleLabel.textContent = val.toFixed(1) + 'x';
-        applyStyleToSelected('symbolScale', val);
-    });
-
-    // Sync panel controls when a new object is selected
-    subscribe('selectionInfo', function (info) {
-        var indicator = document.getElementById('color-selection-indicator');
-        var indicatorText = document.getElementById('color-selection-text');
-
-        // Tactical tasks can scale to 10x; everything else stays at 3x
-        var maxScale = (info && info.type === 'tactical_task') ? TASK_MAX_SCALE : SYMBOL_MAX_SCALE;
-        scaleSlider.max = maxScale;
-        if (!info && get('symbolScale') > SYMBOL_MAX_SCALE) {
-            set('symbolScale', SYMBOL_MAX_SCALE);
-            scaleSlider.value = SYMBOL_MAX_SCALE;
-            scaleLabel.textContent = SYMBOL_MAX_SCALE.toFixed(1) + 'x';
-        }
-
-        if (!info) {
-            if (indicator) indicator.style.display = 'none';
-            return;
-        }
-        if (indicator) indicator.style.display = 'block';
-        if (indicatorText) indicatorText.textContent = 'Editing: ' + (info.label || info.type || '---');
-
-        // Sync line color swatches
-        var lsw = document.getElementById('line-color-swatches');
-        if (lsw && info.lineColor) {
-            lsw.querySelectorAll('.color-swatch').forEach(function (s) {
-                var bg = s.style.backgroundColor || s.style.background;
-                s.classList.toggle('active', bg === info.lineColor);
-            });
-        }
-
-        // Sync fill color swatches
-        var fsw = document.getElementById('fill-color-swatches');
-        if (fsw && info.fillColor !== null) {
-            fsw.querySelectorAll('.color-swatch').forEach(function (s) {
-                if (s.classList.contains('no-fill-swatch')) {
-                    s.classList.toggle('active', info.fillColor === 'none');
-                } else {
-                    var bg = s.style.backgroundColor || s.style.background;
-                    s.classList.toggle('active', info.fillColor !== 'none' && bg === info.fillColor);
-                }
-            });
-        }
-
-        // Sync opacity slider
-        if (info.fillOpacity !== undefined && info.fillOpacity !== null) {
-            var pct = Math.round(info.fillOpacity * 100);
-            slider.value = pct;
-            valueLabel.textContent = pct + '%';
-        }
-
-        // Sync stroke slider
-        if (info.strokeWidth !== undefined && info.strokeWidth !== null) {
-            swSlider.value = info.strokeWidth;
-            swLabel.textContent = info.strokeWidth;
-        }
-
-        // Sync scale slider
-        if (info.symbolScale !== undefined && info.symbolScale !== null) {
-            scaleSlider.value = info.symbolScale;
-            scaleLabel.textContent = parseFloat(info.symbolScale).toFixed(1) + 'x';
-        }
-    });
-}
+// Colors, opacity, stroke and scale are edited per object in the object popover (drawing.js).
 
 // ===== Text Sub-menu =====
 
