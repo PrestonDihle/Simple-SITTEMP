@@ -54,7 +54,9 @@ function _featureLineWidth(feature) {
 }
 function _featureLineOpacity(feature) {
     var flt = get('featureLineTypes'); var lt = flt[feature.id];
-    return (lt && lt !== 'solid') ? 0 : 1;
+    if (lt && lt !== 'solid') return 0;   // the pattern overlay draws the line
+    var fs = get('featureStyles'); var s = fs && fs[feature.id];
+    return (s && s.lineOpacity !== undefined) ? s.lineOpacity : 1;
 }
 
 // ===== Terra Draw Init =====
@@ -372,13 +374,14 @@ function placeStarMarker(latLng) {
     const color = get('lineColor');
     const fill = get('fillColor');
     const opacity = get('fillOpacity');
+    const sw = get('symbolStrokeWidth') || 2;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
         <polygon points="15,1 18.5,11 29,11 20.5,17.5 23.5,28 15,22 6.5,28 9.5,17.5 1,11 11.5,11"
-            fill="${fill}" fill-opacity="${opacity}" stroke="${color}" stroke-width="2"/>
+            fill="${fill}" fill-opacity="${opacity}" stroke="${color}" stroke-width="${sw}"/>
     </svg>`;
 
     const scale = get('symbolScale') || 1.0;
-    createMapMarker(latLng, svg, new google.maps.Size(30 * scale, 30 * scale), new google.maps.Point(15 * scale, 15 * scale), { type: 'star', color, fill, fillOpacity: opacity, symbolScale: scale });
+    createMapMarker(latLng, svg, new google.maps.Size(30 * scale, 30 * scale), new google.maps.Point(15 * scale, 15 * scale), { type: 'star', color, fill, fillOpacity: opacity, strokeWidth: sw, symbolScale: scale });
     pushUndoState();
 }
 
@@ -399,13 +402,14 @@ function placeTriangleMarker(latLng) {
     const color = get('lineColor');
     const fill = get('fillColor');
     const opacity = get('fillOpacity');
+    const sw = get('symbolStrokeWidth') || 2;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
         <polygon points="15,2 28,28 2,28"
-            fill="${fill}" fill-opacity="${opacity}" stroke="${color}" stroke-width="2"/>
+            fill="${fill}" fill-opacity="${opacity}" stroke="${color}" stroke-width="${sw}"/>
     </svg>`;
 
     const scale = get('symbolScale') || 1.0;
-    createMapMarker(latLng, svg, new google.maps.Size(30 * scale, 30 * scale), new google.maps.Point(15 * scale, 15 * scale), { type: 'triangle', color, fill, fillOpacity: opacity, symbolScale: scale });
+    createMapMarker(latLng, svg, new google.maps.Size(30 * scale, 30 * scale), new google.maps.Point(15 * scale, 15 * scale), { type: 'triangle', color, fill, fillOpacity: opacity, strokeWidth: sw, symbolScale: scale });
     pushUndoState();
 }
 
@@ -706,7 +710,7 @@ export function rebuildMarkerIcon(marker) {
         var svgOpacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
         svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">'
             + '<polygon points="15,1 18.5,11 29,11 20.5,17.5 23.5,28 15,22 6.5,28 9.5,17.5 1,11 11.5,11"'
-            + ' fill="' + svgFill + '" fill-opacity="' + svgOpacity + '" stroke="' + info.color + '" stroke-width="2"/>'
+            + ' fill="' + svgFill + '" fill-opacity="' + svgOpacity + '" stroke="' + info.color + '" stroke-width="' + (info.strokeWidth || 2) + '"/>'
             + (marker._selected ? '<rect x="1" y="1" width="28" height="28" fill="none" stroke="' + info.color + '" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.75"/>' : '')
             + '</svg>';
         size = new google.maps.Size(30 * scale, 30 * scale);
@@ -716,7 +720,7 @@ export function rebuildMarkerIcon(marker) {
         var triOpacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
         svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">'
             + '<polygon points="15,2 28,28 2,28"'
-            + ' fill="' + triFill + '" fill-opacity="' + triOpacity + '" stroke="' + info.color + '" stroke-width="2"/>'
+            + ' fill="' + triFill + '" fill-opacity="' + triOpacity + '" stroke="' + info.color + '" stroke-width="' + (info.strokeWidth || 2) + '"/>'
             + (marker._selected ? '<rect x="1" y="1" width="28" height="28" fill="none" stroke="' + info.color + '" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.75"/>' : '')
             + '</svg>';
         size = new google.maps.Size(30 * scale, 30 * scale);
@@ -770,7 +774,7 @@ function _applyStyleToFeature(featureId, prop, value) {
     featureStyles[featureId][prop] = value;
     updateDrawStyles(); // triggers re-render of all features using the updated function
     if (prop === 'lineColor') syncMeasureLabel(featureId); // label follows the outline color
-    if (prop === 'lineColor' || prop === 'strokeWidth') _rebuildLineOverlay(featureId); // pattern follows color/width
+    if (prop === 'lineColor' || prop === 'strokeWidth' || prop === 'lineOpacity') _rebuildLineOverlay(featureId); // pattern follows color/width/opacity
     _scheduleUndoPush();
 }
 
@@ -829,6 +833,7 @@ function _syncPanelToFeature(featureId) {
         fillColor: (s.fillColor !== undefined) ? s.fillColor : get('fillColor'),
         fillOpacity: (s.fillOpacity !== undefined) ? s.fillOpacity : get('fillOpacity'),
         strokeWidth: s.strokeWidth || get('symbolStrokeWidth'),
+        lineOpacity: (s.lineOpacity !== undefined) ? s.lineOpacity : 1,
         symbolScale: null // not applicable for shapes
     });
 }
@@ -924,8 +929,11 @@ function _buildPopoverContent(popover, type, info) {
     popover.appendChild(delBtn);
 
     var isShape = ['polygon', 'rectangle', 'circle', 'freehand', 'linestring'].indexOf(type) !== -1;
-    var hasFill = ['polygon', 'rectangle', 'circle', 'freehand'].indexOf(type) !== -1;
+    // Stars and triangles are markers but have a fill like area shapes
+    var hasFill = ['polygon', 'rectangle', 'circle', 'freehand', 'star', 'triangle'].indexOf(type) !== -1;
+    var isLine = type === 'linestring';
     var isMarker = !isShape;
+    var lineOpacity = (info.lineOpacity !== null && info.lineOpacity !== undefined) ? info.lineOpacity : 1;
 
     var lineColor = info.lineColor || get('lineColor');
     var fillColor = (info.fillColor !== null && info.fillColor !== undefined) ? info.fillColor : get('fillColor');
@@ -990,6 +998,10 @@ function _buildPopoverContent(popover, type, info) {
             var v = parseFloat(sl.value);
             valSpan.textContent = format(v);
             applyStyleToSelected(propName, v);
+            // The popover is the only style control, so it also sets the default for the next object
+            if (propName === 'fillOpacity') set('fillOpacity', v);
+            else if (propName === 'strokeWidth') set('symbolStrokeWidth', v);
+            else if (propName === 'symbolScale') set('symbolScale', Math.min(v, SYMBOL_MAX_SCALE));
         });
         row.appendChild(sl);
         row.appendChild(valSpan);
@@ -1000,6 +1012,10 @@ function _buildPopoverContent(popover, type, info) {
     if (hasFill) {
         popover.appendChild(makeColorRow('Fill', 'fillColor', fillColor));
         popover.appendChild(makeSliderRow('Opacity', 'fillOpacity', 0, 1, 0.01, fillOpacity,
+            function (v) { return Math.round(v * 100) + '%'; }));
+    } else if (isLine) {
+        // Lines have no fill, so opacity applies to the line (and its pattern)
+        popover.appendChild(makeSliderRow('Opacity', 'lineOpacity', 0.05, 1, 0.05, lineOpacity,
             function (v) { return Math.round(v * 100) + '%'; }));
     }
     popover.appendChild(makeSliderRow('Stroke', 'strokeWidth', 1, 10, 1, strokeWidth,
@@ -1360,7 +1376,7 @@ function recreateMarker(data) {
         const opacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
         svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
             <polygon points="15,1 18.5,11 29,11 20.5,17.5 23.5,28 15,22 6.5,28 9.5,17.5 1,11 11.5,11"
-                fill="${fill}" fill-opacity="${opacity}" stroke="${info.color}" stroke-width="2"/>
+                fill="${fill}" fill-opacity="${opacity}" stroke="${info.color}" stroke-width="${info.strokeWidth || 2}"/>
         </svg>`;
         size = new google.maps.Size(30 * scale, 30 * scale);
         anchor = new google.maps.Point(15 * scale, 15 * scale);
@@ -1369,7 +1385,7 @@ function recreateMarker(data) {
         const opacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
         svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
             <polygon points="15,2 28,28 2,28"
-                fill="${fill}" fill-opacity="${opacity}" stroke="${info.color}" stroke-width="2"/>
+                fill="${fill}" fill-opacity="${opacity}" stroke="${info.color}" stroke-width="${info.strokeWidth || 2}"/>
         </svg>`;
         size = new google.maps.Size(30 * scale, 30 * scale);
         anchor = new google.maps.Point(15 * scale, 15 * scale);
@@ -1612,7 +1628,21 @@ function _rebuildLineOverlay(featureId) {
     var color = fs.lineColor || get('lineColor');
     var width = fs.strokeWidth || get('symbolStrokeWidth') || 2;
     var polyline = createLineOverlay(path, lt, color, get('map'), width);
-    if (polyline) overlays[featureId] = polyline;
+    if (!polyline) return;
+    // Apply the line's opacity to the pattern (base stroke and every icon)
+    var op = fs.lineOpacity;
+    if (op !== undefined && op < 1) {
+        var icons = (polyline.get ? polyline.get('icons') : polyline.icons) || [];
+        icons = icons.map(function (ic) {
+            var icon = Object.assign({}, ic.icon);
+            icon.strokeOpacity = (icon.strokeOpacity !== undefined ? icon.strokeOpacity : 1) * op;
+            if (icon.fillOpacity !== undefined) icon.fillOpacity *= op;
+            return Object.assign({}, ic, { icon: icon });
+        });
+        var base = polyline.get ? polyline.get('strokeOpacity') : undefined;
+        polyline.setOptions({ icons: icons, strokeOpacity: (base || 0) * op });
+    }
+    overlays[featureId] = polyline;
 }
 
 function applyLineType(featureId) {
