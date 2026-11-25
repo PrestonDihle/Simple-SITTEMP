@@ -17,6 +17,7 @@ import { shadeFeature, getShadeConfigs, restoreShades } from './elevation.js';
 import { buildMeasureSection, syncMeasureLabel, syncAllMeasureLabels, forgetMeasure } from './measures.js';
 import { enterRoutePlacement, exitRoutePlacement, getRouteConfigs, restoreRoutes } from './routes.js';
 import { getContourConfigs, restoreContours } from './contours.js';
+import { DATA_BOX_TYPES, buildDataBoxRow, syncDataBox, syncAllDataBoxes, forgetDataBox } from './databox.js';
 
 // ===== Per-Feature Style Helper Functions =====
 // These are passed as function-based styles to Terra Draw so each feature
@@ -189,6 +190,7 @@ export function initTerraDraw() {
     draw.on('change', function (ids, type) {
         if (type === 'delete') {
             ids.forEach(forgetMeasure);
+            ids.forEach(forgetDataBox);
             pushUndoState();
         }
 
@@ -196,6 +198,8 @@ export function initTerraDraw() {
         if (type === 'update') {
             var measures = get('featureMeasures');
             ids.forEach(function (id) { if (measures[id]) syncMeasureLabel(id); });
+            var boxes = get('featureDataBoxes');
+            ids.forEach(function (id) { if (boxes[id]) syncDataBox(id); });   // data box follows edits
         }
 
         // Sync line-type overlays when features are updated (dragged/edited)
@@ -777,7 +781,7 @@ function _applyStyleToFeature(featureId, prop, value) {
     if (!featureStyles[featureId]) featureStyles[featureId] = {};
     featureStyles[featureId][prop] = value;
     updateDrawStyles(); // triggers re-render of all features using the updated function
-    if (prop === 'lineColor') syncMeasureLabel(featureId); // label follows the outline color
+    if (prop === 'lineColor') { syncMeasureLabel(featureId); syncDataBox(featureId); } // labels follow the outline color
     if (prop === 'lineColor' || prop === 'strokeWidth' || prop === 'lineOpacity') _rebuildLineOverlay(featureId); // pattern follows color/width/opacity
     _scheduleUndoPush();
 }
@@ -1067,6 +1071,11 @@ function _buildPopoverContent(popover, type, info) {
         }
     }
 
+    // Data box: side lengths / area, circle radius / circumference / area, line segment lengths
+    if (DATA_BOX_TYPES.indexOf(type) !== -1 && get('selectedFeatureId')) {
+        buildDataBoxRow(popover, get('selectedFeatureId'), _scheduleUndoPush);
+    }
+
     // Line type grid for lines and area shapes (moved here from the Style Panel)
     if (LINE_TYPE_SHAPES.indexOf(type) !== -1 && get('selectedFeatureId')) {
         var ltId = get('selectedFeatureId');
@@ -1241,6 +1250,7 @@ export function pushUndoState() {
         featureLineTypes: Object.assign({}, get('featureLineTypes')),
         featureStyles: Object.assign({}, get('featureStyles')),
         featureMeasures: JSON.parse(JSON.stringify(get('featureMeasures') || {})),
+        featureDataBoxes: Object.assign({}, get('featureDataBoxes')),
         elevationShades: getShadeConfigs(),
         routes: getRouteConfigs(),
         contours: getContourConfigs()
@@ -1322,6 +1332,12 @@ function restoreState(stateJson) {
     for (const id of Object.keys(featureMeasures)) delete featureMeasures[id];
     if (saved.featureMeasures) Object.assign(featureMeasures, JSON.parse(JSON.stringify(saved.featureMeasures)));
     syncAllMeasureLabels();
+
+    // Restore data boxes
+    const featureDataBoxes = get('featureDataBoxes');
+    for (const id of Object.keys(featureDataBoxes)) delete featureDataBoxes[id];
+    if (saved.featureDataBoxes) Object.assign(featureDataBoxes, saved.featureDataBoxes);
+    syncAllDataBoxes();
 
     // Re-apply line type overlays for restored lines and area shapes
     if (saved.featureLineTypes) {
@@ -1710,164 +1726,4 @@ export function changeLineType(newLineType) {
     updateDrawStyles();   // re-evaluates outline width / line opacity for the new type
     pushUndoState();
     return true;
-}
-
-// ===== Measurement Tool =====
-
-var measureState = {
-    active: false,
-    points: [],
-    polyline: null,
-    markers: [],
-    infoWindow: null,
-    clickListener: null,
-    dblClickListener: null,
-    keyListener: null,
-};
-
-export function enterMeasureMode() {
-    exitMeasureMode();
-    exitTextPlacement();
-    exitSymbolPlacement();
-    exitRoutePlacement();
-    if (get('ready')) get('draw').setMode('select');
-
-    measureState.active = true;
-    measureState.points = [];
-    showToast('Click to add points. Double-click or Esc to finish.');
-
-    const map = get('map');
-
-    measureState.clickListener = map.addListener('click', function (e) {
-        if (!measureState.active) return;
-        addMeasurePoint(e.latLng);
-    });
-
-    measureState.dblClickListener = map.addListener('dblclick', function () {
-        finishMeasurement();
-    });
-
-    measureState.keyListener = function (e) {
-        if (e.key === 'Escape') finishMeasurement();
-    };
-    document.addEventListener('keydown', measureState.keyListener);
-}
-
-export function exitMeasureMode() {
-    measureState.active = false;
-    if (measureState.clickListener) {
-        google.maps.event.removeListener(measureState.clickListener);
-        measureState.clickListener = null;
-    }
-    if (measureState.dblClickListener) {
-        google.maps.event.removeListener(measureState.dblClickListener);
-        measureState.dblClickListener = null;
-    }
-    if (measureState.keyListener) {
-        document.removeEventListener('keydown', measureState.keyListener);
-        measureState.keyListener = null;
-    }
-}
-
-export function clearMeasurement() {
-    exitMeasureMode();
-    if (measureState.polyline) {
-        measureState.polyline.setMap(null);
-        measureState.polyline = null;
-    }
-    measureState.markers.forEach(function (m) { m.setMap(null); });
-    measureState.markers = [];
-    if (measureState.infoWindow) {
-        measureState.infoWindow.close();
-        measureState.infoWindow = null;
-    }
-    measureState.points = [];
-}
-
-function addMeasurePoint(latLng) {
-    const map = get('map');
-    measureState.points.push(latLng);
-
-    // Add small dot marker at the point
-    var dot = new google.maps.Marker({
-        position: latLng,
-        map: map,
-        icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            fillColor: '#FF4444',
-            fillOpacity: 1,
-            strokeColor: '#FFFFFF',
-            strokeWeight: 2,
-            scale: 5,
-        },
-        clickable: false,
-        zIndex: 200,
-    });
-    measureState.markers.push(dot);
-
-    // Update or create the polyline
-    if (measureState.polyline) {
-        measureState.polyline.setPath(measureState.points);
-    } else if (measureState.points.length > 1) {
-        measureState.polyline = new google.maps.Polyline({
-            path: measureState.points,
-            strokeColor: '#FF4444',
-            strokeOpacity: 1,
-            strokeWeight: 3,
-            geodesic: true,
-            map: map,
-        });
-    }
-
-    // Show running distance
-    if (measureState.points.length > 1) {
-        var totalM = computeTotalDistance(measureState.points);
-        showMeasureInfo(totalM, measureState.points[measureState.points.length - 1]);
-    }
-}
-
-function finishMeasurement() {
-    if (!measureState.active) return;
-    exitMeasureMode();
-
-    if (measureState.points.length < 2) {
-        showToast('Need at least 2 points to measure');
-        clearMeasurement();
-        return;
-    }
-
-    var totalM = computeTotalDistance(measureState.points);
-    showMeasureInfo(totalM, measureState.points[measureState.points.length - 1]);
-    showToast('Measurement complete. Click Measure again to start new.');
-}
-
-function computeTotalDistance(points) {
-    var total = 0;
-    for (var i = 1; i < points.length; i++) {
-        total += google.maps.geometry.spherical.computeDistanceBetween(points[i - 1], points[i]);
-    }
-    return total;
-}
-
-function showMeasureInfo(meters, position) {
-    var map = get('map');
-    var km = meters / 1000;
-    var miles = meters * 0.000621371;
-
-    var content = '<div style="font-family:Arial,sans-serif;font-size:13px;line-height:1.5;color:#333;">'
-        + '<b>' + Math.round(meters).toLocaleString() + ' m</b><br>'
-        + km.toFixed(2) + ' km<br>'
-        + miles.toFixed(2) + ' mi'
-        + '</div>';
-
-    if (measureState.infoWindow) {
-        measureState.infoWindow.setContent(content);
-        measureState.infoWindow.setPosition(position);
-    } else {
-        measureState.infoWindow = new google.maps.InfoWindow({
-            content: content,
-            position: position,
-        });
-        measureState.infoWindow.open(map);
-    }
 }
