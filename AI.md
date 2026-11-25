@@ -52,7 +52,7 @@ Simple-SITTEMP/
 
 ### Drawing Features (via Terra Draw)
 - **Shapes:** Circle, Triangle, Rectangle, Polygon, LineString, Five-Point Star, Freehand
-- **Line Types:** Solid, Dashed, Dotted, Dash-Dot, Mine Belt, Wire Obstacle, Tank Ditch
+- **Line Types:** Solid, Dashed, Dotted, Dash-Dot, FLOT, Low Wire, 1x Concertina, Arrow, AT Ditch, AT Ditch (unfinished), AP Mine, AT Mine. Chosen per shape in the object popover ("Line type" grid) for lines, polygons, rectangles, circles and freehand shapes (`LINE_TYPE_SHAPES`); not for stars or flight routes. Picking a type applies its default color (`LINE_TYPE_COLORS` in symbols.js)
 - **Select Mode:** Click to select, drag to move, delete selected features
 - **Color Picker:** Line colors (Green, Blue, Red, Purple, Orange, Black, White, Grey)
 - **Fill Colors:** Same set, plus "No Fill" swatch (sentinel `fillColor: 'none'` → `fillOpacity: 0`)
@@ -137,7 +137,7 @@ Simple-SITTEMP/
 - Sub-menus offset `calc(58px + 1vw)` from left edge
 - Tooltips on hover for all toolbar icons
 - Classification warning modal on first load (green — UNCLASSIFIED USE ONLY)
-- Right-side Style Panel: Line Types + Colors + opacity/stroke/scale sliders + selection indicator
+- Right-side Style Panel: Colors + opacity/stroke/scale sliders + selection indicator (line types moved to the object popover)
 
 ## Architectural Decisions
 
@@ -256,7 +256,7 @@ overlay.setMap(map);
 - MGRS grid uses approximate lat/lon spacing (not true UTM grid lines); acceptable for planning use
 - html2canvas may not perfectly capture Google Maps tiles due to CORS restrictions
 - PDF export quality depends on html2canvas rendering; Google Maps tiles may appear blank
-- Specialty line types render as Google Maps Polylines on top of Terra Draw lines; the base Terra Draw line is made transparent via `_featureLineOpacity` when `featureLineTypes[id]` is set
+- Specialty line types render as Google Maps Polylines over the Terra Draw feature (for area shapes, along the closed outline). The base line is hidden via `_featureLineOpacity` (lines) or `_featureOutlineWidth` = 0 (areas) when `featureLineTypes[id]` is not solid; overlays use the feature's own color and stroke width and are rebuilt by `_rebuildLineOverlay()` on color/width change, edit and undo
 - Triangle shape uses standard polygon mode (user manually places 3 points)
 - Five-point star is placed as a Google Maps marker, not a Terra Draw feature
 - Military symbols (equipment/units) are Google Maps markers with a separate selection system from Terra Draw features

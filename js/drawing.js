@@ -9,7 +9,7 @@ import { get, set, subscribe, MAX_UNDO_STATES, SYMBOL_MAX_SCALE, TASK_MAX_SCALE 
 import {
     equipmentSVG, unitSVG, enemyUnitSVG, tacticalTaskSVG,
     EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
-    buildSymbolWithLabels, escapeXml
+    buildSymbolWithLabels, escapeXml, LINE_TYPES, LINE_TYPE_COLORS, getLinePreviewSVG
 } from './symbols.js';
 import { showToast } from './toolbar.js';
 import { syncViewshed, clearViewshedOverlays, buildViewshedSection } from './viewshed.js';
@@ -38,6 +38,9 @@ function _featureOutlineColor(feature) {
     return (s && s.lineColor) ? s.lineColor : get('lineColor');
 }
 function _featureOutlineWidth(feature) {
+    // A patterned line type draws its own outline overlay, so hide the base outline
+    var lt = get('featureLineTypes')[feature.id];
+    if (lt && lt !== 'solid') return 0;
     var fs = get('featureStyles'); var s = fs && fs[feature.id];
     return (s && s.strokeWidth) ? s.strokeWidth : (get('symbolStrokeWidth') || 2);
 }
@@ -193,19 +196,14 @@ export function initTerraDraw() {
             ids.forEach(function (id) { if (measures[id]) syncMeasureLabel(id); });
         }
 
-        // Sync overlay positions when features are updated (dragged/edited)
+        // Sync line-type overlays when features are updated (dragged/edited)
         if (type === 'update') {
             var overlays = get('lineOverlays');
             ids.forEach(function (id) {
                 if (overlays[id]) {
                     try {
-                        var feature = draw.getSnapshotFeature(id);
-                        if (feature && feature.geometry.type === 'LineString') {
-                            var newPath = feature.geometry.coordinates.map(function (c) {
-                                return { lat: c[1], lng: c[0] };
-                            });
-                            overlays[id].setPath(newPath);
-                        }
+                        var path = _overlayPath(draw.getSnapshotFeature(id));
+                        if (path) overlays[id].setPath(path);
                     } catch (e) { /* feature may not exist yet */ }
                 }
             });
@@ -772,6 +770,7 @@ function _applyStyleToFeature(featureId, prop, value) {
     featureStyles[featureId][prop] = value;
     updateDrawStyles(); // triggers re-render of all features using the updated function
     if (prop === 'lineColor') syncMeasureLabel(featureId); // label follows the outline color
+    if (prop === 'lineColor' || prop === 'strokeWidth') _rebuildLineOverlay(featureId); // pattern follows color/width
     _scheduleUndoPush();
 }
 
@@ -1041,6 +1040,36 @@ function _buildPopoverContent(popover, type, info) {
         }
     }
 
+    // Line type grid for lines and area shapes (moved here from the Style Panel)
+    if (LINE_TYPE_SHAPES.indexOf(type) !== -1 && get('selectedFeatureId')) {
+        var ltId = get('selectedFeatureId');
+        var current = get('featureLineTypes')[ltId] || 'solid';
+        var ltSection = document.createElement('div');
+        ltSection.className = 'popover-vs';
+        var ltHead = document.createElement('div');
+        ltHead.className = 'popover-vs-head';
+        ltHead.innerHTML = '<span>Line type</span>';
+        ltSection.appendChild(ltHead);
+        var ltGrid = document.createElement('div');
+        ltGrid.className = 'popover-lt-grid';
+        LINE_TYPES.forEach(function (lt) {
+            var item = document.createElement('button');
+            item.className = 'popover-lt-item' + (lt.key === current ? ' active' : '');
+            item.title = lt.name;
+            item.innerHTML = '<span class="popover-lt-preview">' + getLinePreviewSVG(lt.key) + '</span><span>' + lt.name + '</span>';
+            item.addEventListener('click', function () {
+                if (changeLineType(lt.key)) {
+                    showToast('Line type: ' + lt.name);
+                    _syncPanelToFeature(ltId);
+                    _showPopoverForFeature(ltId);   // refresh swatches and the active item
+                }
+            });
+            ltGrid.appendChild(item);
+        });
+        ltSection.appendChild(ltGrid);
+        popover.appendChild(ltSection);
+    }
+
     // Control measure tagging (PZ/LZ/BP..., airspace zones) for area shapes
     if (hasFill && get('selectedFeatureId')) {
         buildMeasureSection(popover, get('selectedFeatureId'), _scheduleUndoPush);
@@ -1261,24 +1290,11 @@ function restoreState(stateJson) {
     if (saved.featureMeasures) Object.assign(featureMeasures, JSON.parse(JSON.stringify(saved.featureMeasures)));
     syncAllMeasureLabels();
 
-    // Re-apply line type overlays for restored features
-    const map = get('map');
+    // Re-apply line type overlays for restored lines and area shapes
     if (saved.featureLineTypes) {
-        for (const [fId, lt] of Object.entries(saved.featureLineTypes)) {
-            if (lt === 'solid') continue;
-            try {
-                const feature = draw.getSnapshotFeature(fId);
-                if (feature && feature.geometry.type === 'LineString') {
-                    const path = feature.geometry.coordinates.map(function (c) { return { lat: c[1], lng: c[0] }; });
-                    const color = get('lineColor');
-                    const polyline = createLineOverlay(path, lt, color, map);
-                    if (polyline) {
-                        lineOverlays[fId] = polyline;
-                    }
-                }
-            } catch (e) { /* feature may not exist */ }
-        }
+        for (const fId of Object.keys(saved.featureLineTypes)) _rebuildLineOverlay(fId);
     }
+    updateDrawStyles();
 
     // Restore markers
     markers.forEach(function (m) { clearViewshedOverlays(m); m.setMap(null); });
@@ -1569,37 +1585,51 @@ function createLineOverlay(path, lineType, color, map, strokeWidth) {
     return polyline;
 }
 
-function applyLineType(featureId) {
-    const lineType = get('lineType');
-
-    // Store the line type for this feature
-    const featureLineTypes = get('featureLineTypes');
-    featureLineTypes[featureId] = lineType;
-
-    if (lineType === 'solid') return;
-
-    const draw = get('draw');
-    if (!draw) return;
-
-    const feature = draw.getSnapshotFeature(featureId);
-    if (!feature || feature.geometry.type !== 'LineString') return;
-
-    const path = feature.geometry.coordinates.map(function (c) { return { lat: c[1], lng: c[0] }; });
-    const color = get('lineColor');
-    const map = get('map');
-
-    const polyline = createLineOverlay(path, lineType, color, map);
-    if (polyline) {
-        const overlays = get('lineOverlays');
-        overlays[featureId] = polyline;
-    }
+/** Path a line-type overlay follows: the line itself, or a shape's closed outline. */
+function _overlayPath(feature) {
+    if (!feature || !feature.geometry) return null;
+    var g = feature.geometry;
+    var coords = g.type === 'LineString' ? g.coordinates : (g.type === 'Polygon' ? g.coordinates[0] : null);
+    if (!coords) return null;
+    return coords.map(function (c) { return { lat: c[1], lng: c[0] }; });
 }
 
+/** Recreate a feature's line-type overlay from its stored type, color and width. */
+function _rebuildLineOverlay(featureId) {
+    var overlays = get('lineOverlays');
+    if (overlays[featureId]) {
+        overlays[featureId].setMap(null);
+        delete overlays[featureId];
+    }
+    var lt = get('featureLineTypes')[featureId];
+    if (!lt || lt === 'solid') return;
+    var draw = get('draw');
+    var feature = null;
+    try { feature = draw && draw.getSnapshotFeature(featureId); } catch (e) { /* gone */ }
+    var path = _overlayPath(feature);
+    if (!path) return;
+    var fs = get('featureStyles')[featureId] || {};
+    var color = fs.lineColor || get('lineColor');
+    var width = fs.strokeWidth || get('symbolStrokeWidth') || 2;
+    var polyline = createLineOverlay(path, lt, color, get('map'), width);
+    if (polyline) overlays[featureId] = polyline;
+}
+
+function applyLineType(featureId) {
+    // New features start with the default line type (solid unless set elsewhere)
+    get('featureLineTypes')[featureId] = get('lineType') || 'solid';
+    _rebuildLineOverlay(featureId);
+}
+
+/** Shape types that take a line type (stars and flight routes are not Terra Draw shapes). */
+export const LINE_TYPE_SHAPES = ['linestring', 'polygon', 'rectangle', 'circle', 'freehand'];
+
 /**
- * Change the line type of the currently selected LineString feature.
- * Called from the toolbar when the user picks a new line type while a line is selected.
+ * Change the line type of the selected line or area shape.
+ * Applies the line type's default color, redraws the pattern overlay and hides
+ * the base outline/line under patterned types.
  * @param {string} newLineType - The new line type key
- * @returns {boolean} true if a line was updated, false otherwise
+ * @returns {boolean} true if a feature was updated, false otherwise
  */
 export function changeLineType(newLineType) {
     const draw = get('draw');
@@ -1612,31 +1642,21 @@ export function changeLineType(newLineType) {
     } catch (e) {
         return false;
     }
-    if (!feature || feature.geometry.type !== 'LineString') return false;
+    if (!_overlayPath(feature)) return false;
 
-    const overlays = get('lineOverlays');
-    const featureLineTypes = get('featureLineTypes');
+    get('featureLineTypes')[selectedId] = newLineType;
 
-    // Remove old overlay if present
-    if (overlays[selectedId]) {
-        overlays[selectedId].setMap(null);
-        delete overlays[selectedId];
+    // Use the line type's standard color (e.g. green for obstacles)
+    var defaultColor = LINE_TYPE_COLORS[newLineType];
+    if (defaultColor) {
+        var featureStyles = get('featureStyles');
+        if (!featureStyles[selectedId]) featureStyles[selectedId] = {};
+        featureStyles[selectedId].lineColor = defaultColor;
+        syncMeasureLabel(selectedId);
     }
 
-    // Store the new line type
-    featureLineTypes[selectedId] = newLineType;
-
-    // Create new overlay (unless solid)
-    if (newLineType !== 'solid') {
-        const path = feature.geometry.coordinates.map(function (c) { return { lat: c[1], lng: c[0] }; });
-        const color = get('lineColor');
-        const map = get('map');
-        const polyline = createLineOverlay(path, newLineType, color, map);
-        if (polyline) {
-            overlays[selectedId] = polyline;
-        }
-    }
-
+    _rebuildLineOverlay(selectedId);
+    updateDrawStyles();   // re-evaluates outline width / line opacity for the new type
     pushUndoState();
     return true;
 }

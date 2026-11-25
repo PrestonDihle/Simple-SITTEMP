@@ -799,6 +799,16 @@ export const SHAPE_LIST = [
     { key: 'flight_route', name: 'Flight Route', icon: '<polyline points="4,23 12,12 18,17 25,5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="17" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M1,20 h6 v3 l-3,3 l-3,-3 z" fill="none" stroke="currentColor" stroke-width="1.2"/>' },
 ];
 
+// Default line color applied when a line type is chosen
+export const LINE_TYPE_COLORS = {
+    solid: '#000000', dashed: '#000000', dotted: '#000000', dashdot: '#000000',
+    flot_a: '#0000FF',
+    low_wire: '#000000',
+    single_concertina: '#00AA00', atditch_a: '#00AA00', atditch_unfin: '#00AA00',
+    ap_mine: '#00AA00', at_mine: '#00AA00',
+    arrow: '#000000',
+};
+
 export const LINE_TYPES = [
     { key: 'solid', name: 'Solid' },
     { key: 'dashed', name: 'Dashed' },

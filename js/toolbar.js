@@ -8,13 +8,13 @@ import { get, set, subscribe, COLORS, SYMBOL_MAX_SCALE, TASK_MAX_SCALE } from '.
 import {
     equipmentSVG, unitSVG, enemyUnitSVG, tacticalTaskSVG,
     EQUIPMENT_LIST, UNIT_LIST, ENEMY_UNIT_LIST, TACTICAL_TASK_LIST,
-    SHAPE_LIST, LINE_TYPES, getLinePreviewSVG
+    SHAPE_LIST
 } from './symbols.js';
 import {
     activateShape, enterSymbolPlacement, exitSymbolPlacement,
     enterTextPlacement, exitTextPlacement, clearSelected,
     performUndo, performRedo, buildTextSVG, pushUndoState,
-    changeLineType, enterMeasureMode, exitMeasureMode, clearMeasurement,
+    enterMeasureMode, exitMeasureMode, clearMeasurement,
     applyStyleToSelected
 } from './drawing.js';
 
@@ -32,7 +32,6 @@ export function showToast(message, duration) {
 
 export function setupToolbar() {
     buildShapesSubmenu();
-    buildLinesSubmenu();
     buildEquipmentSubmenu();
     buildUnitsSubmenu();
     buildEnemyUnitsSubmenu();
@@ -213,55 +212,7 @@ function buildShapesSubmenu() {
     });
 }
 
-// ===== Lines Sub-menu =====
-
-// Default colors per line type
-const LINE_TYPE_COLORS = {
-    solid: '#000000', dashed: '#000000', dotted: '#000000', dashdot: '#000000',
-    flot_a: '#0000FF',
-    low_wire: '#000000',
-    single_concertina: '#00AA00', atditch_a: '#00AA00', atditch_unfin: '#00AA00',
-    ap_mine: '#00AA00', at_mine: '#00AA00',
-    arrow: '#000000',
-};
-
-function buildLinesSubmenu() {
-    const list = document.getElementById('line-type-list');
-    LINE_TYPES.forEach(function (lt) {
-        const item = document.createElement('div');
-        item.className = 'submenu-list-item';
-        item.dataset.linetype = lt.key;
-        const preview = getLinePreviewSVG(lt.key);
-        item.innerHTML = `<span>${preview}</span><span>${lt.name}</span>`;
-        item.addEventListener('click', function () {
-            set('lineType', lt.key);
-            highlightSubmenuItem(list, item);
-
-            // Auto-set line color to the default for this line type
-            var defaultColor = LINE_TYPE_COLORS[lt.key];
-            if (defaultColor) {
-                set('lineColor', defaultColor);
-                // Update the active swatch in the color picker
-                var lineSwatches = document.getElementById('line-color-swatches');
-                if (lineSwatches) {
-                    lineSwatches.querySelectorAll('.color-swatch').forEach(function (s) {
-                        s.classList.toggle('active', s.style.background === defaultColor || s.style.backgroundColor === defaultColor);
-                    });
-                }
-            }
-
-            // If a line is currently selected, change its type
-            if (get('selectedFeatureId')) {
-                var changed = changeLineType(lt.key);
-                if (changed) {
-                    showToast('Line type changed to ' + lt.name);
-                }
-            }
-        });
-        if (lt.key === 'solid') item.classList.add('active');
-        list.appendChild(item);
-    });
-}
+// Line types are chosen per shape in the object popover (see drawing.js).
 
 // ===== Equipment Sub-menu =====
 
