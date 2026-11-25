@@ -21,6 +21,7 @@
 
 import { get, subscribe } from './state.js';
 import { showToast } from './toolbar.js';
+import { returnToSelect } from './drawing.js';
 import { escapeXml, haloFor } from './symbols.js';
 
 const NM = 1852;
@@ -385,6 +386,7 @@ function _finishPlacement() {
     selectRoute(data.id);
     _notify();
     showToast('Route placed: ' + (pts.length - 2) + ' ACP' + (pts.length === 3 ? '' : 's'));
+    returnToSelect();
 }
 
 // ===== Selection / route card =====

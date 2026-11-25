@@ -1487,15 +1487,16 @@ html, body {
     vertical-align: middle;
 }
 
-/* A popover too tall to fit above its object is pinned to the top and scrolls */
+/* The popover sits beside its object (positioned by _showPopoverAtLatLng), not above it */
+#object-popover.beside { transform: none; }
+#object-popover.beside::before,
+#object-popover.beside::after { display: none; }
+
+/* Too tall to fit: pinned to the top and scrolls */
 #object-popover.clamped {
-    transform: translate(-50%, 0);
     max-height: calc(100% - 16px);
     overflow-y: auto;
 }
-
-#object-popover.clamped::before,
-#object-popover.clamped::after { display: none; }
 .popover-unit-toggle { padding: 2px 5px; min-width: 36px; }
 
 .popover-num {
