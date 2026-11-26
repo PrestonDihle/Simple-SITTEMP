@@ -229,6 +229,7 @@ const [lng, lat] = mgrs.toPoint(mgrsStringNoSpaces);
 ### Symbol Placement Pattern
 - User clicks equipment/unit from submenu → dialog prompts for left/right text labels + echelon
 - `buildSymbolWithLabels()` generates a W×(50+echelonH) SVG data-URL, where W comes from `symbolIconLayout(left, right, rotation)`: the 40 px symbol plus just enough room on each side for that side's label (min 3 px, 9 px when rotated off-axis). Markers are anchored on the symbol center (`symX + 20`), so the click/selection box hugs the symbol and its labels (it used to be a fixed 150 px)
+- Tactical tasks can be flipped left-right with the ⇆ button next to the rotate buttons in the popover (`_sittemp.flip`, in undo snapshots). `buildSymbolWithLabels(..., flip)` mirrors the inner task SVG in its own frame before rotation, and mirrors each `<text>` back around its own x so letters stay readable
 - Left/right text labels rendered at `symY + 40` (bottom of the 40px symbol area)
 - Placed as `google.maps.Marker` with `_sittemp` metadata; added to `state.markers[]`
 - Marker click → `_syncPanelToMarker()` + `_showPopoverForMarker()` (Req 3 + 4)

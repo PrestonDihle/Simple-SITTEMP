@@ -1434,6 +1434,7 @@ html, body {
 }
 
 .popover-rot-btn:hover { background: #3a404c; }
+.popover-rot-btn.active { background: #2f4a6e; border-color: #4a7bbf; }   /* flip is on */
 
 /* Viewshed section in the object popover */
 .popover-vs {

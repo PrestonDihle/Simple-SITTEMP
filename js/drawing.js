@@ -772,7 +772,7 @@ export function rebuildMarkerIcon(marker) {
         else if (info.type === 'enemy_unit') svgBase = enemyUnitSVG(info.key, info.color, sw);
         else if (info.type === 'tactical_task') svgBase = tacticalTaskSVG(info.key, info.color, sw);
         else svgBase = unitSVG(info.key, info.color, sw);
-        svgString = buildSymbolWithLabels(svgBase, info.leftText, info.rightText, info.color, rot, ech);
+        svgString = buildSymbolWithLabels(svgBase, info.leftText, info.rightText, info.color, rot, ech, info.type === 'tactical_task' && info.flip);
         var lay = symbolIconLayout(info.leftText, info.rightText, rot);
         if (marker._selected) svgString = _addSelectionHighlight(svgString, lay.width, h, info.color);
         size = new google.maps.Size(lay.width * scale, h * scale);
@@ -1129,6 +1129,20 @@ function _buildPopoverContent(popover, type, info) {
             rotRow.appendChild(rotLbl);
             rotRow.appendChild(mkRotBtn('⟲', -15, 'Rotate 15° counterclockwise (Shift+R)'));
             rotRow.appendChild(mkRotBtn('⟳', 15, 'Rotate 15° clockwise (R)'));
+            // Tactical tasks can also be mirrored left-right (e.g. a hook on the other side)
+            if (type === 'tactical_task') {
+                var flipBtn = document.createElement('button');
+                flipBtn.className = 'popover-rot-btn' + (rotMarker._sittemp.flip ? ' active' : '');
+                flipBtn.textContent = '⇆';
+                flipBtn.title = rotMarker._sittemp.flip ? 'Flipped - click to unflip' : 'Flip (mirror left-right)';
+                flipBtn.addEventListener('click', function () {
+                    rotMarker._sittemp.flip = !rotMarker._sittemp.flip;
+                    rebuildMarkerIcon(rotMarker);
+                    pushUndoState();
+                    _showPopoverForMarker(rotMarker);
+                });
+                rotRow.appendChild(flipBtn);
+            }
             rotRow.appendChild(rotVal);
             showRot();
             popover.appendChild(rotRow);
@@ -1645,7 +1659,7 @@ function recreateMarker(data) {
         const ech = info.echelon || 'none';
         const echelonH = (ech !== 'none') ? 14 : 0;
         const h = 50 + echelonH;
-        svgString = buildSymbolWithLabels(tacticalTaskSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot, ech);
+        svgString = buildSymbolWithLabels(tacticalTaskSVG(info.key, info.color, sw), info.leftText, info.rightText, info.color, rot, ech, info.flip);
         const lay = symbolIconLayout(info.leftText, info.rightText, rot);
         size = new google.maps.Size(lay.width * scale, h * scale);
         anchor = new google.maps.Point((lay.symX + 20) * scale, (h / 2) * scale);
