@@ -860,6 +860,7 @@ export const LINE_TYPES = [
     { key: 'dotted', name: 'Dotted' },
     { key: 'dashdot', name: 'Dash-Dot' },
     { key: 'flot_a', name: 'FLOT' },
+    { key: 'strong_point', name: 'Strong Pt' },
     { key: 'low_wire', name: 'Low Wire' },
     { key: 'single_concertina', name: '1x Conc.' },
     { key: 'arrow', name: 'Arrow' },
@@ -1031,6 +1032,8 @@ export function getLinePreviewSVG(type) {
             return `<svg width="${w}" height="8" viewBox="${vb} 10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2.5" stroke-dasharray="8,3,2,3"/></svg>`;
         case 'flot_a':
             return `<svg width="${w}" height="8" viewBox="${vb} 14"><path d="M5,1 Q15,7 5,13" fill="none" stroke="${c}" stroke-width="2"/><path d="M25,1 Q35,7 25,13" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
+        case 'strong_point':
+            return `<svg width="${w}" height="8" viewBox="${vb} 14"><line x1="0" y1="10" x2="40" y2="10" stroke="${c}" stroke-width="2"/>${[3, 11, 19, 27, 35].map(function (x) { return '<line x1="' + x + '" y1="10" x2="' + x + '" y2="3" stroke="' + c + '" stroke-width="1.5"/>'; }).join('')}</svg>`;
         case 'low_wire':
             return `<svg width="${w}" height="8" viewBox="${vb} 12"><line x1="0" y1="8" x2="40" y2="8" stroke="${c}" stroke-width="2"/><line x1="5" y1="8" x2="12" y2="2" stroke="${c}" stroke-width="2"/><line x1="5" y1="2" x2="12" y2="8" stroke="${c}" stroke-width="2"/><line x1="25" y1="8" x2="32" y2="2" stroke="${c}" stroke-width="2"/><line x1="25" y1="2" x2="32" y2="8" stroke="${c}" stroke-width="2"/></svg>`;
         case 'single_concertina':

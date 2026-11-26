@@ -6,6 +6,7 @@
  *   - Area control measures (Table 5-4): PZ, LZ, DZ, HA, FARP â€” label "PZ WOLF"
  *     centered inside the area. HA is not in Table 5-4 and uses the same template.
  *   - Battle position (Table 5-5): name inside, echelon on the bottom edge.
+ *     Strong point uses the same label on a 'strong_point' outline (outward ticks).
  *   - Airspace coordinating zones (Table 5-23): ROZ, HIDACZ, AARROZ, UAROZ, WEZ,
  *     JEZ, MEZ, LOMEZ, HIMEZ, SHORAD EZ â€” block of function (A), unit (T),
  *     MIN ALT / MAX ALT (feet AGL or MSL), TIME FROM / TIME TO (DTG).
@@ -30,6 +31,7 @@ export const AREA_MEASURES = [
     { key: 'HA', name: 'HA - holding area' },
     { key: 'FARP', name: 'FARP - fwd arming/refuel pt' },
     { key: 'BP', name: 'BP - battle position' },
+    { key: 'SP', name: 'Strong point' },
     { key: 'CBRN', name: 'CBRN - contaminated area' },
     { key: 'CBRNE', name: 'CBRNE - contaminated area' },
 ];
@@ -138,6 +140,7 @@ export function measureLines(m) {
         return lines;
     }
     if (m.fn === 'BP') return [name || 'BP'];
+    if (m.fn === 'SP') return [name || 'SP'];
     if (m.fn === 'LT') return [name || 'LINEAR TGT'];
     if (_isCbrn(m.fn)) return [(m.fn + ' ' + (m.agent || (m.fn === 'CBRNE' ? 'E' : 'C')) + ' ' + name).trim()];
     return [(m.fn + ' ' + name).trim()];
@@ -148,6 +151,7 @@ export function measureTitle(m) {
     if (!m || !m.fn) return '';
     if (_isZone(m.fn)) return (m.fn + ' ' + (m.unit || '')).trim().toUpperCase();
     if (m.fn === 'BP') return ('BP ' + (m.name || '')).trim().toUpperCase();
+    if (m.fn === 'SP') return ('STRONG POINT ' + (m.name || '')).trim().toUpperCase();
     if (m.fn === 'LT') return ('LINEAR TGT ' + (m.name || '')).trim().toUpperCase();
     if (m.fn === 'BOUNDARY') return ('BOUNDARY ' + [m.unit, m.unit2].filter(Boolean).join(' / ')).trim().toUpperCase();
     if (m.fn === 'PL') return ('PL ' + (m.name || '')).trim().toUpperCase();
@@ -324,7 +328,7 @@ export function syncMeasureLabel(featureId) {
     const l = _labels[featureId] || { main: null, ech: null };
     l.main = _setMarker(l.main, c, _icon(t));
 
-    const glyph = m.fn === 'BP' ? ECHELON_GLYPH[m.echelon] : null;
+    const glyph = (m.fn === 'BP' || m.fn === 'SP') ? ECHELON_GLYPH[m.echelon] : null;
     if (glyph) {
         const e = _textSVG([glyph], color, { fontSize: 13, align: 'center', allBold: true });
         l.ech = _setMarker(l.ech, ringBottom(ring, c.lng), _icon(e));
@@ -593,6 +597,7 @@ export function buildMeasureSection(popover, featureId, onChange, kind) {
             else if (!measures[featureId]) { measures[featureId] = { fn: v, name: '', minRef: 'AGL', maxRef: 'AGL', echelon: 'none' }; }
             else { measures[featureId].fn = v; }
             if (_lineDef(v) && _lineDef(v).dash) changeLineType('dashed');   // PLD and CFL are always dashed (table 5-8)
+            if (v === 'SP') changeLineType('strong_point');                     // battle position outline with outward ticks (table 5-5)
             if (_isCbrn(v)) {
                 const mm = measures[featureId];
                 const allowed = (v === 'CBRNE' ? CBRNE_AGENTS : CBRN_AGENTS).map(function (a) { return a.key; });
@@ -643,7 +648,7 @@ export function buildMeasureSection(popover, featureId, onChange, kind) {
             }
             const ph = _isCbrn(m.fn) ? 'optional' : (m.fn === 'NAI' || m.fn === 'TAI') ? 'e.g. 1' : 'e.g. WOLF';
             _input(_row(section, 'Name'), 'text', m.name, ph, 130, function (v) { m.name = v; commit(); });
-            if (m.fn === 'BP') {
+            if (m.fn === 'BP' || m.fn === 'SP') {
                 _select(_row(section, 'Echelon'), ECHELON_LIST, m.echelon || 'none', function (v) { m.echelon = v; commit(); });
             }
         }

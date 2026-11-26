@@ -1734,6 +1734,29 @@ function createLineOverlay(path, lineType, color, map, strokeWidth) {
                 map
             });
             break;
+        case 'strong_point': {
+            // Strong point (FM 1-02.2 table 5-5): solid outline with short ticks
+            // pointing away from the enclosed area. Symbols on a polyline face along
+            // the path (-y forward), so +x is the right-hand side. Counterclockwise
+            // rings (positive shoelace area, north up) have the outside on the right.
+            var area2 = 0;
+            for (var i = 0, j = path.length - 1; i < path.length; j = i++) {
+                area2 += (path[j].lng - path[i].lng) * (path[j].lat + path[i].lat);
+            }
+            var out = area2 > 0 ? 1 : -1;          // +1: counterclockwise ring, ticks on +x
+            polyline = new google.maps.Polyline({
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: sw,
+                icons: [{
+                    icon: {
+                        path: 'M 0,0 L ' + (5 * out) + ',0',
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: Math.max(1.5, sw * 0.75), scale: 1.6
+                    },
+                    offset: '6px', repeat: '12px'
+                }],
+                map
+            });
+            break;
+        }
         case 'low_wire':
             // Low Wire Fence — base line + picket diagonals (V shape, matches original SVG)
             polyline = new google.maps.Polyline({
