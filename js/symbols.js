@@ -619,6 +619,32 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
             T(175, 130, 'D', 75) +
             fillHead(295, 175, 0, 50),
 
+        // Retrograde tasks (FM 3-90 retrograde form, like delay): hook tail, letter on the shaft
+        withdraw: () => P('M100,90 Q58,175 100,260') +
+            P('M110,175 L265,175') +
+            T(178, 130, 'W', 72) +
+            fillHead(295, 175, 0, 50),
+        withdraw_under_pressure: () => P('M100,90 Q58,175 100,260') +
+            P('M110,175 L265,175') +
+            T(182, 130, 'WP', 66) +
+            fillHead(295, 175, 0, 50),
+        retire: () => P('M100,90 Q58,175 100,260') +
+            P('M110,175 L265,175') +
+            T(175, 130, 'R', 75) +
+            fillHead(295, 175, 0, 50),
+
+        // Ambush — arc facing the kill zone with short spikes on its inner side,
+        // arrow from the arc's center toward the kill zone, open arrowhead
+        ambush: () => {
+            const ax = 230, ay = 175, ar = 150;
+            let s = P(arc(ax, ay, ar, 138, 222));
+            [146, 160, 200, 214].forEach((a) => {
+                const p1 = pt(ax, ay, ar, a), p2 = pt(ax, ay, ar - 38, a);
+                s += P(`M${p1[0]},${p1[1]} L${p2[0]},${p2[1]}`);
+            });
+            return s + P('M80,175 L305,175') + openHead(305, 175, 0, 45);
+        },
+
         // Attack by fire — bracket tail, arrow from its midpoint, open arrowhead, no letter
         attack_by_fire: () => P('M85,85 L135,140 L135,210 L85,265') +
             P('M135,175 L290,175') +
@@ -782,6 +808,10 @@ export const TACTICAL_TASK_LIST = [
     { key: 'disrupt', name: 'Disrupt' },
     { key: 'block', name: 'Block' },
     { key: 'delay', name: 'Delay' },
+    { key: 'withdraw', name: 'Withdraw' },
+    { key: 'withdraw_under_pressure', name: 'Withdraw Under Pressure' },
+    { key: 'retire', name: 'Retire' },
+    { key: 'ambush', name: 'Ambush' },
     { key: 'isolate', name: 'Isolate' },
     { key: 'neutralize', name: 'Neutralize' },
     { key: 'occupy', name: 'Occupy' },
@@ -802,6 +832,8 @@ export const SHAPE_LIST = [
     { key: 'linestring', name: 'Line', icon: '<line x1="3" y1="25" x2="25" y2="3" stroke="currentColor" stroke-width="2"/>' },
     { key: 'freehand', name: 'Freehand', icon: '<path d="M3 20 Q8 5 14 15 T25 8" fill="none" stroke="currentColor" stroke-width="2"/>' },
     { key: 'star', name: 'Star', icon: '<polygon points="14,2 17,11 27,11 19,17 22,26 14,21 6,26 9,17 1,11 11,11" fill="none" stroke="currentColor" stroke-width="1.5"/>' },
+    { key: 'general_point', name: 'Point', icon: '<path d="M14 26 L7.5 15.5 A8 8 0 1 1 20.5 15.5 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' },
+    { key: 'point_target', name: 'Point Target', icon: '<path d="M11 6 V22 M3 14 H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="14" y="9" font-size="7" font-weight="bold" font-family="Arial" fill="currentColor" stroke="none">AB</text>' },
     { key: 'flight_route', name: 'Flight Route', icon: '<polyline points="4,23 12,12 18,17 25,5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="17" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M1,20 h6 v3 l-3,3 l-3,-3 z" fill="none" stroke="currentColor" stroke-width="1.2"/>' },
 ];
 

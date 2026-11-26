@@ -410,7 +410,9 @@ function exportKML() {
 
     markers.forEach(function (m, i) {
         const pos = m.getPosition();
-        const name = escapeXml((m._sittemp && m._sittemp.text) || (m._sittemp && m._sittemp.key) || 'Marker ' + i);
+        const st = m._sittemp || {};
+        const label = st.type === 'general_point' ? ((st.fn || 'POINT') + ' ' + (st.text || '')).trim() : (st.text || st.key);
+        const name = escapeXml(label || 'Marker ' + i);
         kml += '<Placemark>\n';
         kml += '<name>' + name + '</name>\n';
         kml += '<Point><coordinates>' + pos.lng() + ',' + pos.lat() + ',0</coordinates></Point>\n';

@@ -1,5 +1,5 @@
 /**
- * Simple SITTEMP - Control Measures Module
+ * Simple SITTEMP - Define Area / Target Tagging Module
  *
  * Tags drawn area shapes (polygon, rectangle, circle, freehand) as doctrinal
  * control measures and draws their labels, per FM 1-02.2 (INCL C1):
@@ -9,6 +9,11 @@
  *   - Airspace coordinating zones (Table 5-23): ROZ, HIDACZ, AARROZ, UAROZ, WEZ,
  *     JEZ, MEZ, LOMEZ, HIMEZ, SHORAD EZ â€” block of function (A), unit (T),
  *     MIN ALT / MAX ALT (feet AGL or MSL), TIME FROM / TIME TO (DTG).
+ *
+ *   - Intelligence / targeting areas: NAI (named area of interest) and TAI
+ *     (target area of interest), labeled "NAI 1" / "TAI 3" centered inside.
+ *   - Linear target (fire support) on drawn lines: target number above the
+ *     line's midpoint and a short perpendicular tick at each end.
  *
  * Tags live in state.featureMeasures keyed by Terra Draw feature id (included in
  * undo snapshots). Labels are non-clickable Google Maps markers, runtime only.
@@ -58,6 +63,34 @@ function _cbrnIcon(agent, name, color) {
     return { svg: svg, w: w, h: h };
 }
 
+export const INTEL_AREAS = [
+    { key: 'NAI', name: 'NAI - named area of interest' },
+    { key: 'TAI', name: 'TAI - target area of interest' },
+];
+
+// Named lines (FM 1-02.2 ch. 5 maneuver / fire support coordination lines).
+// label: 'ends' = "ABBR NAME" at both ends; 'fs' = abbr + unit + DTG at both
+// ends; 'boundary' = echelon in the middle with a unit on each side;
+// 'target' = number above the midpoint plus end ticks.
+export const LINE_MEASURES = [
+    { key: 'PL', name: 'PL - phase line', label: 'ends', group: 'maneuver' },
+    { key: 'BOUNDARY', name: 'Boundary', label: 'boundary', group: 'maneuver' },
+    { key: 'LD', name: 'LD - line of departure', label: 'ends', group: 'maneuver' },
+    { key: 'LD/LC', name: 'LD/LC - line of dep./contact', label: 'ends', group: 'maneuver' },
+    { key: 'LOA', name: 'LOA - limit of advance', label: 'ends', group: 'maneuver' },
+    { key: 'FCL', name: 'FCL - final coordination line', label: 'ends', group: 'maneuver' },
+    { key: 'PLD', name: 'PLD - probable line of deploy.', label: 'ends', group: 'maneuver' },
+    { key: 'RL', name: 'RL - release line', label: 'ends', group: 'maneuver' },
+    { key: 'FLOT', name: 'FLOT - fwd line of own troops', label: 'ends', group: 'maneuver' },
+    { key: 'FSCL', name: 'FSCL - fire support coord. line', label: 'fs', group: 'fires' },
+    { key: 'CFL', name: 'CFL - coordinated fire line', label: 'fs', group: 'fires' },
+    { key: 'RFL', name: 'RFL - restrictive fire line', label: 'fs', group: 'fires' },
+    { key: 'NFL', name: 'NFL - no-fire line', label: 'fs', group: 'fires' },
+    { key: 'LT', name: 'Linear target', label: 'target', group: 'fires' },
+];
+function _lineDef(fn) { return LINE_MEASURES.find(function (x) { return x.key === fn; }) || null; }
+function _isLineMeasure(fn) { return LINE_MEASURES.some(function (x) { return x.key === fn; }); }
+
 export const AIRSPACE_ZONES = [
     { key: 'ROZ', name: 'ROZ - restricted operations zone' },
     { key: 'HIDACZ', name: 'HIDACZ - high-density ACZ' },
@@ -73,11 +106,11 @@ export const AIRSPACE_ZONES = [
 
 const ECHELON_GLYPH = {
     team: 'Ø', squad: '•', section: '••',
-    platoon: 'â€¢â€¢â€¢', company: 'I', battalion: 'II', regiment: 'III',
+    platoon: '•••', company: 'I', battalion: 'II', regiment: 'III',
     brigade: 'X', division: 'XX', corps: 'XXX',
 };
 
-const _labels = {};   // featureId -> { main: Marker, ech: Marker|null }
+const _labels = {};   // featureId -> { main: Marker, ech: Marker|null, ticks: Polyline[] }
 
 function _isZone(fn) { return AIRSPACE_ZONES.some(function (z) { return z.key === fn; }); }
 
@@ -103,6 +136,7 @@ export function measureLines(m) {
         return lines;
     }
     if (m.fn === 'BP') return [name || 'BP'];
+    if (m.fn === 'LT') return [name || 'LINEAR TGT'];
     if (_isCbrn(m.fn)) return [(m.fn + ' ' + (m.agent || (m.fn === 'CBRNE' ? 'E' : 'C')) + ' ' + name).trim()];
     return [(m.fn + ' ' + name).trim()];
 }
@@ -112,6 +146,9 @@ export function measureTitle(m) {
     if (!m || !m.fn) return '';
     if (_isZone(m.fn)) return (m.fn + ' ' + (m.unit || '')).trim().toUpperCase();
     if (m.fn === 'BP') return ('BP ' + (m.name || '')).trim().toUpperCase();
+    if (m.fn === 'LT') return ('LINEAR TGT ' + (m.name || '')).trim().toUpperCase();
+    if (m.fn === 'BOUNDARY') return ('BOUNDARY ' + [m.unit, m.unit2].filter(Boolean).join(' / ')).trim().toUpperCase();
+    if (_lineDef(m.fn) && _lineDef(m.fn).label === 'fs') return (m.fn + ' ' + (m.name || '') + ' ' + (m.dtg || '')).replace(/\s+/g, ' ').trim().toUpperCase();
     if (_isCbrn(m.fn)) return (m.fn + ' ' + (m.agent || '') + ' ' + (m.name || '')).replace(/\s+/g, ' ').trim().toUpperCase();
     return (m.fn + ' ' + (m.name || '')).trim().toUpperCase();
 }
@@ -141,12 +178,64 @@ function _textSVG(lines, color, opts) {
 
 // ===== Geometry =====
 
-function _ring(featureId) {
+function _geom(featureId) {
     const draw = get('draw');
     let f = null;
     try { f = draw && draw.getSnapshotFeature(featureId); } catch (e) { /* gone */ }
-    if (!f || !f.geometry || f.geometry.type !== 'Polygon') return null;
-    return f.geometry.coordinates[0];
+    return f && f.geometry ? f.geometry : null;
+}
+
+function _ring(featureId) {
+    const g = _geom(featureId);
+    return g && g.type === 'Polygon' ? g.coordinates[0] : null;
+}
+
+function _line(featureId) {
+    const g = _geom(featureId);
+    return g && g.type === 'LineString' && g.coordinates.length >= 2 ? g.coordinates : null;
+}
+
+/** Geometry a tag needs: the line for linear targets, the ring for areas. */
+function _shapeFor(featureId, m) {
+    return m && _isLineMeasure(m.fn) ? _line(featureId) : _ring(featureId);
+}
+
+const M_PER_DEG = 111320;
+
+/** Point halfway along a [lng,lat] line, plus the line's length in meters. */
+export function lineMidpoint(coords) {
+    const k = Math.cos(coords[0][1] * Math.PI / 180);
+    const seg = [];
+    let total = 0;
+    for (let i = 1; i < coords.length; i++) {
+        const dx = (coords[i][0] - coords[i - 1][0]) * k * M_PER_DEG, dy = (coords[i][1] - coords[i - 1][1]) * M_PER_DEG;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        seg.push(d); total += d;
+    }
+    let half = total / 2;
+    for (let i = 0; i < seg.length; i++) {
+        if (half <= seg[i] || i === seg.length - 1) {
+            const t = seg[i] ? Math.min(1, half / seg[i]) : 0;
+            const a = coords[i], b = coords[i + 1];
+            return { lat: a[1] + (b[1] - a[1]) * t, lng: a[0] + (b[0] - a[0]) * t, length: total };
+        }
+        half -= seg[i];
+    }
+    return { lat: coords[0][1], lng: coords[0][0], length: total };
+}
+
+/** Short perpendicular tick paths ({lat,lng} pairs) at both ends of a [lng,lat] line. */
+function _endTicks(coords, lenM) {
+    const k = Math.cos(coords[0][1] * Math.PI / 180);
+    function tick(end, next) {
+        const dx = (next[0] - end[0]) * k, dy = next[1] - end[1];
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const px = -dy / d, py = dx / d;          // unit perpendicular in ground space
+        const h = lenM / 2 / M_PER_DEG;
+        return [{ lat: end[1] + py * h, lng: end[0] + px * h / k }, { lat: end[1] - py * h, lng: end[0] - px * h / k }];
+    }
+    const n = coords.length;
+    return [tick(coords[0], coords[1]), tick(coords[n - 1], coords[n - 2])];
 }
 
 /** Area-weighted centroid of a [lng,lat] ring (falls back to vertex mean). */
@@ -200,20 +289,26 @@ function _setMarker(existing, pos, icon) {
     return new google.maps.Marker({ position: pos, icon: icon, map: get('map'), clickable: false, zIndex: 60, optimized: false });
 }
 
+function _clearList(list) { (list || []).forEach(function (x) { if (x) x.setMap(null); }); }
+
 function _removeLabel(id) {
     const l = _labels[id];
     if (!l) return;
-    l.main.setMap(null);
+    if (l.main) l.main.setMap(null);
     if (l.ech) l.ech.setMap(null);
+    _clearList(l.ticks);
+    _clearList(l.ends);
     delete _labels[id];
 }
 
 /** Create, move or remove the label for one feature. */
 export function syncMeasureLabel(featureId) {
     const m = (get('featureMeasures') || {})[featureId];
-    const ring = m && m.fn ? _ring(featureId) : null;
-    if (!ring) { _removeLabel(featureId); return; }
+    const shape = m && m.fn ? _shapeFor(featureId, m) : null;
+    if (!shape) { _removeLabel(featureId); return; }
     const color = _color(featureId);
+    if (_isLineMeasure(m.fn)) { _syncLineLabel(featureId, m, shape, color); return; }
+    const ring = shape;
     const zone = _isZone(m.fn);
     const lines = measureLines(m);
     const t = _isCbrn(m.fn)
@@ -234,12 +329,120 @@ export function syncMeasureLabel(featureId) {
     _labels[featureId] = l;
 }
 
+// Web Mercator y in the same units as radians of longitude (screen y grows downward when negated)
+function _mercY(lat) { return Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)); }
+
+/** Screen-space unit direction (x right, y down) from [lng,lat] a to b. */
+function _screenDir(a, b) {
+    const dx = (b[0] - a[0]) * Math.PI / 180, dy = -(_mercY(b[1]) - _mercY(a[1]));
+    const d = Math.sqrt(dx * dx + dy * dy) || 1;
+    return { x: dx / d, y: dy / d };
+}
+
+/** Icon anchored so the label sits just beyond a line end, on the side the line points to. */
+function _endIcon(t, out) {
+    const icon = _icon(t), GAP = 6;
+    let ax, ay;
+    if (Math.abs(out.x) >= Math.abs(out.y)) {             // mostly horizontal: beside the end
+        ax = out.x > 0 ? -GAP : t.w + GAP; ay = t.h / 2;
+    } else {                                               // mostly vertical: above / below the end
+        ax = t.w / 2; ay = out.y > 0 ? -GAP : t.h + GAP;
+    }
+    icon.anchor = new google.maps.Point(ax, ay);
+    return icon;
+}
+
+/** Text lines shown at each end of a named line. */
+export function lineEndLines(m) {
+    const def = _lineDef(m.fn);
+    const name = (m.name || '').toUpperCase().trim();
+    if (!def) return [];
+    if (def.label === 'fs') {
+        const lines = [(m.fn + ' ' + name).trim()];
+        if (m.dtg) lines.push(String(m.dtg).toUpperCase().trim());
+        return lines;
+    }
+    if (def.label === 'ends') return [(m.fn + ' ' + name).trim()];
+    return [];
+}
+
+function _syncLineLabel(featureId, m, coords, color) {
+    const def = _lineDef(m.fn);
+    const l = _labels[featureId] || {};
+    if (l.ech) { l.ech.setMap(null); l.ech = null; }
+    const n = coords.length;
+    const mid = lineMidpoint(coords);
+
+    // Middle: linear target number above the line, or boundary echelon + units
+    let midIcon = null;
+    if (def.label === 'target') {
+        const t = _textSVG(measureLines(m), color, { fontSize: 13, align: 'center', allBold: true });
+        midIcon = _icon(t);
+        midIcon.anchor = new google.maps.Point(t.w / 2, t.h + 2);   // sit just above the line
+    } else if (def.label === 'boundary') {
+        midIcon = _icon(_boundarySVG(m, color, _screenDir(coords[0], coords[n - 1])));
+    }
+    if (midIcon) l.main = _setMarker(l.main, { lat: mid.lat, lng: mid.lng }, midIcon);
+    else if (l.main) { l.main.setMap(null); l.main = null; }
+
+    // Ends: "PL AMBER" etc. at both ends
+    const endLines = lineEndLines(m);
+    if (endLines.length) {
+        const t = _textSVG(endLines, color, { fontSize: 13, align: 'center', allBold: true });
+        l.ends = l.ends || [];
+        const ends = [[coords[0], _screenDir(coords[1], coords[0])], [coords[n - 1], _screenDir(coords[n - 2], coords[n - 1])]];
+        ends.forEach(function (e, i) {
+            l.ends[i] = _setMarker(l.ends[i], { lat: e[0][1], lng: e[0][0] }, _endIcon(t, e[1]));
+        });
+    } else { _clearList(l.ends); l.ends = []; }
+
+    // Linear target end ticks
+    if (def.label === 'target') {
+        const tickLen = Math.max(20, Math.min(400, mid.length * 0.06));
+        const sw = Math.max(2, ((get('featureStyles') || {})[featureId] || {}).strokeWidth || get('symbolStrokeWidth') || 2);
+        l.ticks = l.ticks || [];
+        _endTicks(coords, tickLen).forEach(function (p, i) {
+            if (l.ticks[i]) { l.ticks[i].setPath(p); l.ticks[i].setOptions({ strokeColor: color, strokeWeight: sw }); }
+            else l.ticks[i] = new google.maps.Polyline({ path: p, strokeColor: color, strokeWeight: sw, strokeOpacity: 1, clickable: false, zIndex: 59, map: get('map') });
+        });
+    } else { _clearList(l.ticks); l.ticks = []; }
+    _labels[featureId] = l;
+}
+
+/**
+ * Boundary label: echelon glyph on the line with a unit on each side. A mostly
+ * horizontal line puts unit 1 above and unit 2 below; a mostly vertical one puts
+ * unit 1 left and unit 2 right. The glyph gets a halo that stands in for the gap.
+ */
+function _boundarySVG(m, color, dir) {
+    const glyph = ECHELON_GLYPH[m.echelon] || '';
+    const u1 = (m.unit || '').toUpperCase().trim(), u2 = (m.unit2 || '').toUpperCase().trim();
+    const fs = 13, cw = fs * 0.62, halo = haloFor(color);
+    const txt = function (x, y, s, anchor) {
+        return '<text x="' + x + '" y="' + y + '" text-anchor="' + anchor + '" font-family="Consolas,Menlo,monospace" font-size="' + fs + '" font-weight="bold"'
+            + ' fill="' + color + '" stroke="' + halo + '" stroke-width="3" stroke-linejoin="round" paint-order="stroke">' + escapeXml(s) + '</text>';
+    };
+    const gw = Math.max(cw * 2, glyph.length * cw) + 8;
+    let w, h, body;
+    if (Math.abs(dir.x) >= Math.abs(dir.y)) {
+        w = Math.ceil(Math.max(gw, u1.length * cw, u2.length * cw) + 8); h = 60;
+        const cx = w / 2;
+        body = (u1 ? txt(cx, 14, u1, 'middle') : '') + (glyph ? txt(cx, 35, glyph, 'middle') : '') + (u2 ? txt(cx, 56, u2, 'middle') : '');
+    } else {
+        const l1 = Math.ceil(u1.length * cw), l2 = Math.ceil(u2.length * cw), side = Math.max(l1, l2) + 6;
+        w = Math.ceil(side * 2 + gw); h = 22;
+        const cx = w / 2;
+        body = (u1 ? txt(cx - gw / 2, 16, u1, 'end') : '') + (glyph ? txt(cx, 16, glyph, 'middle') : '') + (u2 ? txt(cx + gw / 2, 16, u2, 'start') : '');
+    }
+    return { svg: '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' + body + '</svg>', w: w, h: h };
+}
+
 /** Bring every label in line with state.featureMeasures and current geometry. */
 export function syncAllMeasureLabels() {
     const measures = get('featureMeasures') || {};
     Object.keys(_labels).forEach(function (id) { if (!measures[id]) _removeLabel(id); });
     Object.keys(measures).forEach(function (id) {
-        if (!_ring(id)) { delete measures[id]; _removeLabel(id); }
+        if (!_shapeFor(id, measures[id])) { delete measures[id]; _removeLabel(id); }
         else syncMeasureLabel(id);
     });
 }
@@ -304,10 +507,11 @@ function _select(row, options, value, onSet) {
 }
 
 /**
- * Append the control-measure section for a feature to the popover.
- * onChange() is called after edits (used to schedule an undo push).
+ * Append the "Define area" section (or, for lines, "Define target") for a
+ * feature to the popover. onChange() is called after edits (undo push).
  */
-export function buildMeasureSection(popover, featureId, onChange) {
+export function buildMeasureSection(popover, featureId, onChange, kind) {
+    const isLine = kind === 'line';
     const section = document.createElement('div');
     section.className = 'popover-vs popover-measure';
     popover.appendChild(section);
@@ -320,12 +524,17 @@ export function buildMeasureSection(popover, featureId, onChange) {
         const m = measures[featureId];
         const head = document.createElement('div');
         head.className = 'popover-vs-head';
-        head.innerHTML = '<span>Control measure</span>';
+        head.innerHTML = '<span>' + (isLine ? 'Define line' : 'Define area') + '</span>';
         section.appendChild(head);
 
         const typeRow = _row(section, 'Type');
-        _select(typeRow, [
+        _select(typeRow, isLine ? [
             { key: '', name: 'None' },
+            { group: 'Maneuver (FM 1-02.2 ch. 5)', items: LINE_MEASURES.filter(function (x) { return x.group === 'maneuver'; }) },
+            { group: 'Fire support', items: LINE_MEASURES.filter(function (x) { return x.group === 'fires'; }) },
+        ] : [
+            { key: '', name: 'None' },
+            { group: 'Intelligence / targeting', items: INTEL_AREAS },
             { group: 'Area (FM 1-02.2 Tbl 5-4/5-5)', items: AREA_MEASURES },
             { group: 'Airspace (Tbl 5-23)', items: AIRSPACE_ZONES },
         ], m ? m.fn : '', function (v) {
@@ -346,6 +555,23 @@ export function buildMeasureSection(popover, featureId, onChange) {
         });
         if (!m) return;
 
+        const ldef = _lineDef(m.fn);
+        if (ldef) {
+            if (ldef.label === 'boundary') {
+                _select(_row(section, 'Echelon'), ECHELON_LIST, m.echelon || 'none', function (v) { m.echelon = v; commit(); });
+                _input(_row(section, 'Unit 1'), 'text', m.unit, 'above / left, e.g. 1-66', 130, function (v) { m.unit = v; commit(); });
+                _input(_row(section, 'Unit 2'), 'text', m.unit2, 'below / right, e.g. 2-66', 130, function (v) { m.unit2 = v; commit(); });
+            } else if (ldef.label === 'fs') {
+                _input(_row(section, 'Unit'), 'text', m.name, 'e.g. 1 AD', 130, function (v) { m.name = v; commit(); });
+                _input(_row(section, 'DTG'), 'text', m.dtg, 'e.g. 030001ZJUL26', 130, function (v) { m.dtg = v; commit(); });
+            } else if (ldef.label === 'target') {
+                _input(_row(section, 'Target #'), 'text', m.name, 'e.g. AB1002', 130, function (v) { m.name = v; commit(); });
+            } else {
+                _input(_row(section, 'Name'), 'text', m.name, m.fn === 'PL' ? 'e.g. AMBER' : 'optional', 130, function (v) { m.name = v; commit(); });
+            }
+            return;
+        }
+
         if (_isZone(m.fn)) {
             _input(_row(section, 'Unit'), 'text', m.unit, 'e.g. 11 ADA BDE', 130, function (v) { m.unit = v; commit(); });
             const refOpts = [{ key: 'AGL', name: 'AGL' }, { key: 'MSL', name: 'MSL' }];
@@ -361,7 +587,8 @@ export function buildMeasureSection(popover, featureId, onChange) {
             if (_isCbrn(m.fn)) {
                 _select(_row(section, 'Agent'), m.fn === 'CBRNE' ? CBRNE_AGENTS : CBRN_AGENTS, m.agent || 'C', function (v) { m.agent = v; commit(); });
             }
-            _input(_row(section, 'Name'), 'text', m.name, _isCbrn(m.fn) ? 'optional' : 'e.g. WOLF', 130, function (v) { m.name = v; commit(); });
+            const ph = _isCbrn(m.fn) ? 'optional' : (m.fn === 'NAI' || m.fn === 'TAI') ? 'e.g. 1' : 'e.g. WOLF';
+            _input(_row(section, 'Name'), 'text', m.name, ph, 130, function (v) { m.name = v; commit(); });
             if (m.fn === 'BP') {
                 _select(_row(section, 'Echelon'), ECHELON_LIST, m.echelon || 'none', function (v) { m.echelon = v; commit(); });
             }
