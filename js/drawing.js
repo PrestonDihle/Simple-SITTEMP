@@ -1249,23 +1249,32 @@ function _buildPopoverContent(popover, type, info) {
             });
             gpTypeRow.appendChild(gpSel);
             gpSection.appendChild(gpTypeRow);
-            var gpRow = document.createElement('div');
-            gpRow.className = 'popover-row';
-            gpRow.innerHTML = '<span class="popover-label">Designation</span>';
-            var gpInp = document.createElement('input');
-            gpInp.type = 'text';
-            gpInp.className = 'popover-num popover-text';
-            gpInp.style.width = '130px';
-            gpInp.placeholder = 'e.g. 5';
-            gpInp.value = gpInfo.text || '';
-            gpInp.addEventListener('keydown', function (e) { e.stopPropagation(); if (e.key === 'Enter') gpInp.blur(); });
-            gpInp.addEventListener('change', function () {
-                gpInfo.text = gpInp.value.toUpperCase().trim();
-                rebuildMarkerIcon(gpMarker);
-                _scheduleUndoPush();
+            // FM 1-02.2 figure 5-8 amplifier fields
+            [
+                { prop: 'text', label: 'Designation', ph: 'inside, e.g. 12' },
+                { prop: 'unit', label: 'Unit', ph: 'right, e.g. 100MP DET' },
+                { prop: 'dtg', label: 'DTG from', ph: 'left, e.g. 140700ZMAR26' },
+                { prop: 'dtg2', label: 'DTG to', ph: 'optional' },
+                { prop: 'info', label: 'Info', ph: 'above, e.g. MSR 5' },
+            ].forEach(function (fd) {
+                var row = document.createElement('div');
+                row.className = 'popover-row';
+                row.innerHTML = '<span class="popover-label">' + fd.label + '</span>';
+                var inp = document.createElement('input');
+                inp.type = 'text';
+                inp.className = 'popover-num popover-text';
+                inp.style.width = '130px';
+                inp.placeholder = fd.ph;
+                inp.value = gpInfo[fd.prop] || '';
+                inp.addEventListener('keydown', function (e) { e.stopPropagation(); if (e.key === 'Enter') inp.blur(); });
+                inp.addEventListener('change', function () {
+                    gpInfo[fd.prop] = inp.value.toUpperCase().trim();
+                    rebuildMarkerIcon(gpMarker);
+                    _scheduleUndoPush();
+                });
+                row.appendChild(inp);
+                gpSection.appendChild(row);
             });
-            gpRow.appendChild(gpInp);
-            gpSection.appendChild(gpRow);
             popover.appendChild(gpSection);
         }
     }
@@ -1725,6 +1734,29 @@ function createLineOverlay(path, lineType, color, map, strokeWidth) {
                 map
             });
             break;
+        case 'strong_point': {
+            // Strong point (FM 1-02.2 table 5-5): solid outline with short ticks
+            // pointing away from the enclosed area. Symbols on a polyline face along
+            // the path (-y forward), so +x is the right-hand side. Counterclockwise
+            // rings (positive shoelace area, north up) have the outside on the right.
+            var area2 = 0;
+            for (var i = 0, j = path.length - 1; i < path.length; j = i++) {
+                area2 += (path[j].lng - path[i].lng) * (path[j].lat + path[i].lat);
+            }
+            var out = area2 > 0 ? 1 : -1;          // +1: counterclockwise ring, ticks on +x
+            polyline = new google.maps.Polyline({
+                path, strokeColor: color, strokeOpacity: 1, strokeWeight: sw,
+                icons: [{
+                    icon: {
+                        path: 'M 0,0 L ' + (5 * out) + ',0',
+                        strokeOpacity: 1, strokeColor: color, strokeWeight: Math.max(1.5, sw * 0.75), scale: 1.6
+                    },
+                    offset: '6px', repeat: '12px'
+                }],
+                map
+            });
+            break;
+        }
         case 'low_wire':
             // Low Wire Fence — base line + picket diagonals (V shape, matches original SVG)
             polyline = new google.maps.Polyline({

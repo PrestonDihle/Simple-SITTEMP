@@ -556,8 +556,8 @@ export function enemyUnitSVG(key, color, strokeWidth) {
 
 // ===== Tactical Task Symbol SVGs =====
 // Geometry follows FM 1-02.2 (INCL C1, 23 Jan 2025), Chapter 6, Table 6-1
-// "Tactical mission task symbols". Delay is not in Table 6-1 and keeps its
-// FM 3-90 retrograde-task form. Tasks are drawn pointing right (this app's
+// "Tactical mission task symbols". Delay, withdraw, withdraw under pressure and
+// retire follow chapter 5 Table 5-12 and ambush Table 5-11. Tasks are drawn pointing right (this app's
 // rotation convention). All symbols use a 350x350 viewBox with parameterized
 // color and stroke width.
 export function tacticalTaskSVG(key, color, strokeWidth) {
@@ -612,37 +612,36 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
     const CX = 160, CY = 175, CR = 105, A0 = 205, A1 = 150;
     const arcEnd = pt(CX, CY, CR, A1);
 
+    // Retrograde template: hook from (HX, Y - 120) round the left to (HX, Y), shaft along y = Y
+    const retro = (letter) => {
+        const HX = 95, Y = 235, END = 330, LX = 205;
+        const half = letter.length * 22 + 10;              // half-width of the break for the letter
+        return P(`M${HX},${Y - 120} A60,60 0 0,0 ${HX},${Y}`) +
+            P(`M${HX},${Y} L${LX - half},${Y} M${LX + half},${Y} L${END},${Y}`) +
+            T(LX, Y, letter, 64) +
+            openHead(END, Y, 0, 40);
+    };
+
     const builders = {
-        // Delay — not in FM 1-02.2 Table 6-1; FM 3-90 retrograde form: hook tail, D on shaft
-        delay: () => P('M100,90 Q58,175 100,260') +
-            P('M110,175 L265,175') +
-            T(175, 130, 'D', 75) +
-            fillHead(295, 175, 0, 50),
+        // Retrograde tasks (FM 1-02.2 Table 5-12): half-circle hook at the rear joined
+        // to the end of the shaft, letter in a break in the shaft, open arrowhead.
+        // Mirrored from the FM drawing (which points left) to point right.
+        delay: () => retro('D'),
+        withdraw: () => retro('W'),
+        withdraw_under_pressure: () => retro('WP'),
+        retire: () => retro('R'),
 
-        // Retrograde tasks (FM 3-90 retrograde form, like delay): hook tail, letter on the shaft
-        withdraw: () => P('M100,90 Q58,175 100,260') +
-            P('M110,175 L265,175') +
-            T(178, 130, 'W', 72) +
-            fillHead(295, 175, 0, 50),
-        withdraw_under_pressure: () => P('M100,90 Q58,175 100,260') +
-            P('M110,175 L265,175') +
-            T(182, 130, 'WP', 66) +
-            fillHead(295, 175, 0, 50),
-        retire: () => P('M100,90 Q58,175 100,260') +
-            P('M110,175 L265,175') +
-            T(175, 130, 'R', 75) +
-            fillHead(295, 175, 0, 50),
-
-        // Ambush — arc facing the kill zone with short spikes on its inner side,
-        // arrow from the arc's center toward the kill zone, open arrowhead
+        // Ambush (FM 1-02.2 Table 5-11): arc bulging toward the kill zone, hatched
+        // with lines parallel to the arrow on its inner side, arrow from the arc's apex
         ambush: () => {
-            const ax = 230, ay = 175, ar = 150;
-            let s = P(arc(ax, ay, ar, 138, 222));
-            [146, 160, 200, 214].forEach((a) => {
-                const p1 = pt(ax, ay, ar, a), p2 = pt(ax, ay, ar - 38, a);
-                s += P(`M${p1[0]},${p1[1]} L${p2[0]},${p2[1]}`);
+            const ax = 90, ay = 175, ar = 120, a0 = 65;
+            const chordX = f1(ax + ar * Math.cos(a0 * RAD));
+            let s = P(arc(ax, ay, ar, -a0, a0));
+            [88, 112, 136, 158, 192, 214, 238, 262].forEach((y) => {
+                const xe = f1(ax + Math.sqrt(ar * ar - (y - ay) * (y - ay)));
+                s += P(`M${chordX},${y} L${xe},${y}`, `stroke-width="${f1(sw * 0.6)}"`);
             });
-            return s + P('M80,175 L305,175') + openHead(305, 175, 0, 45);
+            return s + P(`M${ax + ar},175 L315,175`) + openHead(315, 175, 0, 45);
         },
 
         // Attack by fire — bracket tail, arrow from its midpoint, open arrowhead, no letter
@@ -832,7 +831,7 @@ export const SHAPE_LIST = [
     { key: 'linestring', name: 'Line', icon: '<line x1="3" y1="25" x2="25" y2="3" stroke="currentColor" stroke-width="2"/>' },
     { key: 'freehand', name: 'Freehand', icon: '<path d="M3 20 Q8 5 14 15 T25 8" fill="none" stroke="currentColor" stroke-width="2"/>' },
     { key: 'star', name: 'Star', icon: '<polygon points="14,2 17,11 27,11 19,17 22,26 14,21 6,26 9,17 1,11 11,11" fill="none" stroke="currentColor" stroke-width="1.5"/>' },
-    { key: 'general_point', name: 'Point', icon: '<path d="M14 26 L7.5 15.5 A8 8 0 1 1 20.5 15.5 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>' },
+    { key: 'general_point', name: 'Point', icon: '<path d="M8 3 H20 V17 L14 25 L8 17 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="miter"/>' },
     { key: 'point_target', name: 'Point Target', icon: '<path d="M11 6 V22 M3 14 H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="14" y="9" font-size="7" font-weight="bold" font-family="Arial" fill="currentColor" stroke="none">AB</text>' },
     { key: 'flight_route', name: 'Flight Route', icon: '<polyline points="4,23 12,12 18,17 25,5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="17" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M1,20 h6 v3 l-3,3 l-3,-3 z" fill="none" stroke="currentColor" stroke-width="1.2"/>' },
 ];
@@ -861,6 +860,7 @@ export const LINE_TYPES = [
     { key: 'dotted', name: 'Dotted' },
     { key: 'dashdot', name: 'Dash-Dot' },
     { key: 'flot_a', name: 'FLOT' },
+    { key: 'strong_point', name: 'Strong Pt' },
     { key: 'low_wire', name: 'Low Wire' },
     { key: 'single_concertina', name: '1x Conc.' },
     { key: 'arrow', name: 'Arrow' },
@@ -1032,6 +1032,8 @@ export function getLinePreviewSVG(type) {
             return `<svg width="${w}" height="8" viewBox="${vb} 10"><line x1="0" y1="5" x2="40" y2="5" stroke="${c}" stroke-width="2.5" stroke-dasharray="8,3,2,3"/></svg>`;
         case 'flot_a':
             return `<svg width="${w}" height="8" viewBox="${vb} 14"><path d="M5,1 Q15,7 5,13" fill="none" stroke="${c}" stroke-width="2"/><path d="M25,1 Q35,7 25,13" fill="none" stroke="${c}" stroke-width="2"/></svg>`;
+        case 'strong_point':
+            return `<svg width="${w}" height="8" viewBox="${vb} 14"><line x1="0" y1="10" x2="40" y2="10" stroke="${c}" stroke-width="2"/>${[3, 11, 19, 27, 35].map(function (x) { return '<line x1="' + x + '" y1="10" x2="' + x + '" y2="3" stroke="' + c + '" stroke-width="1.5"/>'; }).join('')}</svg>`;
         case 'low_wire':
             return `<svg width="${w}" height="8" viewBox="${vb} 12"><line x1="0" y1="8" x2="40" y2="8" stroke="${c}" stroke-width="2"/><line x1="5" y1="8" x2="12" y2="2" stroke="${c}" stroke-width="2"/><line x1="5" y1="2" x2="12" y2="8" stroke="${c}" stroke-width="2"/><line x1="25" y1="8" x2="32" y2="2" stroke="${c}" stroke-width="2"/><line x1="25" y1="2" x2="32" y2="8" stroke="${c}" stroke-width="2"/></svg>`;
         case 'single_concertina':

@@ -96,14 +96,15 @@ Simple-SITTEMP/
 - Popover of any polygon / rectangle / circle / freehand has a "Define area" section: Type + fields
 - NAI / TAI (Intelligence / targeting group): label "NAI 1" / "TAI 3" at the area centroid
 - Lines (only) get a "Define line" section (`LINE_MEASURES`, `label` picks the template):
-  - `ends` — PL, LD, LD/LC, LOA, FCL, PLD, RL, FLOT: "PL AMBER" just beyond both ends (anchored on the side the line points, in screen space)
-  - `fs` — FSCL, CFL, RFL, NFL: "FSCL 1 AD" plus DTG on a second line, at both ends
+  - `pl` — phase line: "PL AMBER" just beyond both ends (anchored on the side the line points, in screen space)
+  - `line` — LD, LD/LC, LOA, FCL, PLD, RL, FSCL, CFL, RFL (FM 1-02.2 figure 5-9): function + controlling HQ ("RFL 23ID") on top of the line just inside both ends, DTG from / to below the line there, and the optional phase line name ("PL MOCA") beyond both ends. Inside labels are offset in screen pixels along the line and to its top side (up, or left for a vertical line) via the marker anchor (`insideOffset`). Choosing PLD or CFL switches the line to dashed (always dashed per table 5-8). FLOT is a line type (scallops), not a label; NFL is not in FM 1-02.2
   - `boundary` — echelon glyph at the midpoint with unit 1 / unit 2 on either side (above/below for mostly horizontal lines, left/right for mostly vertical)
   - `target` — Linear target (`fn: 'LT'`): target number just above the midpoint plus a perpendicular tick at each end (6% of line length, 20–400 m). Ticks are runtime Polylines stored with the label
 - Point target: Shapes menu → Point Target places a marker (`_sittemp.type = 'point_target'`), a cross with the target number at its upper right; the popover's "Target #" field sets `_sittemp.text` (also the KML name)
-- General purpose point: Shapes menu → Point places an inverted teardrop (`_sittemp.type = 'general_point'`) anchored at its tip. Popover: Type (`_sittemp.fn`: general, CKP, CCP, ECP, LU, PP, RLY, RP, SP, TCP — abbreviation inside) and Designation (`_sittemp.text`: inside when there's no abbreviation, else to the right). Icons for both point types are in `js/targets.js`
+- General purpose point (FM 1-02.2 figure 5-8 / table 5-6): Shapes menu → Point places an upright rectangle with a V-shaped bottom (`_sittemp.type = 'general_point'`) anchored at the tip. Popover fields map to the FM amplifiers: Type = A inside top (`fn`: general, CP, CKP (NATO alternate), CCP, ERP, LU, PD, PP, RLY, RP, SP, TCP = traffic control post), Designation = T1 inside below (`text`), Unit = T right (`unit`), DTG from / to = W / W1 left (`dtg`, `dtg2`), Info = H above (`info`). Icons for both point types are in `js/targets.js`
 - CBRN / CBRNE contaminated area (Table 5-28): inverted triangle with the agent letter (B, C, N, R; CBRNE also E for explosive) over the contamination mark, optional name below. Choosing it sets the shape to a black outline and 35% yellow fill (Terra Draw can't draw the FM hatching)
 - Area (FM 1-02.2 INCL C1 Tables 5-4/5-5): PZ, LZ, DZ, HA, FARP → label "PZ WOLF" at the area centroid; BP → name inside plus echelon glyph (I, II, X…) on the bottom edge (its white halo stands in for the doctrinal gap). HA is not in Table 5-4 and uses the same template
+- Strong point (Table 5-5, `fn: 'SP'`): same label as BP (name inside, echelon on the bottom edge); choosing it switches the outline to the `strong_point` line type, a solid outline with short ticks pointing outward every 12 px. Tick side comes from the ring winding (shoelace sign) because polyline symbols face along the path, +x on the right
 - Airspace (Table 5-23): ROZ, HIDACZ, AARROZ, UAROZ, WEZ, JEZ, MEZ, LOMEZ, HIMEZ, SHORAD EZ → block: function, unit (T), MIN/MAX ALT in feet AGL or MSL, TIME FROM/TO (DTG)
 - Tags in `state.featureMeasures[featureId]` (in undo snapshots); labels are non-clickable markers that follow Terra Draw `change` update/delete events and the outline color
 - KML: tagged features export with the measure as the Placemark name and the label block as description
@@ -253,7 +254,7 @@ overlay.setMap(map);
 - [x] Right-click MGRS copy to clipboard
 - [x] Shapes (circle, rectangle, polygon, linestring, freehand, star, triangle)
 - [x] Line types (solid, dashed, dotted, dash-dot, mine belt, wire obstacle, tank ditch)
-- [x] 24+ equipment symbols, 11 unit symbols, enemy units, 19 tactical tasks (geometry matched to FM 1-02.2 INCL C1, Table 6-1; Delay, Withdraw, Withdraw Under Pressure and Retire use the FM 3-90 retrograde form: hook tail, letter on the shaft, filled head; Ambush is an arc with spikes on its inner side and an arrow toward the kill zone)
+- [x] 24+ equipment symbols, 11 unit symbols, enemy units, 19 tactical tasks (geometry matched to FM 1-02.2 INCL C1, Table 6-1; Delay, Withdraw, Withdraw Under Pressure and Retire follow Table 5-12: half-circle hook at the rear joined to the end of the shaft, letter in a break in the shaft, open arrowhead, mirrored to point right; Ambush follows Table 5-11: arc bulging toward the kill zone, hatched on its inner side with lines parallel to the arrow, arrow from the arc's apex)
 - [x] Coordinate display in `#right-rail` (the Style Panel that used to stack under it was removed)
 - [x] Symbol placement with left/right text labels (bottom of symbol area, `symY+40`)
 - [x] Symbol echelon markers: none, team (Ø), squad (●), section (●●), platoon, company, battalion, regiment, brigade, division, corps (`ECHELON_LIST`; BP labels use the same set)
