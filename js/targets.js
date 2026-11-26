@@ -42,51 +42,64 @@ export function pointTargetIcon(info, selected) {
 
 
 /**
- * General purpose point (FM 1-02.2 ch. 5 point control measures): an inverted
- * teardrop whose tip marks the location. The function abbreviation (CKP, LU,
- * PP...) goes inside; the designation (e.g. "5") goes inside when there is no
- * abbreviation, otherwise to the right of the teardrop.
+ * General purpose point (FM 1-02.2 INCL C1, figure 5-8 / table 5-6): an upright
+ * rectangle with a V-shaped bottom whose tip marks the location.
+ *   inside, top     A  - function (CP, LU, PP...), required by the FM
+ *   inside, bottom  T1 - designation ("12", "RED")
+ *   right, top      T  - controlling unit ("100MP DET")
+ *   left            W / W1 - date-time group start / end
+ *   above           H  - additional information ("MSR 5")
  */
 export const GENERAL_POINTS = [
     { key: '', name: 'General point' },
-    { key: 'CKP', name: 'CKP - checkpoint' },
+    { key: 'CP', name: 'CP - checkpoint' },
+    { key: 'CKP', name: 'CKP - checkpoint (NATO alt.)' },
     { key: 'CCP', name: 'CCP - casualty collection pt' },
-    { key: 'ECP', name: 'ECP - entry control point' },
+    { key: 'ERP', name: 'ERP - engineer regulating pt' },
     { key: 'LU', name: 'LU - linkup point' },
+    { key: 'PD', name: 'PD - point of departure' },
     { key: 'PP', name: 'PP - passage point' },
     { key: 'RLY', name: 'RLY - rally point' },
     { key: 'RP', name: 'RP - release point' },
     { key: 'SP', name: 'SP - start point' },
-    { key: 'TCP', name: 'TCP - traffic control point' },
+    { key: 'TCP', name: 'TCP - traffic control post' },
 ];
 
 export function generalPointIcon(info, selected) {
     const color = info.color || '#000000';
     const sw = info.strokeWidth || 2;
-    const fn = String(info.fn || '').toUpperCase();
-    const des = String(info.text || '').toUpperCase().trim();
-    const inside = fn || des;
-    const outside = fn ? des : '';
-    const R = Math.max(13, inside.length * 4.4 + 4);   // head radius grows for 3-letter codes
-    const pad = 3, cx = R + pad + sw, cy = R + pad + sw, tipY = cy + R * 1.9;
-    const outW = outside ? Math.ceil(outside.length * 8.2) + 8 : 0;
-    const w = Math.ceil(cx + R + pad + sw + outW), h = Math.ceil(tipY + pad + sw);
-    // Teardrop: circle head with tangents meeting at the tip
-    const a = Math.asin(R / (tipY - cy));               // half-angle at the tip
-    const tx = R * Math.cos(a), ty = R * Math.sin(a);   // tangent points relative to the center
+    const up = function (v) { return String(v || '').toUpperCase().trim(); };
+    const A = up(info.fn), T1 = up(info.text), T = up(info.unit), W = up(info.dtg), W1 = up(info.dtg2), H = up(info.info);
     const f = function (n) { return Math.round(n * 10) / 10; };
-    const d = 'M' + cx + ',' + f(tipY) + ' L' + f(cx - tx) + ',' + f(cy + ty)
-        + ' A' + f(R) + ',' + f(R) + ' 0 1,1 ' + f(cx + tx) + ',' + f(cy + ty) + ' Z';
-    const fs = inside.length > 2 ? 10 : 12;
+    const MONO = 6.9;                                    // advance of 11px monospace
+    const halo = haloFor(color);
+    const outText = function (x, y, txt, anchor) {
+        return '<text x="' + f(x) + '" y="' + f(y) + '" text-anchor="' + anchor + '" font-family="Consolas,Menlo,monospace" font-size="11" font-weight="bold"'
+            + ' fill="' + color + '" stroke="' + halo + '" stroke-width="3" stroke-linejoin="round" paint-order="stroke">' + escapeXml(txt) + '</text>';
+    };
+    const inText = function (x, y, txt, size) {
+        return '<text x="' + f(x) + '" y="' + f(y) + '" text-anchor="middle" font-family="Arial,sans-serif" font-size="' + size + '" font-weight="bold" fill="' + color + '">' + escapeXml(txt) + '</text>';
+    };
+
+    const FW = Math.max(30, Math.max(A.length * 8.6, T1.length * 7.6) + 10);   // frame width
+    const FH = 36, TH = Math.min(18, FW * 0.5);                                // frame and tip heights
+    const LW = (W || W1) ? Math.ceil(Math.max(W.length, W1.length) * MONO) + 6 : 0;
+    const RW = T ? Math.ceil(T.length * MONO) + 6 : 0;
+    const HH = H ? 15 : 0;
+    const m = sw + 2;
+    const x0 = m + LW, y0 = m + HH, cx = x0 + FW / 2;
+    const w = Math.ceil(Math.max(x0 + FW + RW + m, cx + H.length * MONO / 2 + m)), h = Math.ceil(y0 + FH + TH + m);
+    const tipY = y0 + FH + TH;
+
     let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">'
-        + '<path d="' + d + '" fill="#ffffff" fill-opacity="0.85" stroke="' + color + '" stroke-width="' + sw + '" stroke-linejoin="round"/>';
-    if (inside) {
-        svg += '<text x="' + cx + '" y="' + f(cy + fs * 0.36) + '" text-anchor="middle" font-family="Arial,sans-serif" font-size="' + fs + '" font-weight="bold" fill="' + color + '">' + escapeXml(inside) + '</text>';
-    }
-    if (outside) {
-        svg += '<text x="' + f(cx + R + pad + 4) + '" y="' + f(cy + 4.5) + '" font-family="Consolas,Menlo,monospace" font-size="13" font-weight="bold"'
-            + ' fill="' + color + '" stroke="' + haloFor(color) + '" stroke-width="3" paint-order="stroke">' + escapeXml(outside) + '</text>';
-    }
+        + '<path d="M' + f(x0) + ',' + f(y0) + ' H' + f(x0 + FW) + ' V' + f(y0 + FH) + ' L' + f(cx) + ',' + f(tipY) + ' L' + f(x0) + ',' + f(y0 + FH) + ' Z"'
+        + ' fill="#ffffff" fill-opacity="0.85" stroke="' + color + '" stroke-width="' + sw + '" stroke-linejoin="miter"/>';
+    if (A) svg += inText(cx, y0 + 15, A, A.length > 2 ? 11 : 12);
+    if (T1) svg += inText(cx, y0 + 31, T1, 10);
+    if (T) svg += outText(x0 + FW + 4, y0 + 12, T, 'start');
+    if (W) svg += outText(x0 - 4, y0 + 12, W + (W1 ? ' -' : ''), 'end');
+    if (W1) svg += outText(x0 - 4, y0 + 26, W1, 'end');
+    if (H) svg += outText(cx, y0 - 4, H, 'middle');
     if (selected) {
         svg += '<rect x="1" y="1" width="' + (w - 2) + '" height="' + (h - 2) + '" fill="none" stroke="' + color
             + '" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.75"/>';

@@ -1249,23 +1249,32 @@ function _buildPopoverContent(popover, type, info) {
             });
             gpTypeRow.appendChild(gpSel);
             gpSection.appendChild(gpTypeRow);
-            var gpRow = document.createElement('div');
-            gpRow.className = 'popover-row';
-            gpRow.innerHTML = '<span class="popover-label">Designation</span>';
-            var gpInp = document.createElement('input');
-            gpInp.type = 'text';
-            gpInp.className = 'popover-num popover-text';
-            gpInp.style.width = '130px';
-            gpInp.placeholder = 'e.g. 5';
-            gpInp.value = gpInfo.text || '';
-            gpInp.addEventListener('keydown', function (e) { e.stopPropagation(); if (e.key === 'Enter') gpInp.blur(); });
-            gpInp.addEventListener('change', function () {
-                gpInfo.text = gpInp.value.toUpperCase().trim();
-                rebuildMarkerIcon(gpMarker);
-                _scheduleUndoPush();
+            // FM 1-02.2 figure 5-8 amplifier fields
+            [
+                { prop: 'text', label: 'Designation', ph: 'inside, e.g. 12' },
+                { prop: 'unit', label: 'Unit', ph: 'right, e.g. 100MP DET' },
+                { prop: 'dtg', label: 'DTG from', ph: 'left, e.g. 140700ZMAR26' },
+                { prop: 'dtg2', label: 'DTG to', ph: 'optional' },
+                { prop: 'info', label: 'Info', ph: 'above, e.g. MSR 5' },
+            ].forEach(function (fd) {
+                var row = document.createElement('div');
+                row.className = 'popover-row';
+                row.innerHTML = '<span class="popover-label">' + fd.label + '</span>';
+                var inp = document.createElement('input');
+                inp.type = 'text';
+                inp.className = 'popover-num popover-text';
+                inp.style.width = '130px';
+                inp.placeholder = fd.ph;
+                inp.value = gpInfo[fd.prop] || '';
+                inp.addEventListener('keydown', function (e) { e.stopPropagation(); if (e.key === 'Enter') inp.blur(); });
+                inp.addEventListener('change', function () {
+                    gpInfo[fd.prop] = inp.value.toUpperCase().trim();
+                    rebuildMarkerIcon(gpMarker);
+                    _scheduleUndoPush();
+                });
+                row.appendChild(inp);
+                gpSection.appendChild(row);
             });
-            gpRow.appendChild(gpInp);
-            gpSection.appendChild(gpRow);
             popover.appendChild(gpSection);
         }
     }

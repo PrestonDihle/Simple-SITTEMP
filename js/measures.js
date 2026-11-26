@@ -21,7 +21,7 @@
 
 import { get } from './state.js';
 import { ECHELON_LIST, escapeXml, haloFor } from './symbols.js';
-import { applyStyleToSelected } from './drawing.js';
+import { applyStyleToSelected, changeLineType } from './drawing.js';
 
 export const AREA_MEASURES = [
     { key: 'PZ', name: 'PZ - pickup zone' },
@@ -68,24 +68,26 @@ export const INTEL_AREAS = [
     { key: 'TAI', name: 'TAI - target area of interest' },
 ];
 
-// Named lines (FM 1-02.2 ch. 5 maneuver / fire support coordination lines).
-// label: 'ends' = "ABBR NAME" at both ends; 'fs' = abbr + unit + DTG at both
-// ends; 'boundary' = echelon in the middle with a unit on each side;
-// 'target' = number above the midpoint plus end ticks.
+// Named lines (FM 1-02.2 INCL C1 figure 5-9 / table 5-8). Templates:
+//   'pl'       - phase line: "PL NAME" just beyond both ends
+//   'line'     - function (T1) + controlling HQ (T2) on top of the line just inside
+//                both ends, DTG (W - W1) below it there, and the optional phase
+//                line name "PL NAME" beyond both ends
+//   'boundary' - echelon on the line with a unit on each side (figure 5-6)
+//   'target'   - linear target: number above the midpoint, end ticks (table 5-25)
+// dash: drawn dashed in every status (PLD, CFL).
 export const LINE_MEASURES = [
-    { key: 'PL', name: 'PL - phase line', label: 'ends', group: 'maneuver' },
+    { key: 'PL', name: 'PL - phase line', label: 'pl', group: 'maneuver' },
     { key: 'BOUNDARY', name: 'Boundary', label: 'boundary', group: 'maneuver' },
-    { key: 'LD', name: 'LD - line of departure', label: 'ends', group: 'maneuver' },
-    { key: 'LD/LC', name: 'LD/LC - line of dep./contact', label: 'ends', group: 'maneuver' },
-    { key: 'LOA', name: 'LOA - limit of advance', label: 'ends', group: 'maneuver' },
-    { key: 'FCL', name: 'FCL - final coordination line', label: 'ends', group: 'maneuver' },
-    { key: 'PLD', name: 'PLD - probable line of deploy.', label: 'ends', group: 'maneuver' },
-    { key: 'RL', name: 'RL - release line', label: 'ends', group: 'maneuver' },
-    { key: 'FLOT', name: 'FLOT - fwd line of own troops', label: 'ends', group: 'maneuver' },
-    { key: 'FSCL', name: 'FSCL - fire support coord. line', label: 'fs', group: 'fires' },
-    { key: 'CFL', name: 'CFL - coordinated fire line', label: 'fs', group: 'fires' },
-    { key: 'RFL', name: 'RFL - restrictive fire line', label: 'fs', group: 'fires' },
-    { key: 'NFL', name: 'NFL - no-fire line', label: 'fs', group: 'fires' },
+    { key: 'LD', name: 'LD - line of departure', label: 'line', group: 'maneuver' },
+    { key: 'LD/LC', name: 'LD/LC - line of dep./contact', label: 'line', group: 'maneuver' },
+    { key: 'LOA', name: 'LOA - limit of advance', label: 'line', group: 'maneuver' },
+    { key: 'FCL', name: 'FCL - final coordination line', label: 'line', group: 'maneuver' },
+    { key: 'PLD', name: 'PLD - probable line of deploy.', label: 'line', group: 'maneuver', dash: true },
+    { key: 'RL', name: 'RL - release line', label: 'line', group: 'maneuver' },
+    { key: 'FSCL', name: 'FSCL - fire support coord. line', label: 'line', group: 'fires' },
+    { key: 'CFL', name: 'CFL - coordinated fire line', label: 'line', group: 'fires', dash: true },
+    { key: 'RFL', name: 'RFL - restrictive fire line', label: 'line', group: 'fires' },
     { key: 'LT', name: 'Linear target', label: 'target', group: 'fires' },
 ];
 function _lineDef(fn) { return LINE_MEASURES.find(function (x) { return x.key === fn; }) || null; }
@@ -148,7 +150,10 @@ export function measureTitle(m) {
     if (m.fn === 'BP') return ('BP ' + (m.name || '')).trim().toUpperCase();
     if (m.fn === 'LT') return ('LINEAR TGT ' + (m.name || '')).trim().toUpperCase();
     if (m.fn === 'BOUNDARY') return ('BOUNDARY ' + [m.unit, m.unit2].filter(Boolean).join(' / ')).trim().toUpperCase();
-    if (_lineDef(m.fn) && _lineDef(m.fn).label === 'fs') return (m.fn + ' ' + (m.name || '') + ' ' + (m.dtg || '')).replace(/\s+/g, ' ').trim().toUpperCase();
+    if (m.fn === 'PL') return ('PL ' + (m.name || '')).trim().toUpperCase();
+    if (_lineDef(m.fn) && _lineDef(m.fn).label === 'line') {
+        return (m.fn + ' ' + (m.unit || '') + (m.name ? ' (PL ' + m.name + ')' : '')).replace(/\s+/g, ' ').trim().toUpperCase();
+    }
     if (_isCbrn(m.fn)) return (m.fn + ' ' + (m.agent || '') + ' ' + (m.name || '')).replace(/\s+/g, ' ').trim().toUpperCase();
     return (m.fn + ' ' + (m.name || '')).trim().toUpperCase();
 }
@@ -298,6 +303,7 @@ function _removeLabel(id) {
     if (l.ech) l.ech.setMap(null);
     _clearList(l.ticks);
     _clearList(l.ends);
+    _clearList(l.inner);
     delete _labels[id];
 }
 
@@ -352,18 +358,55 @@ function _endIcon(t, out) {
     return icon;
 }
 
-/** Text lines shown at each end of a named line. */
+/** "PL NAME" shown beyond both ends ([] when there is none). */
 export function lineEndLines(m) {
     const def = _lineDef(m.fn);
     const name = (m.name || '').toUpperCase().trim();
     if (!def) return [];
-    if (def.label === 'fs') {
-        const lines = [(m.fn + ' ' + name).trim()];
-        if (m.dtg) lines.push(String(m.dtg).toUpperCase().trim());
-        return lines;
-    }
-    if (def.label === 'ends') return [(m.fn + ' ' + name).trim()];
+    if (def.label === 'pl') return [('PL ' + name).trim()];
+    if (def.label === 'line' && name) return ['PL ' + name];
     return [];
+}
+
+/** Function + controlling HQ (above the line) and DTG lines (below), inside both ends. */
+export function lineInnerLines(m) {
+    const def = _lineDef(m.fn);
+    if (!def || def.label !== 'line') return { top: [], bottom: [] };
+    const up = function (v) { return String(v || '').toUpperCase().trim(); };
+    const w = up(m.dtg), w1 = up(m.dtg2);
+    const bottom = [];
+    if (w) bottom.push(w + (w1 ? ' -' : ''));
+    if (w1) bottom.push(w1);
+    return { top: [(m.fn + ' ' + up(m.unit)).trim()], bottom: bottom };
+}
+
+/**
+ * Icon placed at a line end so the text box sits just inside the end (along the
+ * inward screen direction u) on one side of the line. side = 1 is the "top" of the
+ * line (up on screen; left for a vertical line), -1 the other side.
+ */
+export function insideOffset(w, h, u, side) {
+    let n = { x: u.y, y: -u.x };                                   // a perpendicular
+    if (n.y > 0.05 || (Math.abs(n.y) <= 0.05 && n.x > 0)) n = { x: -n.x, y: -n.y };   // point it up (or left)
+    n = { x: n.x * side, y: n.y * side };
+    const along = (Math.abs(u.x) * w + Math.abs(u.y) * h) / 2 + 6;
+    const across = (Math.abs(n.x) * w + Math.abs(n.y) * h) / 2 + 2;
+    return { x: u.x * along + n.x * across, y: u.y * along + n.y * across };   // box center relative to the end
+}
+
+function _insideIcon(t, u, side) {
+    const c = insideOffset(t.w, t.h, u, side);
+    const icon = _icon(t);
+    icon.anchor = new google.maps.Point(t.w / 2 - c.x, t.h / 2 - c.y);
+    return icon;
+}
+
+function _syncMarkers(list, specs) {
+    list = list || [];
+    specs.forEach(function (sp, i) { list[i] = _setMarker(list[i], sp.pos, sp.icon); });
+    for (let i = specs.length; i < list.length; i++) if (list[i]) list[i].setMap(null);
+    list.length = specs.length;
+    return list;
 }
 
 function _syncLineLabel(featureId, m, coords, color) {
@@ -372,6 +415,9 @@ function _syncLineLabel(featureId, m, coords, color) {
     if (l.ech) { l.ech.setMap(null); l.ech = null; }
     const n = coords.length;
     const mid = lineMidpoint(coords);
+    const endPts = [{ lat: coords[0][1], lng: coords[0][0] }, { lat: coords[n - 1][1], lng: coords[n - 1][0] }];
+    const outDirs = [_screenDir(coords[1], coords[0]), _screenDir(coords[n - 2], coords[n - 1])];
+    const inDirs = [_screenDir(coords[0], coords[1]), _screenDir(coords[n - 1], coords[n - 2])];
 
     // Middle: linear target number above the line, or boundary echelon + units
     let midIcon = null;
@@ -385,16 +431,21 @@ function _syncLineLabel(featureId, m, coords, color) {
     if (midIcon) l.main = _setMarker(l.main, { lat: mid.lat, lng: mid.lng }, midIcon);
     else if (l.main) { l.main.setMap(null); l.main = null; }
 
-    // Ends: "PL AMBER" etc. at both ends
+    // Beyond both ends: "PL AMBER"
     const endLines = lineEndLines(m);
-    if (endLines.length) {
-        const t = _textSVG(endLines, color, { fontSize: 13, align: 'center', allBold: true });
-        l.ends = l.ends || [];
-        const ends = [[coords[0], _screenDir(coords[1], coords[0])], [coords[n - 1], _screenDir(coords[n - 2], coords[n - 1])]];
-        ends.forEach(function (e, i) {
-            l.ends[i] = _setMarker(l.ends[i], { lat: e[0][1], lng: e[0][0] }, _endIcon(t, e[1]));
-        });
-    } else { _clearList(l.ends); l.ends = []; }
+    const endT = endLines.length ? _textSVG(endLines, color, { fontSize: 12, align: 'center', allBold: true }) : null;
+    l.ends = _syncMarkers(l.ends, endT ? endPts.map(function (p, i) { return { pos: p, icon: _endIcon(endT, outDirs[i]) }; }) : []);
+
+    // Inside both ends: function + HQ on top of the line, DTG below it
+    const inner = lineInnerLines(m);
+    const topT = inner.top.length ? _textSVG(inner.top, color, { fontSize: 13, align: 'center', allBold: true }) : null;
+    const botT = inner.bottom.length ? _textSVG(inner.bottom, color, { fontSize: 10, align: 'center', allBold: true }) : null;
+    const innerSpecs = [];
+    endPts.forEach(function (p, i) {
+        if (topT) innerSpecs.push({ pos: p, icon: _insideIcon(topT, inDirs[i], 1) });
+        if (botT) innerSpecs.push({ pos: p, icon: _insideIcon(botT, inDirs[i], -1) });
+    });
+    l.inner = _syncMarkers(l.inner, innerSpecs);
 
     // Linear target end ticks
     if (def.label === 'target') {
@@ -541,6 +592,7 @@ export function buildMeasureSection(popover, featureId, onChange, kind) {
             if (!v) { delete measures[featureId]; }
             else if (!measures[featureId]) { measures[featureId] = { fn: v, name: '', minRef: 'AGL', maxRef: 'AGL', echelon: 'none' }; }
             else { measures[featureId].fn = v; }
+            if (_lineDef(v) && _lineDef(v).dash) changeLineType('dashed');   // PLD and CFL are always dashed (table 5-8)
             if (_isCbrn(v)) {
                 const mm = measures[featureId];
                 const allowed = (v === 'CBRNE' ? CBRNE_AGENTS : CBRN_AGENTS).map(function (a) { return a.key; });
@@ -561,9 +613,11 @@ export function buildMeasureSection(popover, featureId, onChange, kind) {
                 _select(_row(section, 'Echelon'), ECHELON_LIST, m.echelon || 'none', function (v) { m.echelon = v; commit(); });
                 _input(_row(section, 'Unit 1'), 'text', m.unit, 'above / left, e.g. 1-66', 130, function (v) { m.unit = v; commit(); });
                 _input(_row(section, 'Unit 2'), 'text', m.unit2, 'below / right, e.g. 2-66', 130, function (v) { m.unit2 = v; commit(); });
-            } else if (ldef.label === 'fs') {
-                _input(_row(section, 'Unit'), 'text', m.name, 'e.g. 1 AD', 130, function (v) { m.name = v; commit(); });
-                _input(_row(section, 'DTG'), 'text', m.dtg, 'e.g. 030001ZJUL26', 130, function (v) { m.dtg = v; commit(); });
+            } else if (ldef.label === 'line') {
+                _input(_row(section, 'Phase line'), 'text', m.name, 'optional, e.g. JADE', 130, function (v) { m.name = v; commit(); });
+                _input(_row(section, 'Unit'), 'text', m.unit, 'controlling HQ, e.g. 23ID', 130, function (v) { m.unit = v; commit(); });
+                _input(_row(section, 'DTG from'), 'text', m.dtg, 'e.g. 110800ZMAY26', 130, function (v) { m.dtg = v; commit(); });
+                _input(_row(section, 'DTG to'), 'text', m.dtg2, 'optional', 130, function (v) { m.dtg2 = v; commit(); });
             } else if (ldef.label === 'target') {
                 _input(_row(section, 'Target #'), 'text', m.name, 'e.g. AB1002', 130, function (v) { m.name = v; commit(); });
             } else {
