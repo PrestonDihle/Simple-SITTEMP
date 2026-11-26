@@ -34,7 +34,9 @@ Simple-SITTEMP/
     export.js          # KML, PDF, and screenshot export
     viewshed.js        # Range fans + terrain-masked viewsheds attached to symbols; shared fetchElevations()
     elevation.js       # Elevation band shading for drawn areas or the current view
-    measures.js        # Control-measure tags (PZ/LZ/DZ/HA/FARP/BP, airspace zones) on drawn areas
+    slope.js           # Slope analysis: up to 3 colored slope % ranges inside a drawn area
+    measures.js        # "Define area" tags (NAI/TAI, PZ/LZ/DZ/HA/FARP/BP, CBRN, airspace zones) on areas; linear targets on lines
+    targets.js         # Point target marker icon (cross + target number)
     routes.js          # Flight routes (SP/ACP/RP), air corridors, route card, CSV/PDF
     contours.js        # Vector contour lines for the current view (marching squares)
     databox.js         # "Data box" labels: side lengths / area, circle r / C / A, line segment lengths
@@ -90,8 +92,11 @@ Simple-SITTEMP/
 - Requires the Elevation API to be enabled on the Maps key; on REQUEST_DENIED the mask is disabled for the session with a toast
 - KML export writes the range fan and, when computed, the visible-terrain MultiGeometry
 
-### Control Measures (`js/measures.js`)
-- Popover of any polygon / rectangle / circle / freehand has a "Control measure" section: Type + fields
+### Define Area / Targets (`js/measures.js`, `js/targets.js`)
+- Popover of any polygon / rectangle / circle / freehand has a "Define area" section: Type + fields
+- NAI / TAI (Intelligence / targeting group): label "NAI 1" / "TAI 3" at the area centroid
+- Lines get a "Define target" section with one type, Linear target (`fn: 'LT'`): target number (e.g. AB1002) just above the line's midpoint plus a perpendicular tick at each end (6% of line length, 20–400 m). Ticks are runtime Polylines stored with the label
+- Point target: Shapes menu → Point Target places a marker (`_sittemp.type = 'point_target'`), a cross with the target number at its upper right; the popover's "Target #" field sets `_sittemp.text` (also the KML name)
 - CBRN / CBRNE contaminated area (Table 5-28): inverted triangle with the agent letter (B, C, N, R; CBRNE also E for explosive) over the contamination mark, optional name below. Choosing it sets the shape to a black outline and 35% yellow fill (Terra Draw can't draw the FM hatching)
 - Area (FM 1-02.2 INCL C1 Tables 5-4/5-5): PZ, LZ, DZ, HA, FARP → label "PZ WOLF" at the area centroid; BP → name inside plus echelon glyph (I, II, X…) on the bottom edge (its white halo stands in for the doctrinal gap). HA is not in Table 5-4 and uses the same template
 - Airspace (Table 5-23): ROZ, HIDACZ, AARROZ, UAROZ, WEZ, JEZ, MEZ, LOMEZ, HIMEZ, SHORAD EZ → block: function, unit (T), MIN/MAX ALT in feet AGL or MSL, TIME FROM/TO (DTG)
@@ -127,6 +132,12 @@ Simple-SITTEMP/
 - Legend (`#elev-legend`, bottom-left, inside `#map-container` so PDF/PNG capture it): per-shading interval input, opacity slider, palette picker, min/max, band list, × to remove
 - Shade configs are in undo snapshots (`elevationShades`); fetched grids are cached in memory by shade id, so undo/redo and interval changes don't re-query
 - A shading is a snapshot of the area when created; moving or deleting the source shape does not change it. Not included in KML export
+
+### Slope Analysis (`js/slope.js`)
+- "Slope analysis" button under "Shade elevation" in the popover of polygon / rectangle / circle / freehand features
+- Same ~100×100 grid as elevation shading (≈20 Elevation requests, its own cache). Slope % = rise/run × 100 from central differences on the grid, bilinear upsample, clipped to the shape
+- Up to 3 ranges, each with on/off, min %, max % (blank = and steeper) and color; defaults 10–20 yellow, 20–40 orange, > 40 red. First matching range wins; ground outside every range is clear. Edited in the legend (`#slope-legend`), which also shows each range's share of the area and mean/max slope. Last ranges used are remembered (localStorage `sittemp_slope_ranges`)
+- Configs in undo snapshots (`slopes`); range edits redraw from the cached grid. Coarse grids (> 300 m samples) under-read steep ground, so the toast suggests a smaller area
 
 ### MGRS Features
 - Real-time cursor coordinate display (Lat/Lon + MGRS) in upper-right

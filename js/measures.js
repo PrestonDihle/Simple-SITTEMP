@@ -1,5 +1,5 @@
 /**
- * Simple SITTEMP - Control Measures Module
+ * Simple SITTEMP - Define Area / Target Tagging Module
  *
  * Tags drawn area shapes (polygon, rectangle, circle, freehand) as doctrinal
  * control measures and draws their labels, per FM 1-02.2 (INCL C1):
@@ -9,6 +9,11 @@
  *   - Airspace coordinating zones (Table 5-23): ROZ, HIDACZ, AARROZ, UAROZ, WEZ,
  *     JEZ, MEZ, LOMEZ, HIMEZ, SHORAD EZ â€” block of function (A), unit (T),
  *     MIN ALT / MAX ALT (feet AGL or MSL), TIME FROM / TIME TO (DTG).
+ *
+ *   - Intelligence / targeting areas: NAI (named area of interest) and TAI
+ *     (target area of interest), labeled "NAI 1" / "TAI 3" centered inside.
+ *   - Linear target (fire support) on drawn lines: target number above the
+ *     line's midpoint and a short perpendicular tick at each end.
  *
  * Tags live in state.featureMeasures keyed by Terra Draw feature id (included in
  * undo snapshots). Labels are non-clickable Google Maps markers, runtime only.
@@ -58,6 +63,16 @@ function _cbrnIcon(agent, name, color) {
     return { svg: svg, w: w, h: h };
 }
 
+export const INTEL_AREAS = [
+    { key: 'NAI', name: 'NAI - named area of interest' },
+    { key: 'TAI', name: 'TAI - target area of interest' },
+];
+
+export const LINE_MEASURES = [
+    { key: 'LT', name: 'Linear target' },
+];
+function _isLineMeasure(fn) { return LINE_MEASURES.some(function (x) { return x.key === fn; }); }
+
 export const AIRSPACE_ZONES = [
     { key: 'ROZ', name: 'ROZ - restricted operations zone' },
     { key: 'HIDACZ', name: 'HIDACZ - high-density ACZ' },
@@ -77,7 +92,7 @@ const ECHELON_GLYPH = {
     brigade: 'X', division: 'XX', corps: 'XXX',
 };
 
-const _labels = {};   // featureId -> { main: Marker, ech: Marker|null }
+const _labels = {};   // featureId -> { main: Marker, ech: Marker|null, ticks: Polyline[] }
 
 function _isZone(fn) { return AIRSPACE_ZONES.some(function (z) { return z.key === fn; }); }
 
@@ -103,6 +118,7 @@ export function measureLines(m) {
         return lines;
     }
     if (m.fn === 'BP') return [name || 'BP'];
+    if (m.fn === 'LT') return [name || 'LINEAR TGT'];
     if (_isCbrn(m.fn)) return [(m.fn + ' ' + (m.agent || (m.fn === 'CBRNE' ? 'E' : 'C')) + ' ' + name).trim()];
     return [(m.fn + ' ' + name).trim()];
 }
@@ -112,6 +128,7 @@ export function measureTitle(m) {
     if (!m || !m.fn) return '';
     if (_isZone(m.fn)) return (m.fn + ' ' + (m.unit || '')).trim().toUpperCase();
     if (m.fn === 'BP') return ('BP ' + (m.name || '')).trim().toUpperCase();
+    if (m.fn === 'LT') return ('LINEAR TGT ' + (m.name || '')).trim().toUpperCase();
     if (_isCbrn(m.fn)) return (m.fn + ' ' + (m.agent || '') + ' ' + (m.name || '')).replace(/\s+/g, ' ').trim().toUpperCase();
     return (m.fn + ' ' + (m.name || '')).trim().toUpperCase();
 }
@@ -141,12 +158,64 @@ function _textSVG(lines, color, opts) {
 
 // ===== Geometry =====
 
-function _ring(featureId) {
+function _geom(featureId) {
     const draw = get('draw');
     let f = null;
     try { f = draw && draw.getSnapshotFeature(featureId); } catch (e) { /* gone */ }
-    if (!f || !f.geometry || f.geometry.type !== 'Polygon') return null;
-    return f.geometry.coordinates[0];
+    return f && f.geometry ? f.geometry : null;
+}
+
+function _ring(featureId) {
+    const g = _geom(featureId);
+    return g && g.type === 'Polygon' ? g.coordinates[0] : null;
+}
+
+function _line(featureId) {
+    const g = _geom(featureId);
+    return g && g.type === 'LineString' && g.coordinates.length >= 2 ? g.coordinates : null;
+}
+
+/** Geometry a tag needs: the line for linear targets, the ring for areas. */
+function _shapeFor(featureId, m) {
+    return m && _isLineMeasure(m.fn) ? _line(featureId) : _ring(featureId);
+}
+
+const M_PER_DEG = 111320;
+
+/** Point halfway along a [lng,lat] line, plus the line's length in meters. */
+export function lineMidpoint(coords) {
+    const k = Math.cos(coords[0][1] * Math.PI / 180);
+    const seg = [];
+    let total = 0;
+    for (let i = 1; i < coords.length; i++) {
+        const dx = (coords[i][0] - coords[i - 1][0]) * k * M_PER_DEG, dy = (coords[i][1] - coords[i - 1][1]) * M_PER_DEG;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        seg.push(d); total += d;
+    }
+    let half = total / 2;
+    for (let i = 0; i < seg.length; i++) {
+        if (half <= seg[i] || i === seg.length - 1) {
+            const t = seg[i] ? Math.min(1, half / seg[i]) : 0;
+            const a = coords[i], b = coords[i + 1];
+            return { lat: a[1] + (b[1] - a[1]) * t, lng: a[0] + (b[0] - a[0]) * t, length: total };
+        }
+        half -= seg[i];
+    }
+    return { lat: coords[0][1], lng: coords[0][0], length: total };
+}
+
+/** Short perpendicular tick paths ({lat,lng} pairs) at both ends of a [lng,lat] line. */
+function _endTicks(coords, lenM) {
+    const k = Math.cos(coords[0][1] * Math.PI / 180);
+    function tick(end, next) {
+        const dx = (next[0] - end[0]) * k, dy = next[1] - end[1];
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const px = -dy / d, py = dx / d;          // unit perpendicular in ground space
+        const h = lenM / 2 / M_PER_DEG;
+        return [{ lat: end[1] + py * h, lng: end[0] + px * h / k }, { lat: end[1] - py * h, lng: end[0] - px * h / k }];
+    }
+    const n = coords.length;
+    return [tick(coords[0], coords[1]), tick(coords[n - 1], coords[n - 2])];
 }
 
 /** Area-weighted centroid of a [lng,lat] ring (falls back to vertex mean). */
@@ -205,15 +274,18 @@ function _removeLabel(id) {
     if (!l) return;
     l.main.setMap(null);
     if (l.ech) l.ech.setMap(null);
+    (l.ticks || []).forEach(function (t) { t.setMap(null); });
     delete _labels[id];
 }
 
 /** Create, move or remove the label for one feature. */
 export function syncMeasureLabel(featureId) {
     const m = (get('featureMeasures') || {})[featureId];
-    const ring = m && m.fn ? _ring(featureId) : null;
-    if (!ring) { _removeLabel(featureId); return; }
+    const shape = m && m.fn ? _shapeFor(featureId, m) : null;
+    if (!shape) { _removeLabel(featureId); return; }
     const color = _color(featureId);
+    if (_isLineMeasure(m.fn)) { _syncLineLabel(featureId, m, shape, color); return; }
+    const ring = shape;
     const zone = _isZone(m.fn);
     const lines = measureLines(m);
     const t = _isCbrn(m.fn)
@@ -234,12 +306,31 @@ export function syncMeasureLabel(featureId) {
     _labels[featureId] = l;
 }
 
+function _syncLineLabel(featureId, m, coords, color) {
+    const l = _labels[featureId] || { main: null, ech: null, ticks: [] };
+    if (l.ech) { l.ech.setMap(null); l.ech = null; }
+    const t = _textSVG(measureLines(m), color, { fontSize: 13, align: 'center', allBold: true });
+    const mid = lineMidpoint(coords);
+    const icon = _icon(t);
+    icon.anchor = new google.maps.Point(t.w / 2, t.h + 2);    // sit just above the line
+    l.main = _setMarker(l.main, { lat: mid.lat, lng: mid.lng }, icon);
+
+    const tickLen = Math.max(20, Math.min(400, mid.length * 0.06));
+    const sw = Math.max(2, ((get('featureStyles') || {})[featureId] || {}).strokeWidth || get('symbolStrokeWidth') || 2);
+    l.ticks = l.ticks || [];
+    _endTicks(coords, tickLen).forEach(function (p, i) {
+        if (l.ticks[i]) { l.ticks[i].setPath(p); l.ticks[i].setOptions({ strokeColor: color, strokeWeight: sw }); }
+        else l.ticks[i] = new google.maps.Polyline({ path: p, strokeColor: color, strokeWeight: sw, strokeOpacity: 1, clickable: false, zIndex: 59, map: get('map') });
+    });
+    _labels[featureId] = l;
+}
+
 /** Bring every label in line with state.featureMeasures and current geometry. */
 export function syncAllMeasureLabels() {
     const measures = get('featureMeasures') || {};
     Object.keys(_labels).forEach(function (id) { if (!measures[id]) _removeLabel(id); });
     Object.keys(measures).forEach(function (id) {
-        if (!_ring(id)) { delete measures[id]; _removeLabel(id); }
+        if (!_shapeFor(id, measures[id])) { delete measures[id]; _removeLabel(id); }
         else syncMeasureLabel(id);
     });
 }
@@ -304,10 +395,11 @@ function _select(row, options, value, onSet) {
 }
 
 /**
- * Append the control-measure section for a feature to the popover.
- * onChange() is called after edits (used to schedule an undo push).
+ * Append the "Define area" section (or, for lines, "Define target") for a
+ * feature to the popover. onChange() is called after edits (undo push).
  */
-export function buildMeasureSection(popover, featureId, onChange) {
+export function buildMeasureSection(popover, featureId, onChange, kind) {
+    const isLine = kind === 'line';
     const section = document.createElement('div');
     section.className = 'popover-vs popover-measure';
     popover.appendChild(section);
@@ -320,12 +412,16 @@ export function buildMeasureSection(popover, featureId, onChange) {
         const m = measures[featureId];
         const head = document.createElement('div');
         head.className = 'popover-vs-head';
-        head.innerHTML = '<span>Control measure</span>';
+        head.innerHTML = '<span>' + (isLine ? 'Define target' : 'Define area') + '</span>';
         section.appendChild(head);
 
         const typeRow = _row(section, 'Type');
-        _select(typeRow, [
+        _select(typeRow, isLine ? [
             { key: '', name: 'None' },
+            { group: 'Fire support', items: LINE_MEASURES },
+        ] : [
+            { key: '', name: 'None' },
+            { group: 'Intelligence / targeting', items: INTEL_AREAS },
             { group: 'Area (FM 1-02.2 Tbl 5-4/5-5)', items: AREA_MEASURES },
             { group: 'Airspace (Tbl 5-23)', items: AIRSPACE_ZONES },
         ], m ? m.fn : '', function (v) {
@@ -361,7 +457,8 @@ export function buildMeasureSection(popover, featureId, onChange) {
             if (_isCbrn(m.fn)) {
                 _select(_row(section, 'Agent'), m.fn === 'CBRNE' ? CBRNE_AGENTS : CBRN_AGENTS, m.agent || 'C', function (v) { m.agent = v; commit(); });
             }
-            _input(_row(section, 'Name'), 'text', m.name, _isCbrn(m.fn) ? 'optional' : 'e.g. WOLF', 130, function (v) { m.name = v; commit(); });
+            const ph = _isCbrn(m.fn) ? 'optional' : (m.fn === 'NAI' || m.fn === 'TAI') ? 'e.g. 1' : m.fn === 'LT' ? 'e.g. AB1002' : 'e.g. WOLF';
+            _input(_row(section, m.fn === 'LT' ? 'Target #' : 'Name'), 'text', m.name, ph, 130, function (v) { m.name = v; commit(); });
             if (m.fn === 'BP') {
                 _select(_row(section, 'Echelon'), ECHELON_LIST, m.echelon || 'none', function (v) { m.echelon = v; commit(); });
             }

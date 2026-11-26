@@ -17,6 +17,8 @@ import { shadeFeature, getShadeConfigs, restoreShades } from './elevation.js';
 import { buildMeasureSection, syncMeasureLabel, syncAllMeasureLabels, forgetMeasure } from './measures.js';
 import { enterRoutePlacement, exitRoutePlacement, getRouteConfigs, restoreRoutes } from './routes.js';
 import { getContourConfigs, restoreContours } from './contours.js';
+import { slopeFeature, getSlopeConfigs, restoreSlopes } from './slope.js';
+import { pointTargetIcon } from './targets.js';
 import { DATA_BOX_TYPES, buildDataBoxRow, syncDataBox, syncAllDataBoxes, forgetDataBox } from './databox.js';
 
 // ===== Per-Feature Style Helper Functions =====
@@ -260,6 +262,8 @@ export function activateShape(key) {
         enterTrianglePlacement();
     } else if (key === 'star') {
         enterStarPlacement();
+    } else if (key === 'point_target') {
+        enterPointTargetPlacement();
     } else {
         const modeMap = { circle: 'circle', rectangle: 'rectangle', polygon: 'polygon', linestring: 'linestring', freehand: 'freehand' };
         if (modeMap[key]) draw.setMode(modeMap[key]);
@@ -435,6 +439,28 @@ function placeTriangleMarker(latLng) {
 
     const scale = get('symbolScale') || 1.0;
     createMapMarker(latLng, svg, new google.maps.Size(30 * scale, 30 * scale), new google.maps.Point(15 * scale, 15 * scale), { type: 'triangle', color, fill, fillOpacity: opacity, strokeWidth: sw, symbolScale: scale });
+    pushUndoState();
+    returnToSelect();
+}
+
+// ===== Point Target Placement =====
+
+function enterPointTargetPlacement() {
+    exitSymbolPlacement();
+    exitTextPlacement();
+    if (get('ready')) get('draw').setMode('select');
+    showToast('Click on map to place a point target, then click it to set the target number');
+
+    const map = get('map');
+    const listener = map.addListener('click', function (e) { placePointTarget(e.latLng); });
+    set('symbolClickListener', listener);
+}
+
+function placePointTarget(latLng) {
+    const info = { type: 'point_target', color: get('lineColor'), strokeWidth: get('symbolStrokeWidth') || 2, symbolScale: get('symbolScale') || 1.0, text: '' };
+    const t = pointTargetIcon(info, false);
+    const scale = info.symbolScale;
+    createMapMarker(latLng, t.svg, new google.maps.Size(t.w * scale, t.h * scale), new google.maps.Point(t.ax * scale, t.ay * scale), info);
     pushUndoState();
     returnToSelect();
 }
@@ -733,6 +759,11 @@ export function rebuildMarkerIcon(marker) {
         if (marker._selected) svgString = _addSelectionHighlight(svgString, lay.width, h, info.color);
         size = new google.maps.Size(lay.width * scale, h * scale);
         anchor = new google.maps.Point((lay.symX + 20) * scale, (h / 2) * scale);   // anchored on the symbol center
+    } else if (info.type === 'point_target') {
+        var pt = pointTargetIcon(info, marker._selected);
+        svgString = pt.svg;
+        size = new google.maps.Size(pt.w * scale, pt.h * scale);
+        anchor = new google.maps.Point(pt.ax * scale, pt.ay * scale);
     } else if (info.type === 'star') {
         var svgFill = info.fill || info.color;
         var svgOpacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
@@ -869,7 +900,7 @@ function _syncPanelToFeature(featureId) {
 function _typeLabel(type) {
     var labels = {
         equipment: 'Equipment', unit: 'Friendly Unit', enemy_unit: 'Enemy Unit',
-        tactical_task: 'Tactical Task', star: 'Star', triangle: 'Triangle',
+        tactical_task: 'Tactical Task', star: 'Star', triangle: 'Triangle', point_target: 'Point Target',
         text: 'Text', polygon: 'Polygon', linestring: 'Line',
         rectangle: 'Rectangle', circle: 'Circle', freehand: 'Freehand'
     };
@@ -1126,9 +1157,45 @@ function _buildPopoverContent(popover, type, info) {
         popover.appendChild(ltSection);
     }
 
-    // Control measure tagging (PZ/LZ/BP..., airspace zones) for area shapes
+    // Define area tagging (PZ/LZ/BP..., NAI/TAI, airspace zones) for area shapes
     if (hasFill && get('selectedFeatureId')) {
         buildMeasureSection(popover, get('selectedFeatureId'), _scheduleUndoPush);
+    }
+
+    // Linear target tagging for lines
+    if (isLine && get('selectedFeatureId')) {
+        buildMeasureSection(popover, get('selectedFeatureId'), _scheduleUndoPush, 'line');
+    }
+
+    // Point target number
+    if (type === 'point_target') {
+        var ptMarker = get('markers').find(function (m) { return m._selected; });
+        if (ptMarker) {
+            var ptSection = document.createElement('div');
+            ptSection.className = 'popover-vs popover-measure';
+            ptSection.innerHTML = '<div class="popover-vs-head"><span>Point target</span></div>';
+            var ptRow = document.createElement('div');
+            ptRow.className = 'popover-row';
+            var ptLbl = document.createElement('span');
+            ptLbl.className = 'popover-label';
+            ptLbl.textContent = 'Target #';
+            var ptInp = document.createElement('input');
+            ptInp.type = 'text';
+            ptInp.className = 'popover-num popover-text';
+            ptInp.style.width = '130px';
+            ptInp.placeholder = 'e.g. AB1001';
+            ptInp.value = ptMarker._sittemp.text || '';
+            ptInp.addEventListener('keydown', function (e) { e.stopPropagation(); if (e.key === 'Enter') ptInp.blur(); });
+            ptInp.addEventListener('change', function () {
+                ptMarker._sittemp.text = ptInp.value.toUpperCase().trim();
+                rebuildMarkerIcon(ptMarker);
+                _scheduleUndoPush();
+            });
+            ptRow.appendChild(ptLbl);
+            ptRow.appendChild(ptInp);
+            ptSection.appendChild(ptRow);
+            popover.appendChild(ptSection);
+        }
     }
 
     // Elevation shading for area shapes
@@ -1144,6 +1211,16 @@ function _buildPopoverContent(popover, type, info) {
                 shadeFeature(featureId);
             });
             popover.appendChild(shadeBtn);
+
+            var slopeBtn = document.createElement('button');
+            slopeBtn.className = 'popover-vs-add popover-elev-btn';
+            slopeBtn.textContent = 'Slope analysis';
+            slopeBtn.title = 'Color the parts of this area steeper than up to 3 slope % ranges you set (uses ~20 Elevation API requests)';
+            slopeBtn.addEventListener('click', function () {
+                _hidePopover();
+                slopeFeature(featureId);
+            });
+            popover.appendChild(slopeBtn);
         }
     }
 
@@ -1313,6 +1390,7 @@ export function pushUndoState() {
         featureMeasures: JSON.parse(JSON.stringify(get('featureMeasures') || {})),
         featureDataBoxes: Object.assign({}, get('featureDataBoxes')),
         elevationShades: getShadeConfigs(),
+        slopes: getSlopeConfigs(),
         routes: getRouteConfigs(),
         contours: getContourConfigs()
     };
@@ -1417,6 +1495,9 @@ function restoreState(stateJson) {
     // Restore elevation shading (grids are cached, so this doesn't re-query)
     restoreShades(saved.elevationShades || []);
 
+    // Restore slope analyses (grids are cached, so this doesn't re-query)
+    restoreSlopes(saved.slopes || []);
+
     // Restore flight routes
     restoreRoutes(saved.routes || []);
 
@@ -1469,6 +1550,11 @@ function recreateMarker(data) {
         const lay = symbolIconLayout(info.leftText, info.rightText, rot);
         size = new google.maps.Size(lay.width * scale, h * scale);
         anchor = new google.maps.Point((lay.symX + 20) * scale, (h / 2) * scale);
+    } else if (info.type === 'point_target') {
+        const pt = pointTargetIcon(info, false);
+        svgString = pt.svg;
+        size = new google.maps.Size(pt.w * scale, pt.h * scale);
+        anchor = new google.maps.Point(pt.ax * scale, pt.ay * scale);
     } else if (info.type === 'star') {
         const fill = info.fill || info.color;
         const opacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;

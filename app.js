@@ -12,6 +12,7 @@ import { setupCoordinateDisplay, setupRightClickMGRS, setupMGRSGrid, setupMGRSGo
 import { setupExport } from './js/export.js';
 import { initViewshedPrefs } from './js/viewshed.js';
 import { setupElevationShading } from './js/elevation.js';
+import { setupSlope } from './js/slope.js';
 import { setupRoutes } from './js/routes.js';
 import { setupContours } from './js/contours.js';
 import { pushUndoState } from './js/drawing.js';
@@ -78,6 +79,7 @@ function initMap() {
     setupExport();
     initViewshedPrefs();
     setupElevationShading(pushUndoState);
+    setupSlope(pushUndoState);
     setupRoutes(pushUndoState);
     setupContours(pushUndoState);
 
