@@ -830,7 +830,7 @@ export const SHAPE_LIST = [
     { key: 'polygon', name: 'Polygon', icon: '<polygon points="14,2 26,10 22,26 6,26 2,10" fill="none" stroke="currentColor" stroke-width="2"/>' },
     { key: 'linestring', name: 'Line', icon: '<line x1="3" y1="25" x2="25" y2="3" stroke="currentColor" stroke-width="2"/>' },
     { key: 'freehand', name: 'Freehand', icon: '<path d="M3 20 Q8 5 14 15 T25 8" fill="none" stroke="currentColor" stroke-width="2"/>' },
-    { key: 'star', name: 'Star', icon: '<polygon points="14,2 17,11 27,11 19,17 22,26 14,21 6,26 9,17 1,11 11,11" fill="none" stroke="currentColor" stroke-width="1.5"/>' },
+    { key: 'star', name: 'Decision Point', icon: '<polygon points="14,2 17,11 27,11 19,17 22,26 14,21 6,26 9,17 1,11 11,11" fill="none" stroke="currentColor" stroke-width="1.5"/>' },
     { key: 'general_point', name: 'Point', icon: '<path d="M8 3 H20 V17 L14 25 L8 17 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="miter"/>' },
     { key: 'point_target', name: 'Point Target', icon: '<path d="M11 6 V22 M3 14 H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><text x="14" y="9" font-size="7" font-weight="bold" font-family="Arial" fill="currentColor" stroke="none">AB</text>' },
     { key: 'flight_route', name: 'Flight Route', icon: '<polyline points="4,23 12,12 18,17 25,5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="17" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M1,20 h6 v3 l-3,3 l-3,-3 z" fill="none" stroke="currentColor" stroke-width="1.2"/>' },

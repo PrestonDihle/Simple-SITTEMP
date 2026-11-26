@@ -33,32 +33,51 @@ export const AREA_MEASURES = [
     { key: 'BP', name: 'BP - battle position' },
     { key: 'SP', name: 'Strong point' },
     { key: 'CBRN', name: 'CBRN - contaminated area' },
-    { key: 'CBRNE', name: 'CBRNE - contaminated area' },
 ];
 
 // CBRN contaminated area (FM 1-02.2 Table 5-28): agent letter in an inverted
-// triangle over the contamination mark. CBRNE adds E (explosive) to the choices.
+// triangle over the contamination mark.
 const CBRN_AGENTS = [
     { key: 'B', name: 'B - biological' },
     { key: 'C', name: 'C - chemical' },
     { key: 'N', name: 'N - nuclear' },
     { key: 'R', name: 'R - radiological' },
 ];
-const CBRNE_AGENTS = CBRN_AGENTS.concat([{ key: 'E', name: 'E - explosive' }]);
-function _isCbrn(fn) { return fn === 'CBRN' || fn === 'CBRNE'; }
+function _isCbrn(fn) { return fn === 'CBRN'; }
 
 /** Inverted-triangle CBRN marker with the agent letter, plus an optional name below. */
+/**
+ * One arc of the contamination mark: a quarter ellipse that leaves the top of one
+ * dot heading across (side = 1 starts at the left dot) and ends heading down
+ * past the other dot. Drawn as the standard cubic approximation (k = 0.5523).
+ */
+function _cbrnArc(cx, dy, dx, side, color) {
+    const f = function (n) { return Math.round(n * 10) / 10; };
+    const sx = cx - side * (dx - 3.3), sy = dy - 2.2;     // start: upper inner edge of the dot
+    const ex = cx + side * 6.5, ey = dy + 8.8;            // end: below and past the other dot
+    const k = 0.5523;
+    return '<path d="M' + f(sx) + ',' + f(sy) + ' C' + f(sx + (ex - sx) * k) + ',' + f(sy) + ' ' + f(ex) + ',' + f(ey - (ey - sy) * k) + ' ' + f(ex) + ',' + f(ey) + '"'
+        + ' fill="none" stroke="' + color + '" stroke-width="1.3"/>';
+}
+
 function _cbrnIcon(agent, name, color) {
-    const w = Math.max(56, name.length * 9 + 10), triH = 44, h = name ? triH + 20 : triH + 4;
-    const cx = w / 2;
+    // Proportions follow FM 1-02.2 tables 5-27 / 5-28: a wide, flat inverted
+    // triangle; the agent letter near the top; below it two solid dots, each the
+    // start of a quarter-circle arc that runs over the top and down past the other
+    // dot, so the two arcs cross in the middle.
+    const TW = 72, TH = 42, top = 3;
+    const w = Math.max(TW + 8, name.length * 9 + 10), h = name ? top + TH + 20 : top + TH + 4;
+    const cx = w / 2, dy = top + 18, dx = 10.5;
+    const f = function (n) { return Math.round(n * 10) / 10; };
     let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">'
-        + '<path d="M' + (cx - 26) + ',3 L' + (cx + 26) + ',3 L' + cx + ',' + (triH + 1) + ' Z" fill="#ffffff" stroke="' + color + '" stroke-width="2.5" stroke-linejoin="round"/>'
-        + '<text x="' + cx + '" y="18" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="' + color + '">' + escapeXml(agent) + '</text>'
-        // contamination mark: two dots joined by an arc
-        + '<circle cx="' + (cx - 8) + '" cy="26" r="2.6" fill="' + color + '"/><circle cx="' + (cx + 8) + '" cy="26" r="2.6" fill="' + color + '"/>'
-        + '<path d="M' + (cx - 8) + ',27 Q' + cx + ',18 ' + (cx + 8) + ',27" fill="none" stroke="' + color + '" stroke-width="1.4"/>';
+        + '<path d="M' + f(cx - TW / 2) + ',' + top + ' L' + f(cx + TW / 2) + ',' + top + ' L' + f(cx) + ',' + (top + TH) + ' Z" fill="#ffffff" stroke="' + color + '" stroke-width="2.5" stroke-linejoin="miter"/>'
+        + '<text x="' + f(cx) + '" y="' + (top + 12.5) + '" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="bold" fill="' + color + '">' + escapeXml(agent) + '</text>'
+        // contamination mark: two dots, each with an arc crossing over to the other side
+        + '<circle cx="' + f(cx - dx) + '" cy="' + dy + '" r="3.4" fill="' + color + '"/>'
+        + '<circle cx="' + f(cx + dx) + '" cy="' + dy + '" r="3.4" fill="' + color + '"/>'
+        + _cbrnArc(cx, dy, dx, 1, color) + _cbrnArc(cx, dy, dx, -1, color);
     if (name) {
-        svg += '<text x="' + cx + '" y="' + (triH + 16) + '" text-anchor="middle" font-family="Consolas,Menlo,monospace" font-size="12" font-weight="bold"'
+        svg += '<text x="' + f(cx) + '" y="' + (top + TH + 16) + '" text-anchor="middle" font-family="Consolas,Menlo,monospace" font-size="12" font-weight="bold"'
             + ' fill="' + color + '" stroke="' + haloFor(color) + '" stroke-width="3" paint-order="stroke">' + escapeXml(name) + '</text>';
     }
     svg += '</svg>';
@@ -142,7 +161,7 @@ export function measureLines(m) {
     if (m.fn === 'BP') return [name || 'BP'];
     if (m.fn === 'SP') return [name || 'SP'];
     if (m.fn === 'LT') return [name || 'LINEAR TGT'];
-    if (_isCbrn(m.fn)) return [(m.fn + ' ' + (m.agent || (m.fn === 'CBRNE' ? 'E' : 'C')) + ' ' + name).trim()];
+    if (_isCbrn(m.fn)) return [(m.fn + ' ' + (m.agent || 'C') + ' ' + name).trim()];
     return [(m.fn + ' ' + name).trim()];
 }
 
@@ -322,7 +341,7 @@ export function syncMeasureLabel(featureId) {
     const zone = _isZone(m.fn);
     const lines = measureLines(m);
     const t = _isCbrn(m.fn)
-        ? _cbrnIcon(m.agent || (m.fn === 'CBRNE' ? 'E' : 'C'), (m.name || '').toUpperCase().trim(), color)
+        ? _cbrnIcon(m.agent || 'C', (m.name || '').toUpperCase().trim(), color)
         : _textSVG(lines, color, zone ? { fontSize: 11, align: 'left', titleScale: 1.15 } : { fontSize: 14, align: 'center', allBold: true });
     const c = ringCentroid(ring);
     const l = _labels[featureId] || { main: null, ech: null };
@@ -607,8 +626,8 @@ export function buildMeasureSection(popover, featureId, onChange, kind) {
             }
             if (_isCbrn(v)) {
                 const mm = measures[featureId];
-                const allowed = (v === 'CBRNE' ? CBRNE_AGENTS : CBRN_AGENTS).map(function (a) { return a.key; });
-                if (allowed.indexOf(mm.agent) === -1) mm.agent = v === 'CBRNE' ? 'E' : 'C';
+                const allowed = CBRN_AGENTS.map(function (a) { return a.key; });
+                if (allowed.indexOf(mm.agent) === -1) mm.agent = 'C';
                 // Contaminated areas: black outline, yellow fill (Terra Draw can't draw FM hatching)
                 applyStyleToSelected('lineColor', '#000000');
                 applyStyleToSelected('fillColor', '#FFFF00');
@@ -651,7 +670,7 @@ export function buildMeasureSection(popover, featureId, onChange, kind) {
             _input(_row(section, 'To'), 'text', m.timeTo, 'DTG', 130, function (v) { m.timeTo = v; commit(); });
         } else {
             if (_isCbrn(m.fn)) {
-                _select(_row(section, 'Agent'), m.fn === 'CBRNE' ? CBRNE_AGENTS : CBRN_AGENTS, m.agent || 'C', function (v) { m.agent = v; commit(); });
+                _select(_row(section, 'Agent'), CBRN_AGENTS, m.agent || 'C', function (v) { m.agent = v; commit(); });
             }
             const ph = _isCbrn(m.fn) ? 'optional' : (m.fn === 'NAI' || m.fn === 'TAI') ? 'e.g. 1' : 'e.g. WOLF';
             _input(_row(section, 'Name'), 'text', m.name, ph, 130, function (v) { m.name = v; commit(); });
