@@ -596,8 +596,15 @@ export function buildMeasureSection(popover, featureId, onChange, kind) {
             if (!v) { delete measures[featureId]; }
             else if (!measures[featureId]) { measures[featureId] = { fn: v, name: '', minRef: 'AGL', maxRef: 'AGL', echelon: 'none' }; }
             else { measures[featureId].fn = v; }
-            if (_lineDef(v) && _lineDef(v).dash) changeLineType('dashed');   // PLD and CFL are always dashed (table 5-8)
-            if (v === 'SP') changeLineType('strong_point');                     // battle position outline with outward ticks (table 5-5)
+            // PLD and CFL are always dashed (table 5-8); a strong point is a battle
+            // position outline with outward ticks (table 5-5)
+            const autoType = (_lineDef(v) && _lineDef(v).dash) ? 'dashed' : (v === 'SP' ? 'strong_point' : null);
+            if (autoType && changeLineType(autoType) !== false) {
+                // Keep the open popover's line-type grid in step with the new type
+                popover.querySelectorAll('.popover-lt-item').forEach(function (it) {
+                    it.classList.toggle('active', it.dataset.lineType === autoType);
+                });
+            }
             if (_isCbrn(v)) {
                 const mm = measures[featureId];
                 const allowed = (v === 'CBRNE' ? CBRNE_AGENTS : CBRN_AGENTS).map(function (a) { return a.key; });
