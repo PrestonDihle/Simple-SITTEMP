@@ -25,6 +25,9 @@ import { ECHELON_LIST, escapeXml, haloFor } from './symbols.js';
 import { applyStyleToSelected, changeLineType } from './drawing.js';
 
 export const AREA_MEASURES = [
+    { key: 'AO', name: 'AO - area of operations' },
+    { key: 'OBJ', name: 'OBJ - objective' },
+    { key: 'KZ', name: 'Kill zone' },
     { key: 'PZ', name: 'PZ - pickup zone' },
     { key: 'LZ', name: 'LZ - landing zone' },
     { key: 'DZ', name: 'DZ - drop zone' },
@@ -33,6 +36,11 @@ export const AREA_MEASURES = [
     { key: 'BP', name: 'BP - battle position' },
     { key: 'SP', name: 'Strong point' },
     { key: 'CBRN', name: 'CBRN - contaminated area' },
+];
+
+// Fire support areas (FM 1-02.2 Table 5-24)
+export const FIRES_AREAS = [
+    { key: 'PAA', name: 'PAA - position area for artillery' },
 ];
 
 // CBRN contaminated area (FM 1-02.2 Table 5-28): agent letter in an inverted
@@ -160,6 +168,16 @@ export function measureLines(m) {
     }
     if (m.fn === 'BP') return [name || 'BP'];
     if (m.fn === 'SP') return [name || 'SP'];
+    if (m.fn === 'KZ') return name ? ['KILL ZONE', name] : ['KILL ZONE'];
+    if (m.fn === 'PAA') {
+        // Table 5-24: unit (T) with the DTG (W - W1) below it; "PAA" sits on the outline
+        const lines = [];
+        if (m.unit) lines.push(String(m.unit).toUpperCase().trim());
+        const w = String(m.dtg || '').toUpperCase().trim(), w1 = String(m.dtg2 || '').toUpperCase().trim();
+        if (w) lines.push(w + (w1 ? ' -' : ''));
+        if (w1) lines.push(w1);
+        return lines;
+    }
     if (m.fn === 'LT') return [name || 'LINEAR TGT'];
     if (_isCbrn(m.fn)) return [(m.fn + ' ' + (m.agent || 'C') + ' ' + name).trim()];
     return [(m.fn + ' ' + name).trim()];
@@ -171,6 +189,8 @@ export function measureTitle(m) {
     if (_isZone(m.fn)) return (m.fn + ' ' + (m.unit || '')).trim().toUpperCase();
     if (m.fn === 'BP') return ('BP ' + (m.name || '')).trim().toUpperCase();
     if (m.fn === 'SP') return ('STRONG POINT ' + (m.name || '')).trim().toUpperCase();
+    if (m.fn === 'KZ') return ('KILL ZONE ' + (m.name || '')).trim().toUpperCase();
+    if (m.fn === 'PAA') return ('PAA ' + (m.unit || '')).trim().toUpperCase();
     if (m.fn === 'LT') return ('LINEAR TGT ' + (m.name || '')).trim().toUpperCase();
     if (m.fn === 'BOUNDARY') return ('BOUNDARY ' + [m.unit, m.unit2].filter(Boolean).join(' / ')).trim().toUpperCase();
     if (m.fn === 'PL') return ('PL ' + (m.name || '')).trim().toUpperCase();
@@ -193,6 +213,9 @@ function _textSVG(lines, color, opts) {
     const anchor = opts.align === 'left' ? 'start' : 'middle';
     const x = opts.align === 'left' ? pad : w / 2;
     let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">';
+    if (opts.boxed) {
+        svg += '<rect x="1" y="1" width="' + (w - 2) + '" height="' + (h - 2) + '" fill="#ffffff" fill-opacity="0.85" stroke="' + color + '" stroke-width="1.5"/>';
+    }
     lines.forEach(function (l, i) {
         const bold = (i === 0 || opts.allBold) ? 'bold' : 'normal';
         const size = (i === 0 && opts.titleScale) ? fs * opts.titleScale : fs;
@@ -297,6 +320,33 @@ export function ringBottom(ring, lng) {
     return { lat: best, lng: lng };
 }
 
+/**
+ * Points on the outline straight above, below, left and right of the centroid
+ * (top, bottom, left, right), for labels that sit on the outline (PAA).
+ */
+export function ringEdgePoints(ring, c) {
+    let top = null, bottom = null, left = null, right = null;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const x1 = ring[j][0], y1 = ring[j][1], x2 = ring[i][0], y2 = ring[i][1];
+        if ((x1 <= c.lng && x2 >= c.lng) || (x2 <= c.lng && x1 >= c.lng)) {
+            const y = x2 === x1 ? Math.max(y1, y2) : y1 + (y2 - y1) * (c.lng - x1) / (x2 - x1);
+            if (y >= c.lat && (top === null || y > top)) top = y;
+            if (y <= c.lat && (bottom === null || y < bottom)) bottom = y;
+        }
+        if ((y1 <= c.lat && y2 >= c.lat) || (y2 <= c.lat && y1 >= c.lat)) {
+            const x = y2 === y1 ? Math.min(x1, x2) : x1 + (x2 - x1) * (c.lat - y1) / (y2 - y1);
+            if (x <= c.lng && (left === null || x < left)) left = x;
+            if (x >= c.lng && (right === null || x > right)) right = x;
+        }
+    }
+    const pts = [];
+    if (top !== null) pts.push({ lat: top, lng: c.lng });
+    if (bottom !== null) pts.push({ lat: bottom, lng: c.lng });
+    if (left !== null) pts.push({ lat: c.lat, lng: left });
+    if (right !== null) pts.push({ lat: c.lat, lng: right });
+    return pts;
+}
+
 // ===== Labels =====
 
 function _color(featureId) {
@@ -342,10 +392,20 @@ export function syncMeasureLabel(featureId) {
     const lines = measureLines(m);
     const t = _isCbrn(m.fn)
         ? _cbrnIcon(m.agent || 'C', (m.name || '').toUpperCase().trim(), color)
-        : _textSVG(lines, color, zone ? { fontSize: 11, align: 'left', titleScale: 1.15 } : { fontSize: 14, align: 'center', allBold: true });
+        : _textSVG(lines.length ? lines : [' '], color, zone ? { fontSize: 11, align: 'left', titleScale: 1.15 }
+            : { fontSize: m.fn === 'KZ' ? 12 : 14, align: 'center', allBold: true, boxed: m.fn === 'KZ' });
     const c = ringCentroid(ring);
     const l = _labels[featureId] || { main: null, ech: null };
     l.main = _setMarker(l.main, c, _icon(t));
+
+    // PAA: "PAA" on the outline at the top, bottom, left and right (its halo stands
+    // in for the gap the FM leaves in the line)
+    if (m.fn === 'PAA') {
+        const pt = _textSVG(['PAA'], color, { fontSize: 11, align: 'center', allBold: true });
+        l.ends = _syncMarkers(l.ends, ringEdgePoints(ring, c).map(function (p) { return { pos: p, icon: _icon(pt) }; }));
+    } else if (l.ends && l.ends.length) {
+        l.ends = _syncMarkers(l.ends, []);
+    }
 
     const glyph = (m.fn === 'BP' || m.fn === 'SP') ? ECHELON_GLYPH[m.echelon] : null;
     if (glyph) {
@@ -610,6 +670,7 @@ export function buildMeasureSection(popover, featureId, onChange, kind) {
             { key: '', name: 'None' },
             { group: 'Intelligence / targeting', items: INTEL_AREAS },
             { group: 'Area (FM 1-02.2 Tbl 5-4/5-5)', items: AREA_MEASURES },
+            { group: 'Fire support (Tbl 5-24)', items: FIRES_AREAS },
             { group: 'Airspace (Tbl 5-23)', items: AIRSPACE_ZONES },
         ], m ? m.fn : '', function (v) {
             if (!v) { delete measures[featureId]; }
@@ -672,7 +733,13 @@ export function buildMeasureSection(popover, featureId, onChange, kind) {
             if (_isCbrn(m.fn)) {
                 _select(_row(section, 'Agent'), CBRN_AGENTS, m.agent || 'C', function (v) { m.agent = v; commit(); });
             }
-            const ph = _isCbrn(m.fn) ? 'optional' : (m.fn === 'NAI' || m.fn === 'TAI') ? 'e.g. 1' : 'e.g. WOLF';
+            if (m.fn === 'PAA') {
+                _input(_row(section, 'Unit'), 'text', m.unit, 'e.g. 3BCT', 130, function (v) { m.unit = v; commit(); });
+                _input(_row(section, 'DTG from'), 'text', m.dtg, 'e.g. 051030ZAPR26', 130, function (v) { m.dtg = v; commit(); });
+                _input(_row(section, 'DTG to'), 'text', m.dtg2, 'optional', 130, function (v) { m.dtg2 = v; commit(); });
+                return;
+            }
+            const ph = _isCbrn(m.fn) ? 'optional' : (m.fn === 'NAI' || m.fn === 'TAI') ? 'e.g. 1' : m.fn === 'KZ' ? 'e.g. B' : m.fn === 'OBJ' ? 'e.g. FIVE' : 'e.g. WOLF';
             _input(_row(section, 'Name'), 'text', m.name, ph, 130, function (v) { m.name = v; commit(); });
             if (m.fn === 'BP' || m.fn === 'SP') {
                 _select(_row(section, 'Echelon'), ECHELON_LIST, m.echelon || 'none', function (v) { m.echelon = v; commit(); });
