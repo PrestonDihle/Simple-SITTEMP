@@ -644,6 +644,93 @@ export function tacticalTaskSVG(key, color, strokeWidth) {
             return s + P(`M${ax + ar},175 L315,175`) + openHead(315, 175, 0, 45);
         },
 
+        // ---- Table 6-1 tasks added to match the FM (pp. 239-243) ----
+
+        // Bypass — bracket open to the right, B on its back, open arrowheads on both arms
+        bypass: () => P('M90,140 L90,95 L280,95 M90,210 L90,255 L280,255') +
+            T(90, 175, 'B', 64) +
+            openHead(285, 95, 0, 38) + openHead(285, 255, 0, 38),
+
+        // Canalize — same bracket, arms end in ticks angled outward, C on its back
+        canalize: () => P('M90,140 L90,95 L270,95 L305,60 M90,210 L90,255 L270,255 L305,290') +
+            T(90, 175, 'C', 64),
+
+        // Contain — half circle facing the enemy with inward spikes, inward end
+        // ticks, and C at its back with a short line toward the center
+        contain: () => {
+            const cx = 235, cy = 175, r = 125;
+            let s = P(arc(cx, cy, r, 90, 163)) + P(arc(cx, cy, r, 197, 270));
+            [113, 137, 223, 247].forEach((a) => {
+                const p1 = pt(cx, cy, r, a), p2 = pt(cx, cy, r - 38, a);
+                s += P(`M${p1[0]},${p1[1]} L${p2[0]},${p2[1]}`);
+            });
+            return s + P(`M${cx},${cy - r} L${cx},${cy - r + 55} M${cx},${cy + r} L${cx},${cy + r - 55}`) +
+                T(cx - r, cy, 'C', 58) + P(`M${cx - r + 24},${cy} L${cx - r + 62},${cy}`);
+        },
+
+        // Control — two arcs leaving C on the right, one over the top and one under
+        // the bottom, each ending at the left with an open arrowhead
+        control: () => {
+            const cx = 165, cy = 175, r = 110;
+            const e1 = pt(cx, cy, r, 210), e2 = pt(cx, cy, r, 150);
+            return P(arc(cx, cy, r, 210, 340)) + P(arc(cx, cy, r, 20, 150)) +
+                openHead(e1[0], e1[1], 210 - 90, 45, 34) + openHead(e2[0], e2[1], tangentCW(150), 45, 34) +
+                T(cx + r, cy, 'C', 60);
+        },
+
+        // Disengage — retrograde form (hook joined to the end of the shaft, DIS in a
+        // break, open arrowhead), mirrored to point right like withdraw
+        disengage: () => {
+            const HX = 80, Y = 235, END = 330, LX = 200, half = 62;
+            return P(`M${HX},${Y - 120} A60,60 0 0,0 ${HX},${Y}`) +
+                P(`M${HX},${Y} L${LX - half},${Y} M${LX + half},${Y} L${END},${Y}`) +
+                T(LX, Y, 'DIS', 48) +
+                openHead(END, Y, 0, 40);
+        },
+
+        // Exfiltrate — short line into EX, then an S-curve down to an open arrowhead
+        // (mirrored from the FM drawing to point right)
+        exfiltrate: () => P('M25,135 L58,135') + T(108, 135, 'EX', 56) +
+            P('M158,135 C215,135 205,220 265,220 L325,220') +
+            openHead(325, 220, 0, 40),
+
+        // Interdict — a horizontal arrow and a rising diagonal arrow, both broken at I
+        interdict: () => {
+            const ang = Math.atan2(-180, 270) / RAD;
+            return P('M45,175 L170,175 M212,175 L320,175') + openHead(320, 175, 0, 40) +
+                P('M45,265 L168,183 M214,152 L320,85') + openHead(320, 85, ang, 40) +
+                T(191, 175, 'I', 64);
+        },
+
+        // Retain — open circle with outward spikes, R in a gap on the right, open
+        // arrowhead at the lower-left end
+        retain: () => {
+            const cx = 165, cy = 175, r = 95;
+            let s = P(arc(cx, cy, r, 205, 340)) + P(arc(cx, cy, r, 20, 150));
+            [218, 244, 270, 296, 322, 40, 66, 92, 118].forEach((a) => {
+                const p1 = pt(cx, cy, r, a), p2 = pt(cx, cy, r + 34, a);
+                s += P(`M${p1[0]},${p1[1]} L${p2[0]},${p2[1]}`);
+            });
+            const e = pt(cx, cy, r, 150);
+            return s + openHead(e[0], e[1], tangentCW(150), 45, 34) + T(cx + r + 5, cy, 'R', 62);
+        },
+
+        // Support by fire — bar with outward arms at each end: a plain arm back and
+        // an arrow forward
+        support_by_fire: () => P('M165,100 L165,250 M165,100 L125,60 M165,250 L125,290') +
+            P('M165,100 L215,62') + openHead(215, 62, -37, 36) +
+            P('M165,250 L215,288') + openHead(215, 288, 37, 36),
+
+        // Suppress — solid and dashed diagonals crossing, broken at S
+        suppress: () => P('M70,70 L148,148 M202,202 L280,280') +
+            P('M70,280 L148,202 M202,148 L280,70', `stroke-dasharray="${f1(sw * 1.4)} ${f1(sw * 1.2)}" stroke-linecap="butt"`) +
+            T(175, 175, 'S', 64),
+
+        // Turn — line into T, then a curve bending down to a filled arrowhead
+        turn: () => P('M35,120 Q85,113 125,121') + T(160, 126, 'T', 62) +
+            P('M195,130 C250,140 285,180 294,228') +
+            fillHead(300, 262, 78, 48),
+
         // Attack by fire — bracket tail, arrow from its midpoint, open arrowhead, no letter
         attack_by_fire: () => P('M85,85 L135,140 L135,210 L85,265') +
             P('M135,175 L290,175') +
@@ -811,6 +898,17 @@ export const TACTICAL_TASK_LIST = [
     { key: 'withdraw_under_pressure', name: 'Withdraw Under Pressure' },
     { key: 'retire', name: 'Retire' },
     { key: 'ambush', name: 'Ambush' },
+    { key: 'bypass', name: 'Bypass' },
+    { key: 'canalize', name: 'Canalize' },
+    { key: 'contain', name: 'Contain' },
+    { key: 'control', name: 'Control' },
+    { key: 'disengage', name: 'Disengage' },
+    { key: 'exfiltrate', name: 'Exfiltrate' },
+    { key: 'interdict', name: 'Interdict' },
+    { key: 'retain', name: 'Retain' },
+    { key: 'support_by_fire', name: 'SBF' },
+    { key: 'suppress', name: 'Suppress' },
+    { key: 'turn', name: 'Turn' },
     { key: 'isolate', name: 'Isolate' },
     { key: 'neutralize', name: 'Neutralize' },
     { key: 'occupy', name: 'Occupy' },
