@@ -914,7 +914,18 @@ export function symbolIconLayout(leftText, rightText, rotation) {
  * Build an SVG that includes the symbol + optional left/right text labels + echelon marks.
  * Handles both legacy 40x40 viewBox (units) and new 350x350 viewBox (equipment).
  */
-export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rotation, echelon) {
+/**
+ * Mirror a symbol's inner SVG left-right within its viewBox (width vbW), keeping
+ * any letters readable: each <text> is mirrored back around its own x.
+ */
+function flipInner(inner, vbW) {
+    const unflipped = inner.replace(/<text x="([\d.]+)"/g, function (m, x) {
+        return '<text transform="translate(' + (2 * parseFloat(x)) + ',0) scale(-1,1)" x="' + x + '"';
+    });
+    return '<g transform="translate(' + vbW + ',0) scale(-1,1)">' + unflipped + '</g>';
+}
+
+export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rotation, echelon, flip) {
     const layout = symbolIconLayout(leftText, rightText, rotation);
     const totalWidth = layout.width;
     const echelonH = (echelon && echelon !== 'none') ? 14 : 0;
@@ -949,11 +960,14 @@ export function buildSymbolWithLabels(svgInner, leftText, rightText, color, rota
         svg += `<text x="${symX - 2}" y="${symY + 40}" text-anchor="end" fill="${color}" font-size="10" font-family="Arial,sans-serif">${escapeXml(leftText)}</text>`;
     }
 
-    // Scale the inner SVG content to fit the 40x40 display area, with optional rotation
+    // Scale the inner SVG content to fit the 40x40 display area, with optional
+    // left-right flip (applied first, in the symbol's own frame) and rotation
+    let inner = stripSvgWrapper(svgInner);
+    if (flip) inner = flipInner(inner, vbW);
     if (rotation !== 0) {
-        svg += `<g transform="rotate(${rotation}, ${symCX}, ${symCY}) translate(${symX}, ${symY}) scale(${scaleX}, ${scaleY})">${stripSvgWrapper(svgInner)}</g>`;
+        svg += `<g transform="rotate(${rotation}, ${symCX}, ${symCY}) translate(${symX}, ${symY}) scale(${scaleX}, ${scaleY})">${inner}</g>`;
     } else {
-        svg += `<g transform="translate(${symX}, ${symY}) scale(${scaleX}, ${scaleY})">${stripSvgWrapper(svgInner)}</g>`;
+        svg += `<g transform="translate(${symX}, ${symY}) scale(${scaleX}, ${scaleY})">${inner}</g>`;
     }
 
     if (rightText) {
