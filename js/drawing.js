@@ -1166,6 +1166,7 @@ function _buildPopoverContent(popover, type, info) {
         LINE_TYPES.forEach(function (lt) {
             var item = document.createElement('button');
             item.className = 'popover-lt-item' + (lt.key === current ? ' active' : '');
+            item.dataset.lineType = lt.key;
             item.title = lt.name;
             item.innerHTML = '<span class="popover-lt-preview">' + getLinePreviewSVG(lt.key) + '</span><span>' + lt.name + '</span>';
             item.addEventListener('click', function () {

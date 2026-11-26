@@ -1798,7 +1798,10 @@ input.rc-input::placeholder { text-transform: none; color: #6b707a; }
 }
 
 /* Slope analysis legend */
-.slope-range .slope-num { width: 42px; }
+.slope-range .slope-num { width: 46px; -moz-appearance: textfield; appearance: textfield; }
+/* No spinner arrows: they took the room the "min" / "max" hints need */
+.slope-range .slope-num::-webkit-outer-spin-button,
+.slope-range .slope-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .slope-range.off { opacity: 0.5; }
 .slope-color {
     width: 22px;
