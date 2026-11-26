@@ -1,5 +1,5 @@
 /**
- * Simple SITTEMP - Point Symbols (point target, general purpose point)
+ * Simple SITTEMP - Point Symbols (point target, general purpose point, decision point)
  *
  * Point target (FM 1-02.2, fire support point target): a cross with the target
  * number at its upper right, e.g. "AB1001". Placed as a map marker from the
@@ -106,4 +106,39 @@ export function generalPointIcon(info, selected) {
     }
     svg += '</svg>';
     return { svg: svg, w: w, h: h, ax: cx, ay: tipY };
+}
+
+/**
+ * Decision point (FM 1-02.2 INCL C1, table 5-7): a five-pointed star with the
+ * designation (T, e.g. "3") inside. The star grows to fit a longer designation.
+ * Marker type stays 'star' so older maps still load; fill / opacity come from the
+ * popover like other filled symbols. Returns { svg, w, h, ax, ay } (anchor = center).
+ */
+export function decisionPointIcon(info, selected) {
+    const color = info.color || '#000000';
+    const sw = info.strokeWidth || 2;
+    const fill = info.fill || '#ffffff';
+    const op = info.fillOpacity !== undefined ? info.fillOpacity : 0.85;
+    const label = String(info.text || '').toUpperCase().trim();
+    const fs = 12;
+    const S = Math.max(40, Math.ceil(label.length * fs * 0.62 / 0.3) + 4);   // label fits the star's inner pentagon
+    const f = function (n) { return Math.round(n * 10) / 10; };
+    const c = S / 2, R = S / 2 - sw, r = R * 0.42;
+    const pts = [];
+    for (let i = 0; i < 10; i++) {
+        const a = -Math.PI / 2 + i * Math.PI / 5, rad = i % 2 ? r : R;
+        pts.push(f(c + rad * Math.cos(a)) + ',' + f(c + 1.5 + rad * Math.sin(a)));
+    }
+    let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + S + '" height="' + S + '" viewBox="0 0 ' + S + ' ' + S + '">'
+        + '<polygon points="' + pts.join(' ') + '" fill="' + (fill === 'none' ? 'none' : fill) + '" fill-opacity="' + op + '" stroke="' + color + '" stroke-width="' + sw + '" stroke-linejoin="miter"/>';
+    if (label) {
+        svg += '<text x="' + f(c) + '" y="' + f(c + 1.5 + fs * 0.42) + '" text-anchor="middle" font-family="Arial,sans-serif" font-size="' + fs + '" font-weight="bold"'
+            + ' fill="' + color + '" stroke="' + haloFor(color) + '" stroke-width="2.5" paint-order="stroke">' + escapeXml(label) + '</text>';
+    }
+    if (selected) {
+        svg += '<rect x="1" y="1" width="' + (S - 2) + '" height="' + (S - 2) + '" fill="none" stroke="' + color
+            + '" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.75"/>';
+    }
+    svg += '</svg>';
+    return { svg: svg, w: S, h: S, ax: c, ay: c };
 }

@@ -18,7 +18,7 @@ import { buildMeasureSection, syncMeasureLabel, syncAllMeasureLabels, forgetMeas
 import { enterRoutePlacement, exitRoutePlacement, getRouteConfigs, restoreRoutes } from './routes.js';
 import { getContourConfigs, restoreContours } from './contours.js';
 import { slopeFeature, getSlopeConfigs, restoreSlopes } from './slope.js';
-import { pointTargetIcon, generalPointIcon, GENERAL_POINTS } from './targets.js';
+import { pointTargetIcon, generalPointIcon, GENERAL_POINTS, decisionPointIcon } from './targets.js';
 import { DATA_BOX_TYPES, buildDataBoxRow, syncDataBox, syncAllDataBoxes, forgetDataBox } from './databox.js';
 
 // ===== Per-Feature Style Helper Functions =====
@@ -387,13 +387,13 @@ function placeSymbol(latLng, leftText, rightText, echelon) {
     returnToSelect();
 }
 
-// ===== Star Placement =====
+// ===== Decision Point Placement (marker type 'star') =====
 
 function enterStarPlacement() {
     exitSymbolPlacement();
     exitTextPlacement();
     if (get('ready')) get('draw').setMode('select');
-    showToast('Click on map to place a star');
+    showToast('Click on map to place a decision point, then click it to set its number');
 
     const map = get('map');
     const listener = map.addListener('click', function (e) { placeStarMarker(e.latLng); });
@@ -401,17 +401,11 @@ function enterStarPlacement() {
 }
 
 function placeStarMarker(latLng) {
-    const color = get('lineColor');
-    const fill = get('fillColor');
-    const opacity = get('fillOpacity');
-    const sw = get('symbolStrokeWidth') || 2;
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
-        <polygon points="15,1 18.5,11 29,11 20.5,17.5 23.5,28 15,22 6.5,28 9.5,17.5 1,11 11.5,11"
-            fill="${fill}" fill-opacity="${opacity}" stroke="${color}" stroke-width="${sw}"/>
-    </svg>`;
-
-    const scale = get('symbolScale') || 1.0;
-    createMapMarker(latLng, svg, new google.maps.Size(30 * scale, 30 * scale), new google.maps.Point(15 * scale, 15 * scale), { type: 'star', color, fill, fillOpacity: opacity, strokeWidth: sw, symbolScale: scale });
+    // FM 1-02.2 draws the decision point as an open star, so new ones start white
+    const info = { type: 'star', color: get('lineColor'), fill: '#ffffff', fillOpacity: 0.85, strokeWidth: get('symbolStrokeWidth') || 2, symbolScale: get('symbolScale') || 1.0, text: '' };
+    const t = decisionPointIcon(info, false);
+    const scale = info.symbolScale;
+    createMapMarker(latLng, t.svg, new google.maps.Size(t.w * scale, t.h * scale), new google.maps.Point(t.ax * scale, t.ay * scale), info);
     pushUndoState();
     returnToSelect();
 }
@@ -789,15 +783,10 @@ export function rebuildMarkerIcon(marker) {
         size = new google.maps.Size(pt.w * scale, pt.h * scale);
         anchor = new google.maps.Point(pt.ax * scale, pt.ay * scale);
     } else if (info.type === 'star') {
-        var svgFill = info.fill || info.color;
-        var svgOpacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
-        svgString = '<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">'
-            + '<polygon points="15,1 18.5,11 29,11 20.5,17.5 23.5,28 15,22 6.5,28 9.5,17.5 1,11 11.5,11"'
-            + ' fill="' + svgFill + '" fill-opacity="' + svgOpacity + '" stroke="' + info.color + '" stroke-width="' + (info.strokeWidth || 2) + '"/>'
-            + (marker._selected ? '<rect x="1" y="1" width="28" height="28" fill="none" stroke="' + info.color + '" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.75"/>' : '')
-            + '</svg>';
-        size = new google.maps.Size(30 * scale, 30 * scale);
-        anchor = new google.maps.Point(15 * scale, 15 * scale);
+        var dp = decisionPointIcon(info, marker._selected);
+        svgString = dp.svg;
+        size = new google.maps.Size(dp.w * scale, dp.h * scale);
+        anchor = new google.maps.Point(dp.ax * scale, dp.ay * scale);
     } else if (info.type === 'triangle') {
         var triFill = info.fill || info.color;
         var triOpacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
@@ -924,7 +913,7 @@ function _syncPanelToFeature(featureId) {
 function _typeLabel(type) {
     var labels = {
         equipment: 'Equipment', unit: 'Friendly Unit', enemy_unit: 'Enemy Unit',
-        tactical_task: 'Tactical Task', star: 'Star', triangle: 'Triangle', point_target: 'Point Target', general_point: 'Point',
+        tactical_task: 'Tactical Task', star: 'Decision Point', triangle: 'Triangle', point_target: 'Point Target', general_point: 'Point',
         text: 'Text', polygon: 'Polygon', linestring: 'Line',
         rectangle: 'Rectangle', circle: 'Circle', freehand: 'Freehand'
     };
@@ -1220,6 +1209,34 @@ function _buildPopoverContent(popover, type, info) {
             ptRow.appendChild(ptInp);
             ptSection.appendChild(ptRow);
             popover.appendChild(ptSection);
+        }
+    }
+
+    // Decision point: designation inside the star
+    if (type === 'star') {
+        var dpMarker = get('markers').find(function (m) { return m._selected; });
+        if (dpMarker) {
+            var dpSection = document.createElement('div');
+            dpSection.className = 'popover-vs popover-measure';
+            dpSection.innerHTML = '<div class="popover-vs-head"><span>Decision point</span></div>';
+            var dpRow = document.createElement('div');
+            dpRow.className = 'popover-row';
+            dpRow.innerHTML = '<span class="popover-label">Designation</span>';
+            var dpInp = document.createElement('input');
+            dpInp.type = 'text';
+            dpInp.className = 'popover-num popover-text';
+            dpInp.style.width = '130px';
+            dpInp.placeholder = 'inside, e.g. 3';
+            dpInp.value = dpMarker._sittemp.text || '';
+            dpInp.addEventListener('keydown', function (e) { e.stopPropagation(); if (e.key === 'Enter') dpInp.blur(); });
+            dpInp.addEventListener('change', function () {
+                dpMarker._sittemp.text = dpInp.value.toUpperCase().trim();
+                rebuildMarkerIcon(dpMarker);
+                _scheduleUndoPush();
+            });
+            dpRow.appendChild(dpInp);
+            dpSection.appendChild(dpRow);
+            popover.appendChild(dpSection);
         }
     }
 
@@ -1638,14 +1655,10 @@ function recreateMarker(data) {
         size = new google.maps.Size(pt.w * scale, pt.h * scale);
         anchor = new google.maps.Point(pt.ax * scale, pt.ay * scale);
     } else if (info.type === 'star') {
-        const fill = info.fill || info.color;
-        const opacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;
-        svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
-            <polygon points="15,1 18.5,11 29,11 20.5,17.5 23.5,28 15,22 6.5,28 9.5,17.5 1,11 11.5,11"
-                fill="${fill}" fill-opacity="${opacity}" stroke="${info.color}" stroke-width="${info.strokeWidth || 2}"/>
-        </svg>`;
-        size = new google.maps.Size(30 * scale, 30 * scale);
-        anchor = new google.maps.Point(15 * scale, 15 * scale);
+        const dp = decisionPointIcon(info, false);
+        svgString = dp.svg;
+        size = new google.maps.Size(dp.w * scale, dp.h * scale);
+        anchor = new google.maps.Point(dp.ax * scale, dp.ay * scale);
     } else if (info.type === 'triangle') {
         const fill = info.fill || info.color;
         const opacity = info.fillOpacity !== undefined ? info.fillOpacity : 0.6;

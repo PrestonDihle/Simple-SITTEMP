@@ -54,7 +54,8 @@ Simple-SITTEMP/
 - Standard Google Maps controls (zoom, layers, my location)
 
 ### Drawing Features (via Terra Draw)
-- **Shapes:** Circle, Triangle, Rectangle, Polygon, LineString, Five-Point Star, Freehand
+- **Shapes:** Circle, Triangle, Rectangle, Polygon, LineString, Decision Point, Freehand
+- **Decision point** (FM 1-02.2 table 5-7): Shapes menu → Decision Point places a star marker (`_sittemp.type` stays `'star'` so older maps load) with the designation (`_sittemp.text`, popover "Designation") inside; the star grows to fit longer text. New ones start with a white fill (the FM draws an open star); fill and opacity stay editable. Icon is `decisionPointIcon()` in `js/targets.js`; KML name "DP 3"
 - **Line Types:** Solid, Dashed, Dotted, Dash-Dot, FLOT, Low Wire, 1x Concertina, Arrow, AT Ditch, AT Ditch (unfinished), AP Mine, AT Mine. Chosen per shape in the object popover ("Line type" grid) for lines, polygons, rectangles, circles and freehand shapes (`LINE_TYPE_SHAPES`); not for stars or flight routes. Picking a type applies its default color (`LINE_TYPE_COLORS` in symbols.js)
 - **Select Mode:** Click to select, drag to move, delete selected features
 - **Color Picker:** Line colors (Green, Blue, Red, Purple, Orange, Black, White, Grey, Yellow). Labels drawn in light colors (yellow, white) get a dark outline via `haloFor()` in symbols.js

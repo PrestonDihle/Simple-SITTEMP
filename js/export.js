@@ -411,7 +411,9 @@ function exportKML() {
     markers.forEach(function (m, i) {
         const pos = m.getPosition();
         const st = m._sittemp || {};
-        const label = st.type === 'general_point' ? [st.fn || 'POINT', st.text, st.unit].filter(Boolean).join(' ') : (st.text || st.key);
+        const label = st.type === 'general_point' ? [st.fn || 'POINT', st.text, st.unit].filter(Boolean).join(' ')
+            : st.type === 'star' ? ('DP ' + (st.text || '')).trim()
+            : (st.text || st.key);
         const name = escapeXml(label || 'Marker ' + i);
         kml += '<Placemark>\n';
         kml += '<name>' + name + '</name>\n';
