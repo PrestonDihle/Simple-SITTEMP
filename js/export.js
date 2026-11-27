@@ -413,6 +413,7 @@ function exportKML() {
         const st = m._sittemp || {};
         const label = st.type === 'general_point' ? [st.fn || 'POINT', st.text, st.unit].filter(Boolean).join(' ')
             : st.type === 'star' ? ('DP ' + (st.text || '')).trim()
+            : st.type === 'task_org' ? (st.h || 'TASK ORGANIZATION')
             : (st.text || st.key);
         const name = escapeXml(label || 'Marker ' + i);
         kml += '<Placemark>\n';

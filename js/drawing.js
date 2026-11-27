@@ -19,6 +19,7 @@ import { enterRoutePlacement, exitRoutePlacement, getRouteConfigs, restoreRoutes
 import { getContourConfigs, restoreContours } from './contours.js';
 import { slopeFeature, getSlopeConfigs, restoreSlopes } from './slope.js';
 import { pointTargetIcon, generalPointIcon, GENERAL_POINTS, decisionPointIcon } from './targets.js';
+import { taskOrgIcon, newTaskOrg, buildTaskOrgSection } from './taskorg.js';
 import { DATA_BOX_TYPES, buildDataBoxRow, syncDataBox, syncAllDataBoxes, forgetDataBox } from './databox.js';
 
 // ===== Per-Feature Style Helper Functions =====
@@ -325,6 +326,8 @@ export function activateShape(key) {
         enterPointTargetPlacement();
     } else if (key === 'general_point') {
         enterGeneralPointPlacement();
+    } else if (key === 'task_org') {
+        enterTaskOrgPlacement();
     } else {
         const modeMap = { circle: 'circle', rectangle: 'rectangle', polygon: 'polygon', linestring: 'linestring', freehand: 'freehand', oval: 'oval_draw' };
         if (modeMap[key]) draw.setMode(modeMap[key]);
@@ -536,6 +539,28 @@ function enterGeneralPointPlacement() {
 function placeGeneralPoint(latLng) {
     const info = { type: 'general_point', color: get('lineColor'), strokeWidth: get('symbolStrokeWidth') || 2, symbolScale: get('symbolScale') || 1.0, fn: '', text: '' };
     const t = generalPointIcon(info, false);
+    const scale = info.symbolScale;
+    createMapMarker(latLng, t.svg, new google.maps.Size(t.w * scale, t.h * scale), new google.maps.Point(t.ax * scale, t.ay * scale), info);
+    pushUndoState();
+    returnToSelect();
+}
+
+// ===== Task Organization Composition Symbol Placement =====
+
+function enterTaskOrgPlacement() {
+    exitSymbolPlacement();
+    exitTextPlacement();
+    if (get('ready')) get('draw').setMode('select');
+    showToast('Click on map to place a task organization symbol, then click it to edit its units');
+
+    const map = get('map');
+    const listener = map.addListener('click', function (e) { placeTaskOrg(e.latLng); });
+    set('symbolClickListener', listener);
+}
+
+function placeTaskOrg(latLng) {
+    const info = newTaskOrg({ color: get('lineColor'), strokeWidth: get('symbolStrokeWidth') || 2, symbolScale: get('symbolScale') || 1.0 });
+    const t = taskOrgIcon(info, false);
     const scale = info.symbolScale;
     createMapMarker(latLng, t.svg, new google.maps.Size(t.w * scale, t.h * scale), new google.maps.Point(t.ax * scale, t.ay * scale), info);
     pushUndoState();
@@ -841,6 +866,11 @@ export function rebuildMarkerIcon(marker) {
         svgString = pt.svg;
         size = new google.maps.Size(pt.w * scale, pt.h * scale);
         anchor = new google.maps.Point(pt.ax * scale, pt.ay * scale);
+    } else if (info.type === 'task_org') {
+        var to = taskOrgIcon(info, marker._selected);
+        svgString = to.svg;
+        size = new google.maps.Size(to.w * scale, to.h * scale);
+        anchor = new google.maps.Point(to.ax * scale, to.ay * scale);
     } else if (info.type === 'star') {
         var dp = decisionPointIcon(info, marker._selected);
         svgString = dp.svg;
@@ -972,7 +1002,7 @@ function _syncPanelToFeature(featureId) {
 function _typeLabel(type) {
     var labels = {
         equipment: 'Equipment', unit: 'Friendly Unit', enemy_unit: 'Enemy Unit',
-        tactical_task: 'Tactical Task', star: 'Decision Point', triangle: 'Triangle', point_target: 'Point Target', general_point: 'Point',
+        tactical_task: 'Tactical Task', star: 'Decision Point', triangle: 'Triangle', point_target: 'Point Target', general_point: 'Point', task_org: 'Task Organization',
         text: 'Text', polygon: 'Polygon', linestring: 'Line',
         rectangle: 'Rectangle', circle: 'Circle', freehand: 'Freehand', oval: 'Oval'
     };
@@ -1282,6 +1312,16 @@ function _buildPopoverContent(popover, type, info) {
             ptRow.appendChild(ptInp);
             ptSection.appendChild(ptRow);
             popover.appendChild(ptSection);
+        }
+    }
+
+    // Task organization composition symbol (FM 1-02.2 ch. 7)
+    if (type === 'task_org') {
+        var toMarker = get('markers').find(function (m) { return m._selected; });
+        if (toMarker) {
+            buildTaskOrgSection(popover, toMarker._sittemp,
+                function () { rebuildMarkerIcon(toMarker); _scheduleUndoPush(); },
+                function () { _showPopoverForMarker(toMarker); });
         }
     }
 
@@ -1727,6 +1767,11 @@ function recreateMarker(data) {
         svgString = pt.svg;
         size = new google.maps.Size(pt.w * scale, pt.h * scale);
         anchor = new google.maps.Point(pt.ax * scale, pt.ay * scale);
+    } else if (info.type === 'task_org') {
+        const to = taskOrgIcon(info, false);
+        svgString = to.svg;
+        size = new google.maps.Size(to.w * scale, to.h * scale);
+        anchor = new google.maps.Point(to.ax * scale, to.ay * scale);
     } else if (info.type === 'star') {
         const dp = decisionPointIcon(info, false);
         svgString = dp.svg;

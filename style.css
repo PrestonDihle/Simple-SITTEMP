@@ -1434,6 +1434,11 @@ html, body {
 }
 
 .popover-rot-btn:hover { background: #3a404c; }
+/* Task organization editor */
+.taskorg-check { display: inline-flex; align-items: center; gap: 3px; margin-right: 6px; font-size: 11px; cursor: pointer; }
+.taskorg-unit { gap: 3px; flex-wrap: nowrap; }
+.taskorg-unit .popover-select { max-width: 92px; font-size: 11px; }
+
 .popover-rot-btn.active { background: #2f4a6e; border-color: #4a7bbf; }   /* flip is on */
 
 /* Viewshed section in the object popover */
