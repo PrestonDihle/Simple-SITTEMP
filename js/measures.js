@@ -1,7 +1,7 @@
 /**
  * Simple SITTEMP - Define Area / Target Tagging Module
  *
- * Tags drawn area shapes (polygon, rectangle, circle, freehand) as doctrinal
+ * Tags drawn area shapes (polygon, rectangle, circle, freehand, oval) as doctrinal
  * control measures and draws their labels, per FM 1-02.2 (INCL C1):
  *   - Area control measures (Table 5-4): PZ, LZ, DZ, HA, FARP â€” label "PZ WOLF"
  *     centered inside the area. HA is not in Table 5-4 and uses the same template.
@@ -92,6 +92,20 @@ function _cbrnIcon(agent, name, color) {
     return { svg: svg, w: w, h: h };
 }
 
+export const BP_STATUS = [
+    { key: 'occupied', name: 'Occupied (solid)' },
+    { key: 'planned', name: 'Planned, not prepared' },
+    { key: 'prepared', name: 'Prepared, not occupied (P)' },
+];
+
+/** Switch the selected shape's line type and keep the open popover's grid in step. */
+function _setOutline(popover, lineType) {
+    if (changeLineType(lineType) === false) return;
+    popover.querySelectorAll('.popover-lt-item').forEach(function (it) {
+        it.classList.toggle('active', it.dataset.lineType === lineType);
+    });
+}
+
 export const INTEL_AREAS = [
     { key: 'NAI', name: 'NAI - named area of interest' },
     { key: 'TAI', name: 'TAI - target area of interest' },
@@ -166,7 +180,7 @@ export function measureLines(m) {
         if (m.timeTo) lines.push('TIME TO: ' + String(m.timeTo).toUpperCase());
         return lines;
     }
-    if (m.fn === 'BP') return [name || 'BP'];
+    if (m.fn === 'BP') return [((m.status === 'prepared' ? '(P) ' : '') + (name || 'BP')).trim()];
     if (m.fn === 'SP') return [name || 'SP'];
     if (m.fn === 'KZ') return name ? ['KILL ZONE', name] : ['KILL ZONE'];
     if (m.fn === 'PAA') {
@@ -743,6 +757,15 @@ export function buildMeasureSection(popover, featureId, onChange, kind) {
             _input(_row(section, 'Name'), 'text', m.name, ph, 130, function (v) { m.name = v; commit(); });
             if (m.fn === 'BP' || m.fn === 'SP') {
                 _select(_row(section, 'Echelon'), ECHELON_LIST, m.echelon || 'none', function (v) { m.echelon = v; commit(); });
+            }
+            if (m.fn === 'BP') {
+                // Table 5-5: occupied = solid; planned but not prepared = dashed;
+                // prepared but not occupied = dashed with "(P)" before the name
+                _select(_row(section, 'Status'), BP_STATUS, m.status || 'occupied', function (v) {
+                    m.status = v;
+                    _setOutline(popover, v === 'occupied' ? 'solid' : 'dashed');
+                    commit();
+                });
             }
         }
     }

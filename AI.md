@@ -54,7 +54,8 @@ Simple-SITTEMP/
 - Standard Google Maps controls (zoom, layers, my location)
 
 ### Drawing Features (via Terra Draw)
-- **Shapes:** Circle, Triangle, Rectangle, Polygon, LineString, Decision Point, Freehand
+- **Shapes:** Circle, Triangle, Rectangle, Oval, Polygon, LineString, Decision Point, Freehand
+- **Oval:** dragged out as a box with a second Terra Draw rectangle mode (`modeName: 'oval_draw'`); on finish `_boxToOval()` swaps it for a 72-point ellipse stored under a freehand-type mode named `'oval'` (accepts any closed outline, so undo/redo restores it). The swap suppresses the delete's undo push and pushes one state. Ovals move as a whole (no vertex editing); everything else (fill, line types, Define area, data box excluded, elevation/slope) works like other areas
 - **Decision point** (FM 1-02.2 table 5-7): Shapes menu → Decision Point places a star marker (`_sittemp.type` stays `'star'` so older maps load) with the designation (`_sittemp.text`, popover "Designation") inside; the star grows to fit longer text. New ones start with a white fill (the FM draws an open star); fill and opacity stay editable. Icon is `decisionPointIcon()` in `js/targets.js`; KML name "DP 3"
 - **Line Types:** Solid, Dashed, Dotted, Dash-Dot, FLOT, Low Wire, 1x Concertina, Arrow, AT Ditch, AT Ditch (unfinished), AP Mine, AT Mine. Chosen per shape in the object popover ("Line type" grid) for lines, polygons, rectangles, circles and freehand shapes (`LINE_TYPE_SHAPES`); not for stars or flight routes. Picking a type applies its default color (`LINE_TYPE_COLORS` in symbols.js)
 - **Select Mode:** Click to select, drag to move, delete selected features
@@ -110,7 +111,8 @@ Simple-SITTEMP/
 - Airspace (Table 5-23): ROZ, HIDACZ, AARROZ, UAROZ, WEZ, JEZ, MEZ, LOMEZ, HIMEZ, SHORAD EZ → block: function, unit (T), MIN/MAX ALT in feet AGL or MSL, TIME FROM/TO (DTG)
 - Tags in `state.featureMeasures[featureId]` (in undo snapshots); labels are non-clickable markers that follow Terra Draw `change` update/delete events and the outline color
 - KML: tagged features export with the measure as the Placemark name and the label block as description
-- Not implemented: BP planned/prepared (dashed) variants — Terra Draw polygons can't dash; coordinating altitude (not in the extract)
+- BP status (Table 5-5, `m.status`): Occupied = solid outline; Planned, not prepared = dashed; Prepared, not occupied = dashed with "(P)" before the name. Choosing a status switches the outline line type (`_setOutline`)
+- Not implemented: coordinating altitude (not in the extract)
 
 ### Data Box (`js/databox.js`)
 - "Data box" checkbox in the object popover for circles, rectangles, polygons and lines (`DATA_BOX_TYPES`; not freehand). Replaces the old Measure tool, which was removed

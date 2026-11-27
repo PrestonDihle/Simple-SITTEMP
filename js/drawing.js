@@ -62,6 +62,47 @@ function _featureLineOpacity(feature) {
     return (s && s.lineOpacity !== undefined) ? s.lineOpacity : 1;
 }
 
+// ===== Ovals =====
+
+var _ovalSwap = false;
+
+/** Ellipse ([lng,lat] ring, closed) inscribed in a box ring. */
+export function ovalRing(boxRing, n) {
+    n = n || 72;
+    var lngs = boxRing.map(function (c) { return c[0]; }), lats = boxRing.map(function (c) { return c[1]; });
+    var w = Math.min.apply(null, lngs), e = Math.max.apply(null, lngs);
+    var s = Math.min.apply(null, lats), nn = Math.max.apply(null, lats);
+    var cx = (w + e) / 2, cy = (s + nn) / 2, a = (e - w) / 2, b = (nn - s) / 2;
+    var ring = [];
+    for (var i = 0; i < n; i++) {
+        var t = 2 * Math.PI * i / n;
+        ring.push([+(cx + a * Math.cos(t)).toFixed(9), +(cy + b * Math.sin(t)).toFixed(9)]);
+    }
+    ring.push(ring[0].slice());
+    return ring;
+}
+
+/** Replace a just-drawn 'oval_draw' box with an 'oval' feature. */
+function _boxToOval(id) {
+    var draw = get('draw');
+    var box = null;
+    try { box = draw.getSnapshotFeature(id); } catch (e) { /* gone */ }
+    if (!box || !box.geometry || box.geometry.type !== 'Polygon') { returnToSelect(); return; }
+    _ovalSwap = true;
+    var added = [];
+    try {
+        draw.removeFeatures([id]);
+        added = draw.addFeatures([{ type: 'Feature', geometry: { type: 'Polygon', coordinates: [ovalRing(box.geometry.coordinates[0])] }, properties: { mode: 'oval' } }]);
+    } finally {
+        _ovalSwap = false;
+    }
+    var ok = added && added[0] && added[0].valid;
+    if (ok) applyLineType(added[0].id);
+    else showToast('Could not create the oval');
+    pushUndoState();
+    returnToSelect();
+}
+
 // ===== Terra Draw Init =====
 
 export function initTerraDraw() {
@@ -107,6 +148,16 @@ export function initTerraDraw() {
             new TerraDrawFreehandMode({
                 styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth }
             }),
+            // Oval: dragged out as a box ('oval_draw'), then swapped for an ellipse
+            // stored under 'oval' (a freehand-type mode accepts any closed outline)
+            new TerraDrawRectangleMode({
+                modeName: 'oval_draw',
+                styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth }
+            }),
+            new TerraDrawFreehandMode({
+                modeName: 'oval',
+                styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth }
+            }),
             new TerraDrawSelectMode({
                 flags: {
                     polygon: { feature: { draggable: true, coordinates: { midpoints: true, draggable: true, deletable: true } } },
@@ -114,7 +165,8 @@ export function initTerraDraw() {
                     point: { feature: { draggable: true } },
                     rectangle: { feature: { draggable: true, coordinates: { draggable: true }, resizable: 'opposite' } },
                     circle: { feature: { draggable: true, coordinates: { draggable: true } } },
-                    freehand: { feature: { draggable: true } }
+                    freehand: { feature: { draggable: true } },
+                    oval: { feature: { draggable: true } }
                 },
                 styles: {
                     selectedPolygonColor: lineColor,
@@ -183,6 +235,11 @@ export function initTerraDraw() {
     });
 
     draw.on('finish', function (id, context) {
+        if (context.action === 'draw' && context.mode === 'oval_draw') {
+            // Deferred so Terra Draw is done with the box before it is replaced
+            setTimeout(function () { _boxToOval(id); }, 0);
+            return;
+        }
         if (context.action === 'draw') {
             pushUndoState();
             applyLineType(id);
@@ -195,7 +252,7 @@ export function initTerraDraw() {
         if (type === 'delete') {
             ids.forEach(forgetMeasure);
             ids.forEach(forgetDataBox);
-            pushUndoState();
+            if (!_ovalSwap) pushUndoState();   // the box-to-oval swap pushes one state itself
         }
 
         // Keep control-measure labels on their shapes
@@ -234,6 +291,8 @@ function updateDrawStyles() {
         draw.updateModeOptions('rectangle', { styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth } });
         draw.updateModeOptions('circle', { styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth } });
         draw.updateModeOptions('freehand', { styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth } });
+        draw.updateModeOptions('oval', { styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth } });
+        draw.updateModeOptions('oval_draw', { styles: { fillColor: _featureFillColor, fillOpacity: _featureFillOpacity, outlineColor: _featureOutlineColor, outlineWidth: _featureOutlineWidth } });
         draw.updateModeOptions('linestring', { styles: {
             lineStringColor: _featureLineColor, lineStringWidth: _featureLineWidth,
             lineStringOpacity: _featureLineOpacity
@@ -267,7 +326,7 @@ export function activateShape(key) {
     } else if (key === 'general_point') {
         enterGeneralPointPlacement();
     } else {
-        const modeMap = { circle: 'circle', rectangle: 'rectangle', polygon: 'polygon', linestring: 'linestring', freehand: 'freehand' };
+        const modeMap = { circle: 'circle', rectangle: 'rectangle', polygon: 'polygon', linestring: 'linestring', freehand: 'freehand', oval: 'oval_draw' };
         if (modeMap[key]) draw.setMode(modeMap[key]);
     }
 }
@@ -915,7 +974,7 @@ function _typeLabel(type) {
         equipment: 'Equipment', unit: 'Friendly Unit', enemy_unit: 'Enemy Unit',
         tactical_task: 'Tactical Task', star: 'Decision Point', triangle: 'Triangle', point_target: 'Point Target', general_point: 'Point',
         text: 'Text', polygon: 'Polygon', linestring: 'Line',
-        rectangle: 'Rectangle', circle: 'Circle', freehand: 'Freehand'
+        rectangle: 'Rectangle', circle: 'Circle', freehand: 'Freehand', oval: 'Oval'
     };
     return labels[type] || type || 'Object';
 }
@@ -1000,9 +1059,9 @@ function _buildPopoverContent(popover, type, info) {
     });
     popover.appendChild(delBtn);
 
-    var isShape = ['polygon', 'rectangle', 'circle', 'freehand', 'linestring'].indexOf(type) !== -1;
+    var isShape = ['polygon', 'rectangle', 'circle', 'freehand', 'oval', 'linestring'].indexOf(type) !== -1;
     // Stars and triangles are markers but have a fill like area shapes
-    var hasFill = ['polygon', 'rectangle', 'circle', 'freehand', 'star', 'triangle'].indexOf(type) !== -1;
+    var hasFill = ['polygon', 'rectangle', 'circle', 'freehand', 'oval', 'star', 'triangle'].indexOf(type) !== -1;
     var isLine = type === 'linestring';
     var isMarker = !isShape;
     var lineOpacity = (info.lineOpacity !== null && info.lineOpacity !== undefined) ? info.lineOpacity : 1;
@@ -1968,7 +2027,7 @@ function applyLineType(featureId) {
 }
 
 /** Shape types that take a line type (stars and flight routes are not Terra Draw shapes). */
-export const LINE_TYPE_SHAPES = ['linestring', 'polygon', 'rectangle', 'circle', 'freehand'];
+export const LINE_TYPE_SHAPES = ['linestring', 'polygon', 'rectangle', 'circle', 'freehand', 'oval'];
 
 /**
  * Change the line type of the selected line or area shape.
