@@ -27,6 +27,7 @@ import { applyStyleToSelected, changeLineType } from './drawing.js';
 export const AREA_MEASURES = [
     { key: 'AO', name: 'AO - area of operations' },
     { key: 'OBJ', name: 'OBJ - objective' },
+    { key: 'EA', name: 'EA - engagement area' },
     { key: 'KZ', name: 'Kill zone' },
     { key: 'PZ', name: 'PZ - pickup zone' },
     { key: 'LZ', name: 'LZ - landing zone' },
