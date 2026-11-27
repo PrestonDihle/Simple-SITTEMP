@@ -8,7 +8,8 @@
  *   H  - designation (e.g. "TF1"), top left inside the frame
  *   K  - up to two combat effectiveness pies, top right inside the frame:
  *        effectiveness (ammunition / weapons / personnel) and selected status
- *        (personnel / ammunition / weapons / POL); a filled part = a problem
+ *        (personnel / ammunition / weapons / POL); each part is rated none,
+ *        green, amber, red or black
  *   A  - rows of frameless subordinate unit symbols (table 7-1), any number per
  *        row, each optionally marked (+), (-) or (±) and with a lower echelon
  *        indicator above it; "(empty cell)" leaves a gap so units can be lined
@@ -100,13 +101,28 @@ function BOW(cx, cy, half, hh, c) {
 }
 
 /** A pie of radius r at (cx, cy) with the listed parts filled. */
+// Rating for each pie part. Older maps stored true for a problem: shown as black.
+export const RATINGS = [
+    { key: '', name: 'None', color: '#ffffff' },
+    { key: 'green', name: 'Green', color: '#2e9e44' },
+    { key: 'amber', name: 'Amber', color: '#ffbf00' },
+    { key: 'red', name: 'Red', color: '#e02020' },
+    { key: 'black', name: 'Black', color: '#000000' },
+];
+function ratingColor(v) {
+    if (v === true) return '#000000';
+    const r = RATINGS.find(function (x) { return x.key === v; });
+    return r && r.key ? r.color : null;
+}
+
 function pie(cx, cy, r, parts, filled, c, sw) {
     const pt = (a) => [f(cx + r * Math.cos(a * Math.PI / 180)), f(cy + r * Math.sin(a * Math.PI / 180))];
-    let s = '';
+    let s = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#ffffff"/>`;
     parts.forEach(function (p) {
-        if (!filled || !filled[p.key]) return;
+        const col = ratingColor(filled && filled[p.key]);
+        if (!col) return;
         const a = pt(p.a0), b = pt(p.a1);
-        s += `<path d="M${cx},${cy} L${a[0]},${a[1]} A${r},${r} 0 0,1 ${b[0]},${b[1]} Z" fill="${c}"/>`;
+        s += `<path d="M${cx},${cy} L${a[0]},${a[1]} A${r},${r} 0 0,1 ${b[0]},${b[1]} Z" fill="${col}"/>`;
     });
     s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-width="${sw}"/>`;
     parts.forEach(function (p) { const a = pt(p.a0); s += L(cx, cy, a[0], a[1], c, sw * 0.8); });
@@ -217,6 +233,26 @@ function check(parent, label, value, onSet) {
     return cb;
 }
 
+/** One pie part: its name and a swatch per rating (none, green, amber, red, black). */
+function ratingRow(section, label, store, key, redraw) {
+    const r = row(section, label);
+    const wrap = el('div', 'popover-swatches');
+    const cur = store[key] === true ? 'black' : (store[key] || '');
+    RATINGS.forEach(function (rt) {
+        const sw = el('div', 'popover-swatch taskorg-rating' + (rt.key === cur ? ' active' : '') + (rt.key ? '' : ' no-fill'));
+        if (rt.key) sw.style.backgroundColor = rt.color;
+        sw.title = rt.name;
+        sw.addEventListener('click', function () {
+            store[key] = rt.key;
+            wrap.querySelectorAll('.popover-swatch').forEach(function (s) { s.classList.remove('active'); });
+            sw.classList.add('active');
+            redraw();
+        });
+        wrap.appendChild(sw);
+    });
+    r.appendChild(wrap);
+}
+
 /**
  * Append the task organization editor to the popover. redraw() rebuilds the
  * marker icon and schedules an undo push; refresh() rebuilds the popover (used
@@ -239,18 +275,14 @@ export function buildTaskOrgSection(popover, info, redraw, refresh) {
     const effRow = row(sec, 'Effectiveness (K)');
     check(effRow, 'show', info.showEff, function (v) { info.showEff = v; redraw(); refresh(); });
     if (info.showEff) {
-        const r = row(sec, 'Problems');
-        EFFECTIVENESS_PARTS.forEach(function (p) {
-            check(r, p.name, (info.eff || {})[p.key], function (v) { info.eff = info.eff || {}; info.eff[p.key] = v; redraw(); });
-        });
+        info.eff = info.eff || {};
+        EFFECTIVENESS_PARTS.forEach(function (p) { ratingRow(sec, p.name, info.eff, p.key, redraw); });
     }
     const stRow = row(sec, 'Status pie (K)');
     check(stRow, 'show', info.showStatus, function (v) { info.showStatus = v; redraw(); refresh(); });
     if (info.showStatus) {
-        const r = row(sec, 'Problems');
-        STATUS_PARTS.forEach(function (p) {
-            check(r, p.name, (info.status || {})[p.key], function (v) { info.status = info.status || {}; info.status[p.key] = v; redraw(); });
-        });
+        info.status = info.status || {};
+        STATUS_PARTS.forEach(function (p) { ratingRow(sec, p.name, info.status, p.key, redraw); });
     }
 
     // A: units
